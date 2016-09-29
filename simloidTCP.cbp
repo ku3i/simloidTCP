@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="simloidTCP" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release">
+				<Option output="bin/Release/simloid" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="src" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wextra" />
+			<Add option="-Wall" />
+			<Add option="-std=c++11" />
+		</Compiler>
+		<Linker>
+			<Add option="-lpthread" />
+			<Add library="GL" />
+			<Add library="X11" />
+			<Add library="GLU" />
+			<Add library="glut" />
+			<Add library="/usr/local/lib/libode.a" />
+		</Linker>
+		<Unit filename="src/basic/color.h" />
+		<Unit filename="src/basic/common.cpp" />
+		<Unit filename="src/basic/common.h" />
+		<Unit filename="src/basic/configuration.cpp" />
+		<Unit filename="src/basic/configuration.h" />
+		<Unit filename="src/basic/constants.h" />
+		<Unit filename="src/basic/draw.cpp" />
+		<Unit filename="src/basic/draw.h" />
+		<Unit filename="src/basic/signals.h" />
+		<Unit filename="src/basic/snapshot.cpp" />
+		<Unit filename="src/basic/snapshot.h" />
+		<Unit filename="src/basic/unitime.cpp" />
+		<Unit filename="src/basic/unitime.h" />
+		<Unit filename="src/basic/vector3.h" />
+		<Unit filename="src/basic/version.h" />
+		<Unit filename="src/build/bioloid.cpp" />
+		<Unit filename="src/build/bioloid.h" />
+		<Unit filename="src/build/bodies.h" />
+		<Unit filename="src/build/heightfield.cpp" />
+		<Unit filename="src/build/heightfield.h" />
+		<Unit filename="src/build/joints.cpp" />
+		<Unit filename="src/build/joints.h" />
+		<Unit filename="src/build/obstacles.h" />
+		<Unit filename="src/build/physics.cpp" />
+		<Unit filename="src/build/physics.h" />
+		<Unit filename="src/build/robot.cpp" />
+		<Unit filename="src/build/robot.h" />
+		<Unit filename="src/communication/socketserver.cpp" />
+		<Unit filename="src/communication/socketserver.h" />
+		<Unit filename="src/controller/controller.h" />
+		<Unit filename="src/controller/pid_controller.cpp" />
+		<Unit filename="src/controller/pid_controller.h" />
+		<Unit filename="src/controller/tcp_controller.cpp" />
+		<Unit filename="src/controller/tcp_controller.h" />
+		<Unit filename="src/draw/drawstuff.cpp" />
+		<Unit filename="src/draw/drawstuff.h" />
+		<Unit filename="src/draw/internal.h" />
+		<Unit filename="src/draw/version.h" />
+		<Unit filename="src/draw/x11.cpp" />
+		<Unit filename="src/filehandler/file_handler.cpp" />
+		<Unit filename="src/filehandler/file_handler.h" />
+		<Unit filename="src/main.cpp" />
+		<Unit filename="src/misc/camera.cpp" />
+		<Unit filename="src/misc/camera.h" />
+		<Unit filename="src/robots/biped.h" />
+		<Unit filename="src/robots/crawler.h" />
+		<Unit filename="src/robots/fourlegged.h" />
+		<Unit filename="src/robots/karl_sims.h" />
+		<Unit filename="src/robots/nolegs.h" />
+		<Unit filename="src/robots/standard.h" />
+		<Unit filename="src/scenes/scenes.cpp" />
+		<Unit filename="src/scenes/scenes.h" />
+		<Unit filename="src/sensors/accelsensor.cpp" />
+		<Unit filename="src/sensors/accelsensor.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
+			<envvars />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
