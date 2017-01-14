@@ -69,7 +69,7 @@ public:
         y = common::low_resolution_sensor(y);
         z = common::low_resolution_sensor(z);
     }
-    double length() { return sqrt(x*x + y*y + z*z); }
+    double length() const { return sqrt(x*x + y*y + z*z); }
 
     void normalize(void) {
         double l = 1.0 / length();
