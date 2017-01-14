@@ -38,7 +38,8 @@ void Bioloid::create_robot(Robot& robot)
 
         case 40: Robots::Biped     ::create_ostrich         (robot); break;
 
-        case 50: Robots::Biped     ::create_humanoid        (robot); break;
+        case 50: Robots::Biped     ::create_humanoid0       (robot); break;
+        case 51: Robots::Biped     ::create_humanoid1       (robot); break;
 
         case 60: Robots::Nolegs    ::create_worm            (robot); break;
 
