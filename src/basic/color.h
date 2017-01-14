@@ -44,6 +44,9 @@ namespace colors
     const Color4 cyan     ( .0, 1.0, 1.0, 1.0);
     const Color4 magenta  (1.0,  .0, 1.0, 1.0);
     const Color4 invisible( .0,  .0,  .0,  .0);
+
+    const Color4 orange_t (1.0,  .5,  .0, 0.7);
+    const Color4   cyan_t ( .0, 1.0, 1.0, 0.7);
 }
 
 #endif // COLOR_H_INCLUDED
