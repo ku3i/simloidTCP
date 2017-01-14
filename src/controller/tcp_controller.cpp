@@ -168,6 +168,12 @@ void TCPController::send_robot_configuration()
         message.append(tmp);
     }
 
+    /* transmit body names */
+    for (std::size_t i = 0; i < robot.number_of_bodies(); ++i) {
+        snprintf(tmp, buffer_size, "%lu %s\n", i, robot.bodies[i].name.c_str());
+        message.append(tmp);
+    }
+
     /* send message to socket */
     if (!socketServer->send_message(message))
         dsError("Could not send robot configuration message to client.\n");
