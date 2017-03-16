@@ -2,4 +2,4 @@ obj/*
 bin/*
 *.layout
 *.depend
-*/simloid.conf
+simloid.conf
