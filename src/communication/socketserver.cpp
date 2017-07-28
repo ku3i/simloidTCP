@@ -22,9 +22,9 @@ SocketServer::establish_connection(void) { return open_connection(); }
 bool
 SocketServer::open_connection(void)
 {
-    // Socket anlegen
-    // Domain: AF_INIT (Internetadresse fuer Heterogene Systeme)
-    // Type: SOCK_STREAM (fuer TCP/IP)
+    // create socket
+    // Domain: AF_INIT (Address for heterogeneous systems)
+    // Type: SOCK_STREAM (for TCP/IP)
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
     if (-1 == sockfd)
@@ -33,23 +33,23 @@ SocketServer::open_connection(void)
         return false;
     }
 
-    // serv_addr - Struktur mit 0 initialisieren
-    bzero((char *) &serv_addr, sizeof(serv_addr));
+    // serv_addr - initialize struct with zeros
+    memset((char *) &serv_addr, 0, sizeof(serv_addr));
 
-    // Socketaddresse-Struct initialisieren
+    // initialize socket address struct
     serv_addr.sin_family = AF_INET;
 
-    // Portnummer des Servers (htons fuer Konvertierung in Networkbyteorder)
+    // port number of the servers (htons for converting to network byte order)
     serv_addr.sin_port = htons(portno);
 
-    // IP-Adresse des Servers: IP des eigenen hosts (INADDR_ANY)
+    // IP address of the servers: IP of own host (INADDR_ANY)
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    // TCP_NODELAY flag setzen
+    // set TCP_NODELAY flag
     int flag = 1;
     setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
 
-    // Socket an Socketaddresse binden
+    // bind socket to address
     if (-1 == bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)))
     {
         printf("ERROR on binding.\nPlease wait until release or try another port.\n");
@@ -57,7 +57,7 @@ SocketServer::open_connection(void)
         return false;
     }
 
-    // Listen (maximal fuenf Prozesse kann in der Warteschleife auf Verbindung warten)
+    // listen (to max. 5 processes in the queue)
     if (-1 == listen(sockfd, 5))
     {
         printf("ERROR listening.\n");
@@ -65,7 +65,7 @@ SocketServer::open_connection(void)
         return false;
     }
 
-    // Warten auf eine Client-Connection
+    // wait for client connection
     connectfd = accept(sockfd, NULL, NULL);
 
     if (0 > connectfd)
@@ -75,7 +75,7 @@ SocketServer::open_connection(void)
         return false;
     }
 
-    // Connection established
+    // connection established
     return true;
 }
 
@@ -112,9 +112,9 @@ std::string SocketServer::getNextMessage() const
 {
     #define MSGLEN 8192
     char buffer[MSGLEN];
-    bzero(buffer, MSGLEN); // Buffer leeren
+    memset(buffer, 0, MSGLEN); // clear buffer
 
-    // vom Socket lesen (blockiert, bis was ankommt)
+    // read from socket (blocking)
     int n = read(connectfd, buffer, MSGLEN); // TODO: make non-blocking read
     if (n < 0)
     {
@@ -145,7 +145,3 @@ std::string SocketServer::getNextLine(void)
 
     return ret;
 }
-
-
-/* fin */
-

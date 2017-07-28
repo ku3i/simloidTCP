@@ -14,8 +14,8 @@ public:
     std::string getNextLine(); // get message stream until \n
 
 private:
-    int sockfd, connectfd;  // socket file descriptors
-    int portno;             // port number
+    int sockfd, connectfd;    // socket file descriptors
+    int portno;               // port number
     struct sockaddr_in serv_addr;
     std::string receivedStream;
 
