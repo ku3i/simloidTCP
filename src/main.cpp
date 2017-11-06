@@ -182,7 +182,7 @@ print_time_statistics(void)
 
 static void draw_robot_and_scene()
 {
-    /* draw heightfield */
+    /* draw height field */
     for (unsigned int i = 0; i < landscape.number_of_heightfields(); ++i)
         landscape.heightfields[i].draw();
 
@@ -265,12 +265,11 @@ static void simLoop(int pause, int singlestep) /**TODO this function is far too 
     act_time = UniTime::getTimeStamp();
     lastDrawFrameTime = act_time;
 
-    //Vel und fps neu berechnen
+    /* refresh velocity and fps */
     if ((act_time - intervalBeginRealTime).sec) {
         const double intervalTime = (act_time - intervalBeginRealTime).fseconds();
 
         vel = intervalSimTime / intervalTime;
-        //bvel
         if (intervalSimTime > 0.0001) {
             bvel = common::dist2D((const double *) dBodyGetPosition(robot.get_camera_center_obj()), camera.lastPos) / intervalSimTime;
         }

@@ -1011,9 +1011,9 @@ static void drawPyramidAlley()
     for (int j=-20; j<=1; j++) {
       glPushMatrix();
       glTranslatef ((float)0.25 * i,(float) 0.25 * j,(float)0);
-      if (i==1 && j==1) setColor (1,0,0,1);
-      else if (i==-1 && j==1) setColor (0,0,1,1);
-      else setColor (1,0.7,0,0.2);
+      if (i==1 && j==1) setColor (1,0,0,1); // red
+      else if (i==-1 && j==1) setColor (0,0,1,1); // blue
+      else setColor (1,0.7,0,1); //yellow
       const float k = 0.008f;
       glBegin (GL_TRIANGLE_FAN);
       glNormal3f (0,-1,1);
@@ -1515,19 +1515,19 @@ void dsDrawLineD (const double _pos1[3], const double _pos2[3])
 
 void dsSetSphereQuality (int n)
 {
-  sphere_quality = n;
+    sphere_quality = n;
 }
 
 
 void dsSetCappedCylinderQuality (int n)
 {
-  capped_cylinder_quality = n;
+    capped_cylinder_quality = n;
 }
 
 void drawText(const char* text, const float* pos)
 {
-	const int mWidth = 700;
-	const int mHeight = 500;
+    const int mWidth = 700;
+    const int mHeight = 500;
 
     glDisable (GL_TEXTURE_2D);
     glDisable (GL_DEPTH_TEST);
@@ -1540,11 +1540,11 @@ void drawText(const char* text, const float* pos)
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity();
 
-	glColor4f(0.0, 0.0, 0.0, 1.0);
+    glColor4f(0.0, 0.0, 0.0, 1.0);
 
     glRasterPos2f(pos[0],pos[1]);
     for (const char* s = text; *s; ++s)
-        {
-            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, *s);
-        }
+    {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, *s);
+    }
 }
