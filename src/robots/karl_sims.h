@@ -36,7 +36,7 @@ create_tadpole_0(Robot& robot)
     xpos = .0;
     ypos = radius_body + 0.5*length_body;
     zpos = radius_body + zheight_start;
-    robot.create_segment("body", xpos, ypos, zpos, 2, length_body, radius_body,           0, constants::materials::normal, colors::white, true,  constants::friction::lo);
+    robot.create_segment("body",  xpos, ypos, zpos, 2, length_body, radius_body,          0, constants::materials::normal, colors::white, true,  constants::friction::lo);
 
     zpos = 0.5*radius_body + zheight_start;
     ypos = radius_body + 0.20*length_body;

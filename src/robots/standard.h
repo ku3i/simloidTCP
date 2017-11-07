@@ -187,6 +187,6 @@ create_rotor_axial(Robot& robot)
 }
 
 
-}
-}
+}} // namespace Robots::Standard
+
 #endif // STANDARD_H_INCLUDED
