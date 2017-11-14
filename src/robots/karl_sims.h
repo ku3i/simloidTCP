@@ -55,8 +55,8 @@ create_tadpole_0(Robot& robot)
     robot.connect_joint("body", "lshd", .0, .0, .0,               'y', -90, +90, -10, JointType::normal   , "lshoulderroll" , ""              , strength);
     robot.connect_joint("body", "rshd", .0, .0, .0,               'Y', -90, +90, -10, JointType::symmetric, "rshoulderroll" , "lshoulderroll" , strength);
 
-    robot.connect_joint("lshd", "larm", -0.5*length_arms, .0, .0, 'Z', -90, +90,   0, JointType::normal   , "lshoulderpitch", ""              , strength);
-    robot.connect_joint("rshd", "rarm", +0.5*length_arms, .0, .0, 'z', -90, +90,   0, JointType::symmetric, "rshoulderpitch", "lshoulderpitch", strength);
+    robot.connect_joint("lshd", "larm", -0.5*length_arms, .0, .0, 'Z', -90, +90,   0, JointType::normal   , "lshoulderyaw"  , ""              , strength);
+    robot.connect_joint("rshd", "rarm", +0.5*length_arms, .0, .0, 'z', -90, +90,   0, JointType::symmetric, "rshoulderyaw"  , "lshoulderyaw"  , strength);
 
     /* attach sensors */
     robot.attach_accel_sensor("body");
@@ -96,8 +96,8 @@ create_tadpole_1(Robot& robot)
     robot.connect_joint("body", "lshd", .0, .0, .0,               'y', -90, +90, -20, JointType::normal   , "lshoulderroll" , ""              , strength);
     robot.connect_joint("body", "rshd", .0, .0, .0,               'Y', -90, +90, -20, JointType::symmetric, "rshoulderroll" , "lshoulderroll" , strength);
 
-    robot.connect_joint("lshd", "larm", -0.5*length_arms, .0, .0, 'Z', -90, +90,   0, JointType::normal   , "lshoulderpitch", ""              , strength);
-    robot.connect_joint("rshd", "rarm", +0.5*length_arms, .0, .0, 'z', -90, +90,   0, JointType::symmetric, "rshoulderpitch", "lshoulderpitch", strength);
+    robot.connect_joint("lshd", "larm", -0.5*length_arms, .0, .0, 'Z', -90, +90,   0, JointType::normal   , "lshoulderyaw"  , ""              , strength);
+    robot.connect_joint("rshd", "rarm", +0.5*length_arms, .0, .0, 'z', -90, +90,   0, JointType::symmetric, "rshoulderyaw"  , "lshoulderyaw"  , strength);
 
     /* attach sensors */
     robot.attach_accel_sensor("body");

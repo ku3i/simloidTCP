@@ -12,13 +12,16 @@ void create_worm(Robot& robot)
 {
     dsPrint("WORM\n");
 
-    const Vector3 len_head(.15,.15,.025);
-    const Vector3 len_back(.15,.15,.025);
-    const Vector3 len_tail(.15,.15,.025);
+    const double L = .1;
+    const double B = .025;
 
-    const unsigned int max_segments = 5;
-    const unsigned int torque = 5;
-    const int max_angle = 60;
+    const Vector3 len_head(L, L, B);
+    const Vector3 len_back(L, L, B);
+    const Vector3 len_tail(L, L, B);
+
+    const unsigned int max_segments = 3;
+    const unsigned int torque = 3;
+    const int max_angle = 90;
 
     const double zheight_start = 0.5*std::max(std::max(len_head.z, len_tail.z), len_back.z) + 0.001;
     Vector3 pos(.0, .0, zheight_start);
