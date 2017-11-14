@@ -72,7 +72,9 @@ public:
     double length() const { return sqrt(x*x + y*y + z*z); }
 
     void normalize(void) {
-        double l = 1.0 / length();
+        const double len = length();
+        if (len == 0) return;
+        const double l = 1.0 / len;
         x *= l;
         y *= l;
         z *= l;
