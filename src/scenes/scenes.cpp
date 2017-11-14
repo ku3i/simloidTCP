@@ -26,9 +26,10 @@ Scenes::create_hurdles(Obstacle& obstacles)
 void
 Scenes::create_hills(Landscape& landscape)
 {
-    dsPrint("Heightfield.\n");
-    Color4 color(0.5, 1.0, 0.5, 0.5);
-    Vector3 pos(0.0, -7.0, 0.0);
+    dsPrint("Height field.\n");
+    Color4 color(0.6, 1.0, 0.3, 0.3);
+    Vector3 pos(0.0, -5.0, 0.0);
+    //TODO size
     landscape.create_heightfield("Cosine Hills", pos, color);
 }
 

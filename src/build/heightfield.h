@@ -12,22 +12,6 @@
 #include <basic/constants.h>
 #include <basic/color.h>
 
-
-/** TODO re-factor */
-
-/* height field dimensions */
-#define HFIELD_WSTEP    31 // Vertex count along edge >= 2
-#define HFIELD_DSTEP    121
-
-#define HFIELD_WIDTH    REAL(4.0)
-#define HFIELD_DEPTH    REAL(12.0)
-
-#define HFIELD_WSAMP    (HFIELD_WIDTH / (HFIELD_WSTEP - 1))
-#define HFIELD_DSAMP    (HFIELD_DEPTH / (HFIELD_DSTEP - 1))
-
-#define HFTYPE_TANH 0
-#define HFTYPE_WELL 1
-
 class Heightfield
 {
 private:

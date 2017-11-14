@@ -2,6 +2,20 @@
 #include <build/heightfield.h>
 #include <basic/common.h>
 
+/* height field dimensions */
+const dReal HFIELD_WIDTH = 2.0;
+const dReal HFIELD_DEPTH = 10.0;
+
+const unsigned steps_per_meter = 5;
+const unsigned HFIELD_WSTEP = HFIELD_WIDTH * steps_per_meter;
+const unsigned HFIELD_DSTEP = HFIELD_DEPTH * steps_per_meter;
+
+const dReal HFIELD_WSAMP = HFIELD_WIDTH / (HFIELD_WSTEP - 1);
+const dReal HFIELD_DSAMP = HFIELD_DEPTH / (HFIELD_DSTEP - 1);
+
+
+const float minh = 0.0001;
+
 dReal heightfield_callback(void* pUserData, int x, int z);
 
 Heightfield::Heightfield(const dSpaceID &space, const std::string name, const Vector3 pos, const Color4 color)
@@ -12,15 +26,15 @@ Heightfield::Heightfield(const dSpaceID &space, const std::string name, const Ve
 
     heightid = dGeomHeightfieldDataCreate();
 
-    /* create heightfield */
+    /* create height field */
     dGeomHeightfieldDataBuildCallback(heightid, NULL, heightfield_callback,
         HFIELD_WIDTH, HFIELD_DEPTH, HFIELD_WSTEP, HFIELD_DSTEP,
         REAL(1.0), REAL(0.0), REAL(0.0), 0);
 
     // Give some very bounds which, while conservative,
     // makes AABB computation more accurate than +/-INF.
-    dGeomHeightfieldDataSetBounds(heightid, REAL(-4.0), REAL(+6.0));
     geometry = dCreateHeightfield(space, heightid, 1);
+    dGeomHeightfieldDataSetBounds(heightid, REAL(0.0), REAL(+5.0));
 
     // Rotate so Z is up, not Y (which is the default orientation)
     dMatrix3 R;
@@ -32,12 +46,11 @@ Heightfield::Heightfield(const dSpaceID &space, const std::string name, const Ve
     dGeomSetPosition(geometry, pos.x, pos.y, pos.z);
 
     dsPrint("done.\n");
-
 }
 
 Heightfield::~Heightfield()
 {
-    dsPrint("Destroying heightfield %s...", name.c_str());
+    dsPrint("Destroying height field %s...", name.c_str());
     dGeomHeightfieldDataDestroy(heightid);
     dsPrint("done.\n");
 }
@@ -45,23 +58,20 @@ Heightfield::~Heightfield()
 dReal
 heightfield_callback(void* /*pUserData*/, int x, int y)
 {
-    dReal fx = (((dReal) x * 2.0) - (HFIELD_WSTEP - 1)) / (dReal)(HFIELD_WSTEP - 1);
-    dReal fy = (((dReal) y * 2.0) - (HFIELD_DSTEP - 1)) / (dReal)(HFIELD_DSTEP - 1);
 
+    const dReal fx = (((dReal) x * 2.0) - (HFIELD_WSTEP - 1)) / (dReal)(HFIELD_WSTEP - 1);
+    const dReal fy = (((dReal) y * 2.0) - (HFIELD_DSTEP - 1)) / (dReal)(HFIELD_DSTEP - 1);
 
-    dReal h;
-    //h = REAL(1.0) + tanh(5*fz);
-    dReal Y = 0.5 * tanh(4.0 * cos(-constants::m_pi * fx)) + 0.5;
+    const dReal X = 0.5 * tanh(4.0 * cos(2./3*constants::m_pi * fx)) + 0.5;
+    const dReal Y = (fy + 1) * pow(cos(4.5 * constants::m_pi * (1.0 / (fy + 2))), 2);
 
-    if (fy != 2.0) //TODO ment to be -2 ?
-        h = Y*(fy + 1) * pow(cos(4.5 * constants::m_pi * (1.0 / (fy + 2))), 2);
-    else
-        h = 0.0;
+    dReal h = minh;
 
-    h += 0.0001;
+    if (fy != -2.0)
+        h += X * Y * 0.5;
+
     return h;
 }
-
 
 void
 Heightfield::draw(void)
@@ -70,8 +80,8 @@ Heightfield::draw(void)
     const dReal* RReal = dGeomGetRotation(geometry);
 
     // Set ox and oz to zero for DHEIGHTFIELD_CORNER_ORIGIN mode.
-    int ox = (int) (-HFIELD_WIDTH/2);
-    int oz = (int) (-HFIELD_DEPTH/2);
+    const dReal ox = (-HFIELD_WIDTH/2);
+    const dReal oz = (-HFIELD_DEPTH/2);
 
     dsSetColorAlpha(color.r, color.g, color.b, color.a);
 
