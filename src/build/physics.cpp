@@ -1,5 +1,7 @@
 #include <build/physics.h>
 
+/**TODO: where can we set friction of the groundplane or heightfield?
+
 /* this is called by dSpaceCollide when two objects in space are potentially colliding */
 void near_callback(void *data, dGeomID o1, dGeomID o2)
 {
