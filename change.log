@@ -1,0 +1,12 @@
+2018-01-05: release 1.0.0
+
+	+ renamed joints of tadpole, changed snakebot.
+	+ refactored creation of heightfield.
+	+ normalize vector only if length != 0
+	+ draw pyramids solid (non-alpha), whitespace.
+	+ Added compiler warnings.
+	+ replaced bzero by memset, translated comments, cleanup.
+	+ Create humanoid with additional hip roll joint.
+	+ Simloid transmits body names and ids
+	+ getting length of vector is const function.
+
