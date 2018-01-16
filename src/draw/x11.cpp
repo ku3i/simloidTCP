@@ -308,113 +308,128 @@ static int getHighBitIndex (unsigned int x)
 #define SHIFTL(x,i) (((i) >= 0) ? ((x) << (i)) : ((x) >> (-i)))
 
 
-static void captureFrame (int num)
+static void captureFrame(int num)
 {
-  fprintf (stderr,"capturing frame %04d\n",num);
+    fprintf(stderr, "capturing frame %04d\n", num);
 
-  char s[100];
-  sprintf (s,"frame%04d.ppm",num);
-  FILE *f = fopen (s,"wb");
-  if (!f) dsError ("can't open \"%s\" for writing",s);
-  fprintf (f,"P6\n%d %d\n255\n",width,height);
-  XImage *image = XGetImage (display,win,0,0,width,height,~0,ZPixmap);
+    char s[32];
+    snprintf(s, 32, "frame%04d.ppm", num);
+    FILE *f = fopen(s, "wb");
 
-  int rshift = 7 - getHighBitIndex (image->red_mask);
-  int gshift = 7 - getHighBitIndex (image->green_mask);
-  int bshift = 7 - getHighBitIndex (image->blue_mask);
+    if (!f) dsError("can't open \"%s\" for writing", s);
+    fprintf(f, "P6\n%d %d\n255\n", width, height);
 
-  for (int y=0; y<height; y++) {
-    for (int x=0; x<width; x++) {
-      unsigned long pixel = XGetPixel (image,x,y);
-      unsigned char b[3];
-      b[0] = SHIFTL(pixel & image->red_mask,rshift);
-      b[1] = SHIFTL(pixel & image->green_mask,gshift);
-      b[2] = SHIFTL(pixel & image->blue_mask,bshift);
-      fwrite (b,3,1,f);
+    XImage *image = XGetImage(display, win, 0, 0, width, height, ~0, ZPixmap);
+
+    int rshift = 7 - getHighBitIndex(image->  red_mask);
+    int gshift = 7 - getHighBitIndex(image->green_mask);
+    int bshift = 7 - getHighBitIndex(image-> blue_mask);
+
+    for (int y=0; y<height; y++) {
+        for (int x=0; x<width; x++) {
+            unsigned long pixel = XGetPixel (image,x,y);
+            unsigned char b[3];
+            b[0] = SHIFTL(pixel & image->  red_mask, rshift);
+            b[1] = SHIFTL(pixel & image->green_mask, gshift);
+            b[2] = SHIFTL(pixel & image-> blue_mask, bshift);
+            fwrite(b, 3, 1, f);
+        }
     }
-  }
-  fclose (f);
-  XDestroyImage (image);
+    fclose(f);
+    XDestroyImage(image);
 }
 
 
-void dsPlatformSimLoop (int window_width, int window_height, dsFunctions *fn,
-			int initial_pause)
+void dsPlatformSimLoop (int window_width, int window_height, dsFunctions *fn, int initial_pause, int record_frames)
 {
-  pause = initial_pause;
-  if(!fn->disableGraphics)
-  {
-	createMainWindow (window_width, window_height);
-  	glXMakeCurrent (display,win,glx_context);
+    pause = initial_pause;
+    writeframes = record_frames;
 
-  	dsStartGraphics (window_width,window_height,fn);
+    if(!fn->disableGraphics)
+    {
+        createMainWindow(window_width, window_height);
+        glXMakeCurrent(display, win, glx_context);
+        dsStartGraphics(window_width, window_height, fn);
 
-  	if (!fn->disableGraphics) fprintf (stderr,
-	   "Simulation controls: (dsDrawstuff v%d.%02d):\n"
-	   "   Ctrl-P - pause / unpause simulation (or say `--pause' on command line)\n"
-	   "   Ctrl-O - single step when paused\n"
-	   "   Ctrl-X - exit\n"
-	   "\n"
-	   "Graphic controls:\n"
-	   "   Ctrl-T - toggle textures (or say `--notex' on command line)\n"
-	   "   Ctrl-S - toggle shadows (or say `--noshadow' on command line)\n"
-	   "   Ctrl-V - print current viewpoint coordinates (x,y,z,h,p,r)\n"
-	   "   Ctrl-W - write frames to ppm files: frame/frameNNN.ppm\n"
-	   "   Ctrl-J - write frames in Slow Motion 100Hz\n"
-	   "\n"
-	   "Camera controls:\n"
-	   "   A/D           - left / right\n"
-	   "   W/S           - forward / backward\n"
-	   "   Left button   - pan and tilt\n"
-	   "   Right button  - forward and sideways\n"
-	   "   Middle button - sideways and up (also: left+right button)\n"
-	   "   Mouse wheel   - up and down\n"
-	   "   T             - toggle automatic rotating camera on/off\n"
-	   "\n",DS_VERSION >> 8,DS_VERSION & 0xff);
-  } else {
-	  fprintf (stderr, "Graphics disabled.\n\n");
-  }
+    if (!fn->disableGraphics)
+        fprintf( stderr
+               , "Simulation controls: (dsDrawstuff v%d.%02d):\n"
+                 "   Ctrl-P - pause / unpause simulation (or say `--pause' on command line)\n"
+                 "   Ctrl-O - single step when paused\n"
+                 "   Ctrl-X - exit\n"
+                 "\n"
+                 "Graphic controls:\n"
+                 "   Ctrl-T - toggle textures (or say `--notex' on command line)\n"
+                 "   Ctrl-S - toggle shadows (or say `--noshadow' on command line)\n"
+                 "   Ctrl-V - print current viewpoint coordinates (x,y,z,h,p,r)\n"
+                 "   Ctrl-W - write frames to ppm files: frame/frameNNN.ppm\n"
+                 "   Ctrl-J - write frames in Slow Motion 100Hz\n"
+                 "\n"
+                 "Camera controls:\n"
+                 "   A/D           - left / right\n"
+                 "   W/S           - forward / backward\n"
+                 "   Left button   - pan and tilt\n"
+                 "   Right button  - forward and sideways\n"
+                 "   Middle button - sideways and up (also: left+right button)\n"
+                 "   Mouse wheel   - up and down\n"
+                 "   T             - toggle automatically rotating camera on/off\n"
+                 "\n"
+               , DS_VERSION >> 8
+               , DS_VERSION & 0xff
+               );
+    } else
+      fprintf(stderr, "Graphics disabled.\n\n");
 
-  if (fn->start) fn->start();
+    if (fn->start) fn->start();
 
-  int frame = 1;
-  run = 1;
-  while (run && *(fn->continueLoop) ) {
-    // read in and process all pending events for the main window
-	if (!fn->disableGraphics) {
-    	XEvent event;
-    	while (run && XPending (display)) {
-      		XNextEvent (display,&event);
-      		handleEvent (event,fn);
-    	}
-	}
+    int frame = 1;
+    run = 1;
+    while (run && *(fn->continueLoop))
+    {
+        /* read in and process all pending events for the main window */
+        if (!fn->disableGraphics)
+        {
+            XEvent event;
+            while (run && XPending(display))
+            {
+                XNextEvent(display, &event);
+                handleEvent(event, fn);
+            }
+        }
 
-    dsDrawFrame (width,height,fn,pause && !singlestep, singlestep);
-    singlestep = 0;
+        dsDrawFrame(width, height, fn, pause && !singlestep, singlestep);
+        singlestep = 0;
 
-	if(*(fn->drawScene)) {
-    	glFlush();
-    	glXSwapBuffers (display,win);
-    	XSync (display,0);
+        if(*(fn->drawScene))
+        {
+            glFlush();
+            glXSwapBuffers (display,win);
+            XSync (display,0);
 
-    	// capture frames if necessary
-    	if (pause==0 && writeframes) {
-			if (!slowMotion)
-			{
-				if (frame%4 == 0) captureFrame (frame); //25fps at dt = 0.01 s
-			} else captureFrame (frame);
-      		frame++;
-    	}
-	}
-  };
+            // capture frames if necessary
+            if (pause==0 && (writeframes || *(fn->recordFrames)))
+            {
+                if (!slowMotion)
+                {
+                    if (frame%4 == 0)
+                        captureFrame(frame); //25fps at dt = 0.01 s
+                }
+                else
+                    captureFrame(frame);
 
-  if (fn->stop) fn->stop();
-  if(!fn->disableGraphics)
-  {
-  	dsStopGraphics();
+                frame++;
+            }
+        }
+    }
 
-  	destroyMainWindow();
-  }
+    if (fn->stop)
+        fn->stop();
+
+    if(!fn->disableGraphics)
+    {
+        dsStopGraphics();
+        destroyMainWindow();
+    }
 }
 
 

@@ -484,6 +484,7 @@ main(int argc, char **argv)
     fn.stop = &stop;
     fn.path_to_textures = "./textures";
     fn.drawScene = &global_conf.draw_scene;
+    fn.recordFrames = &global_conf.record_frames;
     fn.disableGraphics = global_conf.disable_graphics;
     fn.continueLoop = &continueLoop;
 
@@ -499,7 +500,7 @@ main(int argc, char **argv)
 
     /* create TCP Controller */
     dsPrint("Starting Controller: TCPController\n");
-    controller = new TCPController(universe, robot, obstacles, reset_time);
+    controller = new TCPController(global_conf, universe, robot, obstacles, reset_time);
     if (((TCPController*)controller)->establishConnection(global_conf.tcp_port))
     {
         /* run simulation */

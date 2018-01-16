@@ -46,6 +46,7 @@ public:
     bool   use_fps_control;     // FPS-Controller benutzen oder nicht
     int    window_width;
     int    window_height;
+    bool   record_frames;       // save each frame to an image file
 
     /* Controller */
     double init_max_torque;	    // default maxtorque used at pid controller

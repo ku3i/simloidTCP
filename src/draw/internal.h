@@ -33,8 +33,7 @@
 
 // supplied by platform specific code
 
-void dsPlatformSimLoop (int window_width, int window_height,
-			dsFunctions *fn, int initial_pause);
+void dsPlatformSimLoop (int window_width, int window_height, dsFunctions *fn, int initial_pause, int record_frames);
 
 
 // used by platform specific code

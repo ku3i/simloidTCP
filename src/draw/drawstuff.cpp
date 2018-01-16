@@ -1221,34 +1221,35 @@ static void setShadowDrawingMode()
 }
 
 
-extern "C" void dsSimulationLoop (int argc, char **argv,
-				  int window_width, int window_height,
-				  dsFunctions *fn)
+extern "C" void dsSimulationLoop ( int argc, char **argv
+                                 , int window_width, int window_height
+                                 , dsFunctions *fn )
 {
-  if (current_state != 0) dsError ("dsSimulationLoop() called more than once");
-  current_state = 1;
+    if (current_state != 0) dsError("dsSimulationLoop() called more than once");
+        current_state = 1;
 
-  // look for flags that apply to us
-  int initial_pause = 0;
-  for (int i=1; i<argc; i++) {
-    if (strcmp(argv[i],"--notex")==0) use_textures = 0;
-    if (strcmp(argv[i],"--noshadow")==0) use_shadows = 0;
-    if (strcmp(argv[i],"--noshadows")==0) use_shadows = 0;
-    if (strcmp(argv[i],"--pause")==0) initial_pause = 1;
-  }
+    /* look for flags that apply to us */
+    int record_frames = 0;
+    int initial_pause = 0;
+    for (int i=1; i<argc; i++) {
+        if (strcmp(argv[i], "--notex"    )==0) use_textures  = 0;
+        if (strcmp(argv[i], "--noshadow" )==0) use_shadows   = 0;
+        if (strcmp(argv[i], "--noshadows")==0) use_shadows   = 0;
+        if (strcmp(argv[i], "--pause"    )==0) initial_pause = 1;
+        if (strcmp(argv[i], "--record"   )==0) record_frames = 1;
+    }
 
-  if (fn->version > DS_VERSION)
-    dsDebug ("bad version number in dsFunctions structure");
+    if (fn->version > DS_VERSION)
+        dsDebug ("bad version number in dsFunctions structure");
 
-  initMotionModel();
+    initMotionModel();
 
-  /***glutInit*******/
-  if(*(fn->drawScene)) glutInit(&argc, argv);
-  /***Ende glutInit*******/
+    /* initialize glut */
+    if(*(fn->drawScene)) glutInit(&argc, argv);
 
-  dsPlatformSimLoop (window_width,window_height,fn,initial_pause);
+    dsPlatformSimLoop(window_width, window_height, fn, initial_pause, record_frames);
 
-  current_state = 0;
+    current_state = 0;
 }
 
 

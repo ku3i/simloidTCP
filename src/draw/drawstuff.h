@@ -39,7 +39,6 @@ the user is able to click+drag in the main window to move the camera:
 
 */
 
-
 #ifndef __DRAWSTUFF_H__
 #define __DRAWSTUFF_H__
 
@@ -50,39 +49,33 @@ the user is able to click+drag in the main window to move the camera:
 extern "C" {
 #endif
 
-
 #include "./version.h"
-
-
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
-
 
 /* texture numbers */
 #define DS_NONE   0	/* uses the current color instead of a texture */
 #define DS_WOOD   1
 
 typedef struct dsFunctions {
-  int version;			/* put DS_VERSION here */
-  /* version 1 data */
-  void (*start)();		/* called before sim loop starts */
-  void (*step) (int pause, int singlestep);	/* called before every frame */
-  void (*command) (int cmd, bool shift);	/* called if a command key is pressed */
-  void (*stop)();		/* called after sim loop exits */
-  /* version 2 data */
-  const char *path_to_textures;	/* if nonzero, path to texture files */
-  bool* drawScene;
-  bool disableGraphics;
-  bool* continueLoop;
+    int version;                              /* put DS_VERSION here */
+    void (*start)();                          /* called before sim loop starts */
+    void (*step) (int pause, int singlestep); /* called before every frame */
+    void (*command) (int cmd, bool shift);    /* called if a command key is pressed */
+    void (*stop)();                           /* called after sim loop exits */
+    /* version 2 data */
+    const char *path_to_textures;             /* if nonzero, path to texture files */
+    bool* drawScene;
+    bool* recordFrames;
+    bool  disableGraphics;
+    bool* continueLoop;
 } dsFunctions;
 
 
 /* the main() function should fill in the dsFunctions structure then
  * call this.
  */
-void dsSimulationLoop (int argc, char **argv,
-		       int window_width, int window_height,
-		       struct dsFunctions *fn);
+void dsSimulationLoop (int argc, char **argv, int window_width, int window_height, struct dsFunctions *fn);
 
 /* these functions display an error message then exit. they take arguments
  * in the same way as printf(), except you do not have to add a terminating
@@ -96,7 +89,7 @@ void dsDebug (const char *msg, ...);
  */
 void dsPrint (const char *msg, ...);
 
-/* set and get the camera position. xyz is the cameria position (x,y,z).
+/* set and get the camera position. xyz is the camera position (x,y,z).
  * hpr contains heading, pitch and roll numbers in degrees. heading=0
  * points along the x axis, pitch=0 is looking towards the horizon, and
  * roll 0 is "unrotated".
@@ -119,9 +112,9 @@ void dsStop();
  * at the start of each frame, the texture is reset to none and the color is
  * reset to white.
  */
-void dsSetTexture (int texture_number);
-void dsSetColor (float red, float green, float blue);
-void dsSetColorAlpha (float red, float green, float blue, float alpha);
+void dsSetTexture(int texture_number);
+void dsSetColor(float red, float green, float blue);
+void dsSetColorAlpha(float red, float green, float blue, float alpha);
 
 /* draw objects.
  *   - pos[] is the x,y,z of the center of the object.
@@ -132,44 +125,25 @@ void dsSetColorAlpha (float red, float green, float blue, float alpha);
  *   - sides[] is an array of x,y,z side lengths.
  *   - all cylinders are aligned along the z axis.
  */
-/*void dsDrawBox (const float pos[3], const float R[12], const float sides[3]);
-void dsDrawSphere (const float pos[3], const float R[12], float radius);
-void dsDrawTriangle (const float pos[3], const float R[12],
-		     const float *v0, const float *v1, const float *v2, int solid);
-void dsDrawCylinder (const float pos[3], const float R[12],
-		     float length, float radius);
-void dsDrawCappedCylinder (const float pos[3], const float R[12],
-			   float length, float radius);
-void dsDrawLine (const float pos1[3], const float pos2[3]);*/
-
-/* these drawing functions are identical to the ones above, except they take
- * double arrays for `pos' and `R'.
- */
-void dsDrawBoxD (const double pos[3], const double R[12],
-		 const double sides[3]);
-void dsDrawSphereD (const double pos[3], const double R[12],
-		    const float radius);
-void dsDrawTriangleD (const double pos[3], const double R[12],
-		      const double *v0, const double *v1, const double *v2, int solid);
-void dsDrawCylinderD (const double pos[3], const double R[12],
-		      float length, float radius);
-void dsDrawCappedCylinderD (const double pos[3], const double R[12],
-			    float length, float radius);
-void dsDrawLineD (const double pos1[3], const double pos2[3]);
+void dsDrawBoxD           (const double pos[3], const double R[12], const double sides[3]);
+void dsDrawSphereD        (const double pos[3], const double R[12], const float radius);
+void dsDrawTriangleD      (const double pos[3], const double R[12], const double *v0, const double *v1, const double *v2, int solid);
+void dsDrawCylinderD      (const double pos[3], const double R[12], float length, float radius);
+void dsDrawCappedCylinderD(const double pos[3], const double R[12], float length, float radius);
+void dsDrawLineD          (const double pos1[3], const double pos2[3]);
 
 /* Set the drawn quality of the objects. Higher numbers are higher quality,
  * but slower to draw. This must be set before the first objects are drawn to
  * be effective.
  */
-void dsSetSphereQuality (int n);		/* default = 1 */
-void dsSetCappedCylinderQuality (int n);	/* default = 3 */
+void dsSetSphereQuality(int n);         /* default = 1 */
+void dsSetCappedCylinderQuality(int n); /* default = 3 */
 
 
-//--------------------------drawText-------------------------------------
-//draws a given text string onto the screen at position pos;; (-1,1)
-//is top left, (+1,-1) is bottom right of the viewport
-//-----------------------------------------------------------------------
-void drawText(const char* text,  const float* pos);
+/* draws a given text string onto the screen at position pos;; (-1,1)
+   is top left, (+1,-1) is bottom right of the viewport
+*/
+void drawText(const char* text, const float* pos);
 
 /* closing bracket for extern "C" */
 #ifdef __cplusplus

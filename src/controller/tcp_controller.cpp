@@ -38,6 +38,9 @@ bool TCPController::control(const double time)
     unsigned int fail_counter = 0;
     std::string msg;
 
+    /* reset frame record flag */
+    config.record_frames = false;
+
     /* send message to client */
     send_ordered_info(time);
 
@@ -78,6 +81,9 @@ bool TCPController::control(const double time)
         if (starts_with(msg, "RESTORE")) { playSnapshot  (robot, obstacles, &s2); continue; }
 
         if (starts_with(msg, "NEWTIME")) { if (reset_time) reset_time(); continue; }
+
+        /* other */
+        if (starts_with(msg, "RECORD" )) { config.record_frames = true; continue; }
 
         /* simulator commands */
         if (starts_with(msg, "DONE")) { done = true; continue; }

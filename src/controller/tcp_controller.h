@@ -15,8 +15,9 @@ extern Configuration global_conf;
 
 class TCPController : public Controller {
 public:
-    TCPController(const physics& universe, Robot& robot, const Obstacle& obstacles, void (*r)())
+    TCPController(Configuration& config, const physics& universe, Robot& robot, const Obstacle& obstacles, void (*r)())
     : Controller(universe, robot, obstacles, r)
+    , config(config)
     {
         dsPrint("Creating TCP controller...");
         if (robot.number_of_joints() < 1)
@@ -63,6 +64,8 @@ private:
 
     void send_ordered_info(const double time);
     void send_robot_configuration();
+
+    Configuration& config;
 };
 
 
