@@ -1,3 +1,12 @@
+
+2018-01-19: release 1.1.0
+
+	+ Added non-default friction values to humanoids.
+	+ enable pausing tcp controller (pausing simulation from remote), refactorings, cleanup
+	+ better turn rate for camera, unary operator for vector3, show_time_stats to global conf.
+	+ Recording: command-line param and tcp command for enabling frame recording.
+
+
 2018-01-05: release 1.0.0
 
 	+ renamed joints of tadpole, changed snakebot.
