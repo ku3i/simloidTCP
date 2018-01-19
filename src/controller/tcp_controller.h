@@ -19,7 +19,7 @@ public:
     : Controller(universe, robot, obstacles, r)
     , config(config)
     {
-        dsPrint("Creating TCP controller...");
+        dsPrint("Starting TCP controller...");
         if (robot.number_of_joints() < 1)
             dsError("Bad Robot definition (%d joints).\n", robot.number_of_joints());
         dsPrint("done.\n");

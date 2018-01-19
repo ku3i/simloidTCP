@@ -46,8 +46,6 @@ static Obstacle    obstacles(universe.world, universe.space);
 static Landscape   landscape(universe.space);
 static Camera      camera;
 
-static bool        show_time_statistics = true;
-
 /* time and snapshots */
 static double simtime;
 static Snapshot s1;
@@ -62,11 +60,9 @@ static Controller* controller;
 /* timer */
 static double  vel = 0.0;
 static double  intervalSimTime = 0.0;
-static UniTime act_time = UniTime::getTimeStamp(), refTime;
 static UniTime intervalBeginRealTime = UniTime::getTimeStamp();
 static UniTime uniTimeStepLength;
 static UniTime lastDrawFrameTime;
-static UniTime t1;
 static UniTime duration = UniTime(0, 0);
 
 /* status FPS */
@@ -85,30 +81,31 @@ static void start(void)
     if (!global_conf.disable_graphics) {
         camera.set_viewpoint(robot.get_camera_center_obj(), robot.get_camera_setup());
 
-        dsPrint("Program controls:\n   1     - toggle disable/enable graphics\n   2     - reset bioloids physics\n   3     - save snapshot of bioloids physics\n   4     - restore snapshot of bioloids physics\n   R     - toggle realtime on/off\n\n");
+        dsPrint("Program controls:\n"
+                "   1: toggle disable/enable graphics\n"
+                "   2: reset physics\n"
+                "   3: save snapshot of physics\n"
+                "   4: restore snapshot of physics\n"
+                "   R: toggle realtime on/off\n\n"
+               );
     }
     uniTimeStepLength = UniTime(0, (int)(global_conf.step_length*1000000000));
 
     frameTime = 1.0 / global_conf.fps;
     if (frameTime > 0.5) {
         frameTime = 0.5;
-        dsPrint("Min fps: 2 => setting fps to 2\n");
+        dsPrint("Min. fps: 2 => setting fps to 2\n");
     }
 
-    if (global_conf.use_fps_control) {
-        dsPrint("Starting simulation with stepLength=%.3lfs and fps=%.0lf/s\n", global_conf.step_length, 1.0/frameTime);
-    }
-    else {
-        dsPrint("Starting simulation with stepLength=%.3lfs and no fps controlling (each simstep is shown).\n", global_conf.step_length);
-    }
+
+    dsPrint( "Starting simulation with step=%.3lfs and fps=%.0lf/s%s\n"
+           , global_conf.step_length, 1.0/frameTime, global_conf.use_fps_control ? "" : " (fps ctrl off, showing each step)");
+
     lastDrawFrameTime = UniTime(0,0);
 }
 
 /* stop simulation */
-static void stop()
-{
-    dsPrint("Exiting simulation.\n");
-}
+static void stop() { dsPrint("Exiting simulation.\n"); }
 
 void reset_time(void) { simtime = 0.0; }
 
@@ -125,30 +122,31 @@ static void command(int cmd, bool /*shift*/)
     switch (cmd)
     {
         /* camera */
-        case 'a': case 'A': camera.turn_cw ();                                              break;
-        case 'd': case 'D': camera.turn_ccw();                                              break;
-        case 'w': case 'W': camera.zoom_in ();                                              break;
-        case 's': case 'S': camera.zoom_out();                                              break;
-        case 't': case 'T': camera.toggle_rotate();                                         break;
-        case 'f': case 'F': camera.toggle_follow(robot.get_camera_center_obj());            break;
-        case '+':           robot.set_camera_center_on_next_obj();                          break;
-        case '-':           robot.set_camera_center_on_prev_obj();                          break;
+        case 'a': camera.turn_cw ();                                              break;
+        case 'd': camera.turn_ccw();                                              break;
+        case 'w': camera.zoom_in ();                                              break;
+        case 's': camera.zoom_out();                                              break;
+        case 't': camera.toggle_rotate();                                         break;
+        case 'f': camera.toggle_follow(robot.get_camera_center_obj());            break;
+        case '+': robot.set_camera_center_on_next_obj();                          break;
+        case '-': robot.set_camera_center_on_prev_obj();                          break;
 
         /* reset */
-        case '2':           reset_simulator();                                              break;
+        case '2': reset_simulator();                                              break;
 
         /* snapshots */
-        case '3':           recordSnapshot(robot, obstacles, &s2);                          break;
-        case '4':           playSnapshot  (robot, obstacles, &s2);                          break;
+        case '3': recordSnapshot(robot, obstacles, &s2);                          break;
+        case '4': playSnapshot  (robot, obstacles, &s2);                          break;
 
         /* drawing */
-        case '1':           global_conf.draw_scene        = !global_conf.draw_scene;        break;
-        case 'r': case 'R': global_conf.real_time         = !global_conf.real_time;         break;
-        case 'z': case 'Z': show_time_statistics          = !show_time_statistics;          break;
-        case 'j': case 'J': global_conf.show_joints       = !global_conf.show_joints;       break;
-        case 'k': case 'K': global_conf.show_contacts     = !global_conf.show_contacts;     break;
-        case 'l': case 'L': global_conf.show_accels       = !global_conf.show_accels;       break;
-        case 'c': case 'C': global_conf.show_cam_position = !global_conf.show_cam_position; break;
+        case '1': global_conf.draw_scene        = !global_conf.draw_scene;        break;
+        case 'r': global_conf.real_time         = !global_conf.real_time;         break;
+        case 'm': global_conf.use_fps_control   = !global_conf.use_fps_control;   break;
+        case 'z': global_conf.show_time_stat    = !global_conf.show_time_stat;    break;
+        case 'j': global_conf.show_joints       = !global_conf.show_joints;       break;
+        case 'k': global_conf.show_contacts     = !global_conf.show_contacts;     break;
+        case 'l': global_conf.show_accels       = !global_conf.show_accels;       break;
+        case 'c': global_conf.show_cam_position = !global_conf.show_cam_position; break;
     } // switch
 }
 
@@ -160,9 +158,9 @@ print_time_statistics(void)
         const float textPos[2] = {-0.98, 0.94};
         char text[1000];
 
-        snprintf(text, 500, "time: %.2lf  sim vel: %.2lfx %s   fps: %.2lf   walking speed: %.2lf m/s",
-                 simtime, vel, (global_conf.real_time?"[real]":"       "),
-                 global_conf.fps, bvel); //TODO: calculate bvel by robot velocity measure
+        snprintf(text, 500, "time: %.2lf  sim vel: %.2lfx %s   fps: %.2lf%s  walking speed: %.2lf m/s",
+                 simtime, vel, (global_conf.real_time?"[real]":"      "),
+                 global_conf.fps, global_conf.use_fps_control? " ":"!", bvel); //TODO: calculate bvel by robot velocity measure
 
         if (global_conf.show_cam_position)
         {
@@ -205,87 +203,97 @@ static void draw_robot_and_scene()
             robot.accels[i].draw();
 
     /* draw time and velocity information */
-    if (show_time_statistics) print_time_statistics();
+    if (global_conf.show_time_stat) print_time_statistics();
 
     /* update camera center of rotation, follow etc. */
     camera.update(robot.get_camera_center_obj());
 }
 
-// simulation loop
-static void simLoop(int pause, int singlestep) /**TODO this function is far too long, split up!*/
+
+static void physics_step(void) {
+    dSpaceCollide(universe.space, &universe, &near_callback);  // collision detection
+    dWorldStep(universe.world, global_conf.step_length);       // world simulation step
+    dJointGroupEmpty(universe.contactgroup);                   // remove all contact joints
+
+    simtime         += global_conf.step_length;                // increase time
+    intervalSimTime += global_conf.step_length;
+    //printf("t: %5.2f\n", simtime);
+}
+
+
+static void sim_loop(int pause, int singlestep) /**TODO this function is far too long, split up!*/
 {
+    static UniTime ref_time = UniTime::getTimeStamp();
+
+    UniTime current_time = UniTime{};
+
     assert(continueLoop);
 
     do {
-        t1 = UniTime::getTimeStamp();
-        if (not pause)
-        {
-            // collision detection
-            dSpaceCollide(universe.space, &universe, &near_callback);
+        const UniTime start_time = UniTime::getTimeStamp();
 
-            // simulation step
-            dWorldStep(universe.world, global_conf.step_length);
+        /* physics */
+        if (not (pause or controller->is_paused()))
+            physics_step();
 
-            //Timer
-            simtime += global_conf.step_length;
-            intervalSimTime += global_conf.step_length;
-
-            // remove all contact joints
-            dJointGroupEmpty(universe.contactgroup);
-        }
-
-        // controller
-        if (not pause && (controller != NULL))
+        /* controller */
+        if (not pause && (controller != nullptr))
             continueLoop = controller->control(simtime);
 
-        // Timer
-        if (global_conf.draw_scene && !global_conf.disable_graphics && global_conf.real_time) {
-            if (not pause) {
-                act_time = UniTime::getTimeStamp();
-                refTime = refTime+uniTimeStepLength;
-                if (act_time < refTime) {
-                    //aktuelle Zeit ist kleiner als Referenzzeit -> haben noch Zeit
-                    struct timeval tv;
-                    tv.tv_sec = 0;
-                    tv.tv_usec = (refTime-act_time).usec;
-                    select(1, NULL, NULL, NULL, &tv);
-                }
-                else {
-                    //aktuelle Zeit ist schon groesser als Referenzzeit -> gleich weiter
-                    if((act_time - refTime).sec > 1) refTime = UniTime::getTimeStamp();
+        /* Timer */
+        if (      global_conf.draw_scene
+             and !global_conf.disable_graphics
+             and  global_conf.real_time
+             and !(pause or controller->is_paused())
+           )
+        {
+            current_time = UniTime::getTimeStamp();
+            ref_time = ref_time + uniTimeStepLength;
+
+            if (current_time < ref_time) { /* we still have time, so wait until timed out */
+                struct timeval tv{0, (ref_time - current_time).usec};
+                select(1, NULL, NULL, NULL, /*timeout=*/&tv);
+            }
+            else { /* pass now */
+                if ((current_time - ref_time).sec > 1) {
+                    ref_time = UniTime::getTimeStamp();
                 }
             }
         }
-        act_time = UniTime::getTimeStamp();
-        duration = duration * 0.7 + (act_time - t1)*0.3;
+
+        current_time = UniTime::getTimeStamp();
+        duration = duration * 0.7 + (current_time - start_time) * 0.3;
 
         if (pause) usleep(1000);
 
-    } while (continueLoop && !singlestep && global_conf.use_fps_control && ((double)((act_time-lastDrawFrameTime+duration*0.5).usec) / 1000000.0) < frameTime);
-    act_time = UniTime::getTimeStamp();
-    lastDrawFrameTime = act_time;
+    } while (     continueLoop
+             and !singlestep
+             and global_conf.use_fps_control
+             and ((double)((current_time - lastDrawFrameTime + duration * 0.5).usec) / 1000000.0) < frameTime
+            );
+
+    current_time = UniTime::getTimeStamp();
+    lastDrawFrameTime = current_time;
 
     /* refresh velocity and fps */
-    if ((act_time - intervalBeginRealTime).sec) {
-        const double intervalTime = (act_time - intervalBeginRealTime).fseconds();
+    if ((current_time - intervalBeginRealTime).sec)
+    {
+        const double intervalTime = (current_time - intervalBeginRealTime).fseconds();
 
         vel = intervalSimTime / intervalTime;
-        if (intervalSimTime > 0.0001) {
-            bvel = common::dist2D((const double *) dBodyGetPosition(robot.get_camera_center_obj()), camera.lastPos) / intervalSimTime;
-        }
-        else {
-            bvel = 0.0;
-        }
+        bvel = (intervalSimTime > 0.0001) ? common::dist2D((const double *) dBodyGetPosition(robot.get_camera_center_obj()), camera.lastPos) / intervalSimTime
+                                          : 0.0;
+
         camera.lastPos[0] = dBodyGetPosition(robot.get_camera_center_obj())[0];
         camera.lastPos[1] = dBodyGetPosition(robot.get_camera_center_obj())[1];
         camera.lastPos[2] = dBodyGetPosition(robot.get_camera_center_obj())[2];
 
         intervalSimTime = 0.0;
 
-        global_conf.fps = (double)intervalFrames / intervalTime;
+        global_conf.fps = (double)intervalFrames / intervalTime; /**What??*/
         intervalFrames = 0;
 
-        intervalBeginRealTime = act_time;
+        intervalBeginRealTime = current_time;
     }
 
     /* drawing robot and scene objects */
@@ -296,18 +304,23 @@ static void simLoop(int pause, int singlestep) /**TODO this function is far too 
     if (not continueLoop) dsPrint("Leaving simulation loop. Shutting down simloid.\n");
 }
 
+
 void
-print_programm_info(const char* executable_name)
+print_programm_info(std::string executable_name = "")
 {
-    dsPrint("%s Simulation Environment\n   Please report bugs to kubisch@informatik.hu-berlin.de\n\n", version::name.c_str());
-    if (strcmp(executable_name, "") != 0)
-        dsPrint("Help: %s --help\n\n", executable_name);
+    dsPrint( "%s Simulation Environment\n"
+             "   Report bugs to kubisch@informatik.hu-berlin.de\n\n"
+           , version::name.c_str() );
+
+    if (executable_name != "")
+        dsPrint("Help: %s --help\n\n", executable_name.c_str());
 }
+
 
 void
 print_help(void)
 {
-    print_programm_info("");
+    print_programm_info();
 
     std::cout << "Help:\n"
               << "   --configfile | -f               - name of config file\n"
@@ -323,6 +336,8 @@ print_help(void)
               << "   --pause                         - initial pause\n\n";
 }
 
+
+/**This should be re-factored next*/
 void
 readOptions (int argc, char* argv[])
 {
@@ -442,6 +457,7 @@ readOptions (int argc, char* argv[])
     }
 }
 
+
 void
 sigtest(int sig)
 {
@@ -451,6 +467,7 @@ sigtest(int sig)
         default:      dsPrint("Received unknown signal: %d\n", sig);
     }
 }
+
 
 int
 main(int argc, char **argv)
@@ -466,45 +483,37 @@ main(int argc, char **argv)
     /* set signal handler */
     Signals signal(sigtest);
 
-    // TODO Ultradreckig
-    char text[10];
-    if (global_conf.initial_pause && !global_conf.disable_graphics)
-    {
-        sprintf(text, "--pause");
-        argv[argc]=text;
-        ++argc;
-    }
-
     /* setup pointers to drawstuff callback functions */
     dsFunctions fn;
-    fn.version = DS_VERSION;
-    fn.start = &start;
-    fn.step = &simLoop;
-    fn.command = &command;
-    fn.stop = &stop;
+    fn.version          = DS_VERSION;
+    fn.start            = &start;
+    fn.step             = &sim_loop;
+    fn.command          = &command;
+    fn.stop             = &stop;
     fn.path_to_textures = "./textures";
-    fn.drawScene = &global_conf.draw_scene;
-    fn.recordFrames = &global_conf.record_frames;
-    fn.disableGraphics = global_conf.disable_graphics;
-    fn.continueLoop = &continueLoop;
+    fn.drawScene        = &global_conf.draw_scene;
+    fn.recordFrames     = &global_conf.record_frames;
+    fn.disableGraphics  =  global_conf.disable_graphics;
+    fn.continueLoop     = &continueLoop;
 
-    global_conf.draw_scene = 1 && !(global_conf.disable_graphics);
+    global_conf.draw_scene = !global_conf.disable_graphics;
+    /** so actually disable_graphics and draw_scene mean the same thing*/
 
     /* create Robot */
     Bioloid::create_robot(robot);
     Bioloid::create_scene(obstacles, landscape);
 
-    /* init snapshots */
+    /* initialize snapshots */
     recordSnapshot(robot, obstacles, &s1);
     recordSnapshot(robot, obstacles, &s2);
 
     /* create TCP Controller */
-    dsPrint("Starting Controller: TCPController\n");
     controller = new TCPController(global_conf, universe, robot, obstacles, reset_time);
     if (((TCPController*)controller)->establishConnection(global_conf.tcp_port))
     {
         /* run simulation */
-        dsSimulationLoop(argc, argv, global_conf.window_width, global_conf.window_height, &fn);
+        bool initial_pause = global_conf.initial_pause && !global_conf.disable_graphics;
+        dsSimulationLoop(argc, argv, global_conf.window_width, global_conf.window_height, &fn, (int) initial_pause);
     }
     else dsError("Could not start TCP controller.\n");
 
@@ -515,4 +524,3 @@ main(int argc, char **argv)
 }
 
 /* fin */
-

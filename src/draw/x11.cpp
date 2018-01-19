@@ -313,7 +313,7 @@ static void captureFrame(int num)
     fprintf(stderr, "capturing frame %04d\n", num);
 
     char s[32];
-    snprintf(s, 32, "frame%04d.ppm", num);
+    snprintf(s, 32, "./data/frame%04d.ppm", num);
     FILE *f = fopen(s, "wb");
 
     if (!f) dsError("can't open \"%s\" for writing", s);
@@ -417,9 +417,10 @@ void dsPlatformSimLoop (int window_width, int window_height, dsFunctions *fn, in
                 else
                     captureFrame(frame);
 
-                frame++;
+                //frame++;
             }
         }
+        frame++;
     }
 
     if (fn->stop)

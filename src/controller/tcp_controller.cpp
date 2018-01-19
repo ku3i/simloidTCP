@@ -2,7 +2,7 @@
 
 bool TCPController::establishConnection(int port)
 {
-    dsPrint("TCPController: listening to port %d...\n", port);
+    dsPrint("TCP Controller: listening to port %d...\n", port);
     fflush(stdout);
     socketServer = new SocketServer(port);
     if (socketServer->establish_connection())
@@ -42,8 +42,10 @@ bool TCPController::control(const double time)
     config.record_frames = false;
 
     /* send message to client */
-    send_ordered_info(time);
+    if (not paused)
+        send_ordered_info(time);
 
+    paused = false; // client must continuously send pause signal
     while (!done)
     {
         /* listen to socket */
@@ -79,15 +81,13 @@ bool TCPController::control(const double time)
         /* save and restore snapshots */
         if (starts_with(msg, "SAVE"   )) { recordSnapshot(robot, obstacles, &s2); continue; }
         if (starts_with(msg, "RESTORE")) { playSnapshot  (robot, obstacles, &s2); continue; }
-
         if (starts_with(msg, "NEWTIME")) { if (reset_time) reset_time(); continue; }
 
-        /* other */
-        if (starts_with(msg, "RECORD" )) { config.record_frames = true; continue; }
-
         /* simulator commands */
-        if (starts_with(msg, "DONE")) { done = true; continue; }
-        if (starts_with(msg, "EXIT")) { dsPrint("Received 'EXIT' command.\n"); return false; }
+        if (starts_with(msg, "RECORD" )) { config.record_frames = true; continue; }
+        if (starts_with(msg, "PAUSE"  )) { paused = true; continue; }
+        if (starts_with(msg, "DONE"   )) { done = true; continue; }
+        if (starts_with(msg, "EXIT"   )) { dsPrint("Received 'EXIT' command.\n"); return false; }
 
         /* error */
         if (fail_counter++ >= 42) { dsPrint("Too many messages without a 'DONE'-command.\n"); return false; }
@@ -95,7 +95,8 @@ bool TCPController::control(const double time)
         dsPrint("ERROR: unknown command: '%s'\n", msg.c_str());
     }
 
-    execute_controller();
+    if (not paused)
+        execute_controller();
     return true;
 }
 

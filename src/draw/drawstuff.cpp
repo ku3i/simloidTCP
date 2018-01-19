@@ -1223,14 +1223,14 @@ static void setShadowDrawingMode()
 
 extern "C" void dsSimulationLoop ( int argc, char **argv
                                  , int window_width, int window_height
-                                 , dsFunctions *fn )
+                                 , dsFunctions *fn, int initial_pause)
 {
     if (current_state != 0) dsError("dsSimulationLoop() called more than once");
         current_state = 1;
 
     /* look for flags that apply to us */
     int record_frames = 0;
-    int initial_pause = 0;
+
     for (int i=1; i<argc; i++) {
         if (strcmp(argv[i], "--notex"    )==0) use_textures  = 0;
         if (strcmp(argv[i], "--noshadow" )==0) use_shadows   = 0;

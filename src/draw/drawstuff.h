@@ -75,7 +75,7 @@ typedef struct dsFunctions {
 /* the main() function should fill in the dsFunctions structure then
  * call this.
  */
-void dsSimulationLoop (int argc, char **argv, int window_width, int window_height, struct dsFunctions *fn);
+void dsSimulationLoop (int argc, char **argv, int window_width, int window_height, struct dsFunctions *fn, int initial_pause);
 
 /* these functions display an error message then exit. they take arguments
  * in the same way as printf(), except you do not have to add a terminating

@@ -3,12 +3,8 @@
 
 #include <ode/ode.h>
 #include <basic/common.h>
-#include <basic/configuration.h>
 #include <build/robot.h>
 #include <build/obstacles.h>
-#include <sensors/accelsensor.h>
-
-extern Configuration global_conf;
 
 class Controller
 {
@@ -23,12 +19,15 @@ public:
     virtual bool control(const double time) = 0;
     virtual void reset() = 0;
 
+    bool is_paused(void) const { return paused; }
+
 protected:
     const physics&  universe;
           Robot&    robot;
     const Obstacle& obstacles;
 
     void (*reset_time)();
+    bool paused;
 };
 
 #endif
