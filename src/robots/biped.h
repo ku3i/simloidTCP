@@ -150,59 +150,59 @@ create_humanoid0(Robot& robot)
 
     /* body */
     pos.z = zheight_start - radius_upper_torso - 0.5*length_upper_torso;
-    robot.create_segment("upto", pos.x, pos.y, pos.z, 3, length_upper_torso, radius_upper_torso, 0, constants::materials::normal, colors::white, true);
+    robot.create_segment("upto", pos.x, pos.y, pos.z, 3, length_upper_torso, radius_upper_torso, 0, constants::materials::normal, colors::white, true, constants::friction::lo);
 
     pos.z = zheight_start - radius_upper_torso - length_upper_torso - .5*length_lower_torso;
-    robot.create_segment("loto", pos.x, pos.y, pos.z, 3, length_lower_torso, radius_lower_torso, 0, constants::materials::normal, colors::white, false);
+    robot.create_segment("loto", pos.x, pos.y, pos.z, 3, length_lower_torso, radius_lower_torso, 0, constants::materials::normal, colors::white, false, constants::friction::lo);
 
     pos.z = zheight_start + radius_upper_torso + 0.5*length_head;
-    robot.create_segment("head", pos.x, pos.y, pos.z, 3, length_head, radius_head, 0, constants::materials::normal, colors::black, true);
+    robot.create_segment("head", pos.x, pos.y, pos.z, 3, length_head, radius_head, 0, constants::materials::normal, colors::black, true, constants::friction::lo);
 
     /* shoulders */
     pos.z = zheight_start - radius_upper_torso;
     pos.y = .0;
     pos.x = radius_upper_torso + radius_arm_upper + arm_torso_distance;
 
-    robot.create_segment("lshd", +pos.x, pos.y, pos.z, 2, length_shoulder, radius_shoulder, 0, constants::materials::heavy, colors::black, 0);
-    robot.create_segment("rshd", -pos.x, pos.y, pos.z, 2, length_shoulder, radius_shoulder, 0, constants::materials::heavy, colors::black, 0);
+    robot.create_segment("lshd", +pos.x, pos.y, pos.z, 2, length_shoulder, radius_shoulder, 0, constants::materials::heavy, colors::black, false, constants::friction::lo);
+    robot.create_segment("rshd", -pos.x, pos.y, pos.z, 2, length_shoulder, radius_shoulder, 0, constants::materials::heavy, colors::black, false, constants::friction::lo);
 
     /* hips */
     pos.z = zheight_start - radius_upper_torso - length_upper_torso - length_lower_torso - radius_lower_torso - radius_leg_upper;
     pos.y = .0;
     pos.x = leg_distance + radius_leg_lower;
 
-    robot.create_segment("lhip", +pos.x, pos.y, pos.z, 2, length_hip, radius_hip, 0, constants::materials::heavy, colors::black, 0);
-    robot.create_segment("rhip", -pos.x, pos.y, pos.z, 2, length_hip, radius_hip, 0, constants::materials::heavy, colors::black, 0);
+    robot.create_segment("lhip", +pos.x, pos.y, pos.z, 2, length_hip, radius_hip, 0, constants::materials::heavy, colors::black, false, constants::friction::lo);
+    robot.create_segment("rhip", -pos.x, pos.y, pos.z, 2, length_hip, radius_hip, 0, constants::materials::heavy, colors::black, false, constants::friction::lo);
 
     /* arms upper */
     pos.z = zheight_start - radius_upper_torso - 0.25*length_arm_upper;
     pos.y = .0;
     pos.x = radius_upper_torso + radius_arm_upper + arm_torso_distance;
-    robot.create_segment("lau0", +pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true);
-    robot.create_segment("rau0", -pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true);
+    robot.create_segment("lau0", +pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
+    robot.create_segment("rau0", -pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
 
     pos.z = zheight_start - radius_upper_torso - 0.75*length_arm_upper;
-    robot.create_segment("lau1", +pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true);
-    robot.create_segment("rau1", -pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true);
+    robot.create_segment("lau1", +pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
+    robot.create_segment("rau1", -pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
 
     /* arms lower */
     pos.z = zheight_start - radius_upper_torso - length_arm_upper - .5*length_arm_lower;
     pos.y = .0;
     pos.x = radius_upper_torso + radius_arm_upper + arm_torso_distance;
 
-    robot.create_segment("lalo", +pos.x, pos.y, pos.z, 3, length_arm_lower, radius_arm_lower, 0, constants::materials::heavy, colors::black, true);
-    robot.create_segment("ralo", -pos.x, pos.y, pos.z, 3, length_arm_lower, radius_arm_lower, 0, constants::materials::heavy, colors::black, true);
+    robot.create_segment("lalo", +pos.x, pos.y, pos.z, 3, length_arm_lower, radius_arm_lower, 0, constants::materials::heavy, colors::black, true, constants::friction::lo);
+    robot.create_segment("ralo", -pos.x, pos.y, pos.z, 3, length_arm_lower, radius_arm_lower, 0, constants::materials::heavy, colors::black, true, constants::friction::lo);
 
     /* legs upper */
     pos.z = zheight_start - radius_upper_torso - length_upper_torso - length_lower_torso - radius_lower_torso - radius_leg_upper -.25*length_leg_upper;
     pos.y = .0;
     pos.x = leg_distance + radius_leg_lower;
-    robot.create_segment("llu0", +pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::white, true);
-    robot.create_segment("rlu0", -pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::white, true);
+    robot.create_segment("llu0", +pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
+    robot.create_segment("rlu0", -pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
 
     pos.z = zheight_start - radius_upper_torso - length_upper_torso - length_lower_torso - radius_lower_torso - radius_leg_upper -.75*length_leg_upper;
-    robot.create_segment("llu1", +pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::blue , true);
-    robot.create_segment("rlu1", -pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::blue , true);
+    robot.create_segment("llu1", +pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::blue , true, constants::friction::lo);
+    robot.create_segment("rlu1", -pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::blue , true, constants::friction::lo);
 
 
     /* legs lower */
@@ -210,24 +210,24 @@ create_humanoid0(Robot& robot)
     pos.y = .0;
     pos.x = leg_distance + radius_leg_lower;
 
-    robot.create_segment("lllo", +pos.x, pos.y, pos.z, 3, length_leg_lower, radius_leg_lower, 0, constants::materials::heavy, colors::black, true);
-    robot.create_segment("rllo", -pos.x, pos.y, pos.z, 3, length_leg_lower, radius_leg_lower, 0, constants::materials::heavy, colors::black, true);
+    robot.create_segment("lllo", +pos.x, pos.y, pos.z, 3, length_leg_lower, radius_leg_lower, 0, constants::materials::heavy, colors::black, true, constants::friction::lo);
+    robot.create_segment("rllo", -pos.x, pos.y, pos.z, 3, length_leg_lower, radius_leg_lower, 0, constants::materials::heavy, colors::black, true, constants::friction::lo);
 
     /* ankles */
     pos.z = zheight_start - radius_upper_torso - length_upper_torso - length_lower_torso - radius_lower_torso - radius_leg_upper - length_leg_upper - length_leg_lower - radius_leg_lower - length_ankles;
     pos.y = .0;
     pos.x = leg_distance + radius_leg_lower;
 
-    robot.create_segment("lean", +pos.x, pos.y, pos.z, 2, length_ankles, radius_ankles, 0, constants::materials::heavy, colors::white, true);
-    robot.create_segment("rian", -pos.x, pos.y, pos.z, 2, length_ankles, radius_ankles, 0, constants::materials::heavy, colors::white, true);
+    robot.create_segment("lean", +pos.x, pos.y, pos.z, 2, length_ankles, radius_ankles, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
+    robot.create_segment("rian", -pos.x, pos.y, pos.z, 2, length_ankles, radius_ankles, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
 
     /* feet */
     pos.z = zheight_start - radius_upper_torso - length_upper_torso - length_lower_torso - radius_lower_torso - radius_leg_upper - length_leg_upper - length_leg_lower - radius_ankles - height_feet;
     pos.y = -0.5*length_feet + radius_leg_lower;
     pos.x = leg_distance + radius_leg_lower;
 
-    robot.create_box("left", +pos.x, pos.y, pos.z, width_feet, length_feet, height_feet, 0, constants::materials::heavy, colors::gray, true);
-    robot.create_box("rift", -pos.x, pos.y, pos.z, width_feet, length_feet, height_feet, 0, constants::materials::heavy, colors::gray, true);
+    robot.create_box("left", +pos.x, pos.y, pos.z, width_feet, length_feet, height_feet, 0, constants::materials::heavy, colors::gray, true, constants::friction::normal);
+    robot.create_box("rift", -pos.x, pos.y, pos.z, width_feet, length_feet, height_feet, 0, constants::materials::heavy, colors::gray, true, constants::friction::normal);
 
 
     /* connect with joints */
@@ -331,62 +331,62 @@ create_humanoid1(Robot& robot)
 
     /* body */
     pos.z = zheight_start - radius_upper_torso - 0.5*length_upper_torso;
-    robot.create_segment("upto", pos.x, pos.y, pos.z, 3, length_upper_torso, radius_upper_torso, 0, constants::materials::normal, colors::white, true);
+    robot.create_segment("upto", pos.x, pos.y, pos.z, 3, length_upper_torso, radius_upper_torso, 0, constants::materials::normal, colors::white, true, constants::friction::lo);
 
     pos.z = zheight_start - radius_upper_torso - length_upper_torso - .5*length_middle_torso;
-    robot.create_segment("mito", pos.x, pos.y, pos.z, 3, length_middle_torso, radius_middle_torso, 0, constants::materials::normal, colors::black, false);
+    robot.create_segment("mito", pos.x, pos.y, pos.z, 3, length_middle_torso, radius_middle_torso, 0, constants::materials::normal, colors::black, false, constants::friction::lo);
 
     pos.z = zheight_start - radius_upper_torso - length_upper_torso - length_middle_torso - .5*length_lower_torso;
-    robot.create_segment("loto", pos.x, pos.y, pos.z, 3, length_lower_torso, radius_lower_torso, 0, constants::materials::normal, colors::white, false);
+    robot.create_segment("loto", pos.x, pos.y, pos.z, 3, length_lower_torso, radius_lower_torso, 0, constants::materials::normal, colors::white, false, constants::friction::lo);
 
     pos.z = zheight_start + radius_upper_torso + 0.5*length_head;
-    robot.create_segment("head", pos.x, pos.y, pos.z, 3, length_head, radius_head, 0, constants::materials::normal, colors::black, true);
+    robot.create_segment("head", pos.x, pos.y, pos.z, 3, length_head, radius_head, 0, constants::materials::normal, colors::black, true, constants::friction::lo);
 
     /* shoulders */
     pos.z = zheight_start - radius_upper_torso;
     pos.y = .0;
     pos.x = radius_upper_torso + radius_arm_upper + arm_torso_distance;
 
-    robot.create_segment("lshd", +pos.x, pos.y, pos.z, 2, length_shoulder, radius_shoulder, 0, constants::materials::heavy, colors::black, 0);
-    robot.create_segment("rshd", -pos.x, pos.y, pos.z, 2, length_shoulder, radius_shoulder, 0, constants::materials::heavy, colors::black, 0);
+    robot.create_segment("lshd", +pos.x, pos.y, pos.z, 2, length_shoulder, radius_shoulder, 0, constants::materials::heavy, colors::black, false, constants::friction::lo);
+    robot.create_segment("rshd", -pos.x, pos.y, pos.z, 2, length_shoulder, radius_shoulder, 0, constants::materials::heavy, colors::black, false, constants::friction::lo);
 
     /* hips */
     pos.z = zheight_start - radius_upper_torso - length_upper_torso - length_lower_torso - radius_lower_torso - radius_leg_upper;
     pos.y = .0;
     pos.x = leg_distance + radius_leg_lower;
 
-    robot.create_segment("lhip", +pos.x, pos.y, pos.z, 2, length_hip, radius_hip, 0, constants::materials::heavy, colors::black, 0);
-    robot.create_segment("rhip", -pos.x, pos.y, pos.z, 2, length_hip, radius_hip, 0, constants::materials::heavy, colors::black, 0);
+    robot.create_segment("lhip", +pos.x, pos.y, pos.z, 2, length_hip, radius_hip, 0, constants::materials::heavy, colors::black, false, constants::friction::lo);
+    robot.create_segment("rhip", -pos.x, pos.y, pos.z, 2, length_hip, radius_hip, 0, constants::materials::heavy, colors::black, false, constants::friction::lo);
 
     /* arms upper */
     pos.z = zheight_start - radius_upper_torso - 0.25*length_arm_upper;
     pos.y = .0;
     pos.x = radius_upper_torso + radius_arm_upper + arm_torso_distance;
-    robot.create_segment("lau0", +pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true);
-    robot.create_segment("rau0", -pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true);
+    robot.create_segment("lau0", +pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
+    robot.create_segment("rau0", -pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
 
     pos.z = zheight_start - radius_upper_torso - 0.75*length_arm_upper;
-    robot.create_segment("lau1", +pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true);
-    robot.create_segment("rau1", -pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true);
+    robot.create_segment("lau1", +pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
+    robot.create_segment("rau1", -pos.x, pos.y, pos.z, 3, 0.5*length_arm_upper, radius_arm_upper, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
 
     /* arms lower */
     pos.z = zheight_start - radius_upper_torso - length_arm_upper - .5*length_arm_lower;
     pos.y = .0;
     pos.x = radius_upper_torso + radius_arm_upper + arm_torso_distance;
 
-    robot.create_segment("lalo", +pos.x, pos.y, pos.z, 3, length_arm_lower, radius_arm_lower, 0, constants::materials::heavy, colors::black, true);
-    robot.create_segment("ralo", -pos.x, pos.y, pos.z, 3, length_arm_lower, radius_arm_lower, 0, constants::materials::heavy, colors::black, true);
+    robot.create_segment("lalo", +pos.x, pos.y, pos.z, 3, length_arm_lower, radius_arm_lower, 0, constants::materials::heavy, colors::black, true, constants::friction::lo);
+    robot.create_segment("ralo", -pos.x, pos.y, pos.z, 3, length_arm_lower, radius_arm_lower, 0, constants::materials::heavy, colors::black, true, constants::friction::lo);
 
     /* legs upper */
     pos.z = zheight_start - radius_upper_torso - length_upper_torso - length_lower_torso - radius_lower_torso - radius_leg_upper -.25*length_leg_upper;
     pos.y = .0;
     pos.x = leg_distance + radius_leg_lower;
-    robot.create_segment("llu0", +pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::white, true);
-    robot.create_segment("rlu0", -pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::white, true);
+    robot.create_segment("llu0", +pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
+    robot.create_segment("rlu0", -pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
 
     pos.z = zheight_start - radius_upper_torso - length_upper_torso - length_lower_torso - radius_lower_torso - radius_leg_upper -.75*length_leg_upper;
-    robot.create_segment("llu1", +pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::blue , true);
-    robot.create_segment("rlu1", -pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::blue , true);
+    robot.create_segment("llu1", +pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::blue , true, constants::friction::lo);
+    robot.create_segment("rlu1", -pos.x, pos.y, pos.z, 3, 0.5*length_leg_upper, radius_leg_upper, 0, constants::materials::heavy, colors::blue , true, constants::friction::lo);
 
 
     /* legs lower */
@@ -394,24 +394,24 @@ create_humanoid1(Robot& robot)
     pos.y = .0;
     pos.x = leg_distance + radius_leg_lower;
 
-    robot.create_segment("lllo", +pos.x, pos.y, pos.z, 3, length_leg_lower, radius_leg_lower, 0, constants::materials::heavy, colors::black, true);
-    robot.create_segment("rllo", -pos.x, pos.y, pos.z, 3, length_leg_lower, radius_leg_lower, 0, constants::materials::heavy, colors::black, true);
+    robot.create_segment("lllo", +pos.x, pos.y, pos.z, 3, length_leg_lower, radius_leg_lower, 0, constants::materials::heavy, colors::black, true, constants::friction::lo);
+    robot.create_segment("rllo", -pos.x, pos.y, pos.z, 3, length_leg_lower, radius_leg_lower, 0, constants::materials::heavy, colors::black, true, constants::friction::lo);
 
     /* ankles */
     pos.z = zheight_start - radius_upper_torso - length_upper_torso - length_lower_torso - radius_lower_torso - radius_leg_upper - length_leg_upper - length_leg_lower - radius_leg_lower - length_ankles;
     pos.y = .0;
     pos.x = leg_distance + radius_leg_lower;
 
-    robot.create_segment("lean", +pos.x, pos.y, pos.z, 2, length_ankles, radius_ankles, 0, constants::materials::heavy, colors::white, true);
-    robot.create_segment("rian", -pos.x, pos.y, pos.z, 2, length_ankles, radius_ankles, 0, constants::materials::heavy, colors::white, true);
+    robot.create_segment("lean", +pos.x, pos.y, pos.z, 2, length_ankles, radius_ankles, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
+    robot.create_segment("rian", -pos.x, pos.y, pos.z, 2, length_ankles, radius_ankles, 0, constants::materials::heavy, colors::white, true, constants::friction::lo);
 
     /* feet */
     pos.z = zheight_start - radius_upper_torso - length_upper_torso - length_lower_torso - radius_lower_torso - radius_leg_upper - length_leg_upper - length_leg_lower - radius_ankles - height_feet;
     pos.y = -0.5*length_feet + radius_leg_lower;
     pos.x = leg_distance + radius_leg_lower;
 
-    robot.create_box("left", +pos.x, pos.y, pos.z, width_feet, length_feet, height_feet, 0, constants::materials::heavy, colors::gray, true);
-    robot.create_box("rift", -pos.x, pos.y, pos.z, width_feet, length_feet, height_feet, 0, constants::materials::heavy, colors::gray, true);
+    robot.create_box("left", +pos.x, pos.y, pos.z, width_feet, length_feet, height_feet, 0, constants::materials::heavy, colors::gray, true, constants::friction::normal);
+    robot.create_box("rift", -pos.x, pos.y, pos.z, width_feet, length_feet, height_feet, 0, constants::materials::heavy, colors::gray, true, constants::friction::normal);
 
 
     /* connect with joints */
