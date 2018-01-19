@@ -59,6 +59,16 @@ public:
         this->z /= rhs;
         return *this;
     }
+    Vector3 operator-() const {
+        Vector3 v;
+        v.x = -x;
+        v.y = -y;
+        v.z = -z;
+        return v;
+    }
+    const Vector3& operator+() const { /* provided for convenience */
+        return *this;
+    }
     void clip(double max_val) {
         x = common::clip(x, max_val);
         y = common::clip(y, max_val);

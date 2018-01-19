@@ -85,7 +85,7 @@ namespace constants {
 
     namespace camera_parameters
     {
-        const double rate_turn         = 0.05;
+        const double rate_turn         = 1.0 * m_pi/180.0; // 1 DEG
         const double rate_turn_inc     = 0.01;
         const double rate_zoom_in      = 0.9;
         const double rate_zoom_out     = 1.0/rate_zoom_in;

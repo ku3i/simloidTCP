@@ -42,6 +42,7 @@ public:
     bool   show_joints;         // show the joint's anchor and axis
     bool   show_accels;         // show the acceleration sensors
     bool   show_cam_position;   // display the postion and the heading of the camera
+    bool   show_time_stat;      // display time statistics and fps
     double fps;                 // Angestrebte Frames per second
     bool   use_fps_control;     // FPS-Controller benutzen oder nicht
     int    window_width;

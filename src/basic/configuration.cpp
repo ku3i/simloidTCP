@@ -23,6 +23,7 @@ Configuration::Configuration()
 , show_joints      (false)
 , show_accels      (false)
 , show_cam_position(true)
+, show_time_stat   (true)
 , fps              (25.0)
 , use_fps_control  (true)
 , window_width     (640)
@@ -45,34 +46,35 @@ void Configuration::init_parameter_vector(void)
 {
     theParameterVector.clear();
     /* General */
-    theParameterVector.push_back(parameter("General"      , "tcp_port"          , &tcp_port          , INT   , "TCP port where to connect client"));
+    theParameterVector.push_back(parameter("General"      , "tcp_port"          , &tcp_port          , INT   , "TCP port where to connect client"          ));
     /* Environment   */
-    theParameterVector.push_back(parameter("Environment"  , "robot"             , &robot             , INT   , "index number of robot's bodyplan"  ));
-    theParameterVector.push_back(parameter("Environment"  , "scene"             , &scene             , INT   , "index number of experimental setup"));
-    theParameterVector.push_back(parameter("Simulation"   , "initial_gravity"   , &initial_gravity   , BOOL  , "start simulation with gravity on"  ));
+    theParameterVector.push_back(parameter("Environment"  , "robot"             , &robot             , INT   , "index number of robot's bodyplan"          ));
+    theParameterVector.push_back(parameter("Environment"  , "scene"             , &scene             , INT   , "index number of experimental setup"        ));
+    theParameterVector.push_back(parameter("Simulation"   , "initial_gravity"   , &initial_gravity   , BOOL  , "start simulation with gravity on"          ));
     /* Simulation    */
-    theParameterVector.push_back(parameter("Simulation"   , "step_length"       , &step_length       , DOUBLE, "step length for one simulation step in s" ));
-    theParameterVector.push_back(parameter("Simulation"   , "real_time"         , &real_time         , BOOL  , "slow down simulation velocity to 1.0x"    ));
-    theParameterVector.push_back(parameter("Simulation"   , "initial_pause"     , &initial_pause     , BOOL  , "start simulation in pause-mode"           ));
-    theParameterVector.push_back(parameter("Simulation"   , "contact_soft_ERP"  , &contact_soft_ERP  , DOUBLE, "error reduction parameter during contacts"));
-    theParameterVector.push_back(parameter("Simulation"   , "contact_soft_CFM"  , &contact_soft_CFM  , DOUBLE, "constraint force mixing during contacts"  ));
+    theParameterVector.push_back(parameter("Simulation"   , "step_length"       , &step_length       , DOUBLE, "step length for one simulation step in s"  ));
+    theParameterVector.push_back(parameter("Simulation"   , "real_time"         , &real_time         , BOOL  , "slow down simulation velocity to 1.0x"     ));
+    theParameterVector.push_back(parameter("Simulation"   , "initial_pause"     , &initial_pause     , BOOL  , "start simulation in pause-mode"            ));
+    theParameterVector.push_back(parameter("Simulation"   , "contact_soft_ERP"  , &contact_soft_ERP  , DOUBLE, "error reduction parameter during contacts" ));
+    theParameterVector.push_back(parameter("Simulation"   , "contact_soft_CFM"  , &contact_soft_CFM  , DOUBLE, "constraint force mixing during contacts"   ));
     /* Visualization */
-    theParameterVector.push_back(parameter("Visualization", "show_aabb"         , &show_aabb         , BOOL  , "show geom AABBs"    ));
-    theParameterVector.push_back(parameter("Visualization", "show_contacts"     , &show_contacts     , BOOL  , "show contact points"));
-    theParameterVector.push_back(parameter("Visualization", "show_joints"       , &show_joints       , BOOL  , "show the joints' anchor and axis"));
-    theParameterVector.push_back(parameter("Visualization", "show_accels"       , &show_accels       , BOOL  , "show the acceleration sensors"));
-    theParameterVector.push_back(parameter("Visualization", "show_cam_position" , &show_cam_position , BOOL  , "display camera position"                  ));
-    theParameterVector.push_back(parameter("Visualization", "disable_graphics"  , &disable_graphics  , BOOL  , "creating window? (otherwise just running on console)"));
-    theParameterVector.push_back(parameter("Visualization", "fps"               , &fps               , DOUBLE, "frames per second"));
-    theParameterVector.push_back(parameter("Visualization", "use_fps_control"   , &use_fps_control   , BOOL  , "use fps-controller or draw every simstep"));
-    theParameterVector.push_back(parameter("Visualization", "window_width"      , &window_width      , INT   , "window width"));
-    theParameterVector.push_back(parameter("Visualization", "window_height"     , &window_height     , INT   , "window height"));
-    theParameterVector.push_back(parameter("Visualization", "record_frames"     , &record_frames     , BOOL  , "record frames"));
+    theParameterVector.push_back(parameter("Visualization", "show_aabb"         , &show_aabb         , BOOL  , "show geom AABBs"                           ));
+    theParameterVector.push_back(parameter("Visualization", "show_contacts"     , &show_contacts     , BOOL  , "show contact points"                       ));
+    theParameterVector.push_back(parameter("Visualization", "show_joints"       , &show_joints       , BOOL  , "show the joints' anchor and axis"          ));
+    theParameterVector.push_back(parameter("Visualization", "show_accels"       , &show_accels       , BOOL  , "show the acceleration sensors"             ));
+    theParameterVector.push_back(parameter("Visualization", "show_cam_position" , &show_cam_position , BOOL  , "display camera position"                   ));
+    theParameterVector.push_back(parameter("Visualization", "show_time_stat"    , &show_time_stat    , BOOL  , "display time statistics and fps"           ));
+    theParameterVector.push_back(parameter("Visualization", "disable_graphics"  , &disable_graphics  , BOOL  , "graphical window or terminal only"         ));
+    theParameterVector.push_back(parameter("Visualization", "fps"               , &fps               , DOUBLE, "frames per second"                         ));
+    theParameterVector.push_back(parameter("Visualization", "use_fps_control"   , &use_fps_control   , BOOL  , "use fps-controller or draw every step"     ));
+    theParameterVector.push_back(parameter("Visualization", "window_width"      , &window_width      , INT   , "window width"                              ));
+    theParameterVector.push_back(parameter("Visualization", "window_height"     , &window_height     , INT   , "window height"                             ));
+    theParameterVector.push_back(parameter("Visualization", "record_frames"     , &record_frames     , BOOL  , "record frames"                             ));
     /* Controller */
     theParameterVector.push_back(parameter("Controller"   , "init_max_torque"   , &init_max_torque   , DOUBLE, "initial max. torque value for joint motors"));
-    theParameterVector.push_back(parameter("Controller"   , "pidP"              , &pidP              , DOUBLE, "P-Value for PID-Controller"));
-    theParameterVector.push_back(parameter("Controller"   , "pidI"              , &pidI              , DOUBLE, "I-Value for PID-Controller"));
-    theParameterVector.push_back(parameter("Controller"   , "pidD"              , &pidD              , DOUBLE, "D-Value for PID-Controller"));
+    theParameterVector.push_back(parameter("Controller"   , "pidP"              , &pidP              , DOUBLE, "P-Value for PID-Controller"                ));
+    theParameterVector.push_back(parameter("Controller"   , "pidI"              , &pidI              , DOUBLE, "I-Value for PID-Controller"                ));
+    theParameterVector.push_back(parameter("Controller"   , "pidD"              , &pidD              , DOUBLE, "D-Value for PID-Controller"                ));
     return;
 }
 
