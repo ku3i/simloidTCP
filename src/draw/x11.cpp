@@ -398,7 +398,6 @@ void dsPlatformSimLoop (int window_width, int window_height, dsFunctions *fn, in
         }
 
         dsDrawFrame(width, height, fn, pause && !singlestep, singlestep);
-        singlestep = 0;
 
         if(*(fn->drawScene))
         {
@@ -407,7 +406,7 @@ void dsPlatformSimLoop (int window_width, int window_height, dsFunctions *fn, in
             XSync (display,0);
 
             // capture frames if necessary
-            if (pause==0 && (writeframes || *(fn->recordFrames)))
+            if ((pause==0 or singlestep==1) && (writeframes || *(fn->recordFrames)))
             {
                 if (!slowMotion)
                 {
@@ -420,6 +419,8 @@ void dsPlatformSimLoop (int window_width, int window_height, dsFunctions *fn, in
                 //frame++;
             }
         }
+
+        singlestep = 0;
         frame++;
     }
 

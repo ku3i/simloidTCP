@@ -90,7 +90,7 @@ namespace constants {
         const double rate_zoom_in      = 0.9;
         const double rate_zoom_out     = 1.0/rate_zoom_in;
         const double fade_rotation     = 0.01;
-        const double fade_translation  = 0.1;
+        const double fade_translation  = 0.25;
         const double rotation_velocity = 0.01;
     }
 
