@@ -50,6 +50,7 @@ namespace colors
 
     const Color4 orange_t (1.0,  .5,  .0, 0.7);
     const Color4   cyan_t ( .0, 1.0, 1.0, 0.7);
+    const Color4  black_t ( .3,  .3,  .4, 0.5);
 }
 
 #endif // COLOR_H_INCLUDED

@@ -6,6 +6,7 @@
 #include <robots/fourlegged.h>
 #include <robots/standard.h>
 #include <robots/nolegs.h>
+#include <robots/hannah.h>
 
 void
 Bioloid::create_scene(Obstacle& obstacles, Landscape& landscape)
@@ -35,6 +36,7 @@ void Bioloid::create_robot(Robot& robot)
 
         case 30: Robots::Fourlegged::create_wildcat_0       (robot); break;
         case 31: Robots::Fourlegged::create_wildcat_1       (robot); break;
+        case 32: Robots::Hannah    ::create_hannah          (robot); break;
 
         case 40: Robots::Biped     ::create_ostrich         (robot); break;
 
@@ -42,6 +44,8 @@ void Bioloid::create_robot(Robot& robot)
         case 51: Robots::Biped     ::create_humanoid1       (robot); break;
 
         case 60: Robots::Nolegs    ::create_worm            (robot); break;
+
+        case 80: Robots::Hannah    ::create_hannah_leg      (robot); break;
 
         case 90: Robots::Standard  ::create_pendulum        (robot); break;
         case 91: Robots::Standard  ::create_double_pendulum (robot); break;

@@ -25,7 +25,7 @@ namespace constants {
         const double lo =  1.0;
         const double normal =  10.0;
         const double hi = 40.0;
-
+        const double sticky = 100.0;
     }
 
     namespace joint
