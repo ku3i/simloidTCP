@@ -83,16 +83,16 @@ create_hannah(Robot& robot)
     robot.create_segment("rhll", -xpos, -ypos + dy, zpos, 3, len_leg_lower, rad_leg_lower, 0, constants::materials::light, colors::black, true, constants::friction::sticky); // right hind leg lower
 
     /* connect by joints */
-    robot.connect_joint("body", "lfsh", .0, .0, .0,                     'y', -90,  +90,  +5, JointType::normal,    "L_shoulder_roll"                     );
-    robot.connect_joint("body", "rfsh", .0, .0, .0,                     'Y', -90,  +90,  +5, JointType::symmetric, "R_shoulder_roll" , "L_shoulder_roll" );
-    robot.connect_joint("body", "lhsh", .0, .0, .0,                     'y', -90,  +90,  +5, JointType::normal,    "L_hip_roll"                          );
-    robot.connect_joint("body", "rhsh", .0, .0, .0,                     'Y', -90,  +90,  +5, JointType::symmetric, "R_hip_roll"      , "L_hip_roll"      );
+    robot.connect_joint("body", "lfsh", .0, .0, .0,                     'y', -90,  +90,  -5, JointType::normal,    "L_shoulder_roll"                     );
+    robot.connect_joint("body", "rfsh", .0, .0, .0,                     'Y', -90,  +90,  -5, JointType::symmetric, "R_shoulder_roll" , "L_shoulder_roll" );
+    robot.connect_joint("body", "lhsh", .0, .0, .0,                     'y', -90,  +90,  -5, JointType::normal,    "L_hip_roll"                          );
+    robot.connect_joint("body", "rhsh", .0, .0, .0,                     'Y', -90,  +90,  -5, JointType::symmetric, "R_hip_roll"      , "L_hip_roll"      );
 
 
-    robot.connect_joint("lfsh", "lflu", .0, .0, +.5*leg_upper_len - fz, 'x', -90,  +90, -5, JointType::normal,    "L_shoulder_pitch"                    );
-    robot.connect_joint("rfsh", "rflu", .0, .0, +.5*leg_upper_len - fz, 'x', -90,  +90, -5, JointType::symmetric, "R_shoulder_pitch", "L_shoulder_pitch");
-    robot.connect_joint("lflu", "lfll", .0, -D, +.5*len_leg_lower + K , 'x',   0, +180, +15, JointType::normal,    "L_elbow_pitch"                       );
-    robot.connect_joint("rflu", "rfll", .0, -D, +.5*len_leg_lower + K , 'x',   0, +180, +15, JointType::symmetric, "R_elbow_pitch"   , "L_elbow_pitch"   );
+    robot.connect_joint("lfsh", "lflu", .0, .0, +.5*leg_upper_len - fz, 'x', -90,  +90, -15, JointType::normal,    "L_shoulder_pitch"                    );
+    robot.connect_joint("rfsh", "rflu", .0, .0, +.5*leg_upper_len - fz, 'x', -90,  +90, -15, JointType::symmetric, "R_shoulder_pitch", "L_shoulder_pitch");
+    robot.connect_joint("lflu", "lfll", .0, -D, +.5*len_leg_lower + K , 'x',   0, +180, +30, JointType::normal,    "L_elbow_pitch"                       );
+    robot.connect_joint("rflu", "rfll", .0, -D, +.5*len_leg_lower + K , 'x',   0, +180, +30, JointType::symmetric, "R_elbow_pitch"   , "L_elbow_pitch"   );
 
     robot.connect_joint("lhsh", "lhlu", .0, .0, +.5*leg_upper_len - fz, 'x', -90,  +90, -25, JointType::normal,    "L_hip_pitch"                         );
     robot.connect_joint("rhsh", "rhlu", .0, .0, +.5*leg_upper_len - fz, 'x', -90,  +90, -25, JointType::symmetric, "R_hip_pitch"     , "L_hip_pitch"     );
