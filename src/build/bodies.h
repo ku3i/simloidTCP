@@ -294,3 +294,149 @@ for (k=0; k < GPB; k++)
 
 */
 
+//HOWTO composite objects
+//
+//This article is known to contain outdated information. If you know of correct information, please edit this article! Thank you.
+//
+//Copy-dump from old wiki! Is it still up-to-date (notably the GeomTransform parts) ?
+//Contents
+//Introduction
+//
+//ODE allows you to have composite objects. These are more complex objects build from several others. For instance a table could be built by combining four leg boxes with a table-top box.
+//
+//The ODE documentation tells you which functions to call, and there's a "box stack" demo which includes composite objects. It can be a little tricky to get to grips with, so here's a page on the subject.
+//Theory
+//
+//A body can contain multiple geoms. However to build a useful composite object you're likely going to need to separate the geoms in space. To do this you need to wrap the collision geoms in "GeomTransforms". A GeomTransform is a geom which has no collision, it just wraps another geom and allows it to be translated/rotated. So the hierarchy for a simple table would look like this:
+//
+//dBody              // Table composite object
+//    dGeomTransform // Transform for offsetting table-top
+//        dGeomBox   // Table-top collision geom
+//    dGeomTransform // Transform for offsetting leg
+//        dGeomBox   // Leg 1 collision geom
+//    dGeomTransform // Transform for offsetting leg
+//        dGeomBox   // Leg 2 collision geom
+//    dGeomTransform // Transform for offsetting leg
+//        dGeomBox   // Leg 3 collision geom
+//    dGeomTransform // Transform for offsetting leg
+//        dGeomBox   // Leg 4 collision geom
+//
+//Building a Composite Object
+//
+//The following code has been copied from the "box stack" sample, cleaned, and commented. The code has also been simplified in that it only uses boxes for the sub objects.
+//
+// const int NUM_BOXES = 3;
+//
+// dGeomID odeGeomTransformList[NUM_BOXES]; /* Geometry transforms which contain single sub objects */
+// dGeomID tempOdeBoxGeomList[NUM_BOXES]; /* Temp array for holding onto the boxes in the transforms.
+//                                         * This doesn't need to be kept, as dGeomTransformSetCleanup
+//                                         * will take care of it. */
+// dReal boxOffset[NUM_BOXES][3]; /* delta-positions for encapsulated geometries */
+//
+// /* Start accumulating masses for the encapsulated geometries */
+// dMass compositeMass, componentMass;
+// dMassSetZero (&compositeMass);
+//
+// /* Pick random positions geoms will be placed at */
+// for (j=0; j<NUM_BOXES; j++)
+// {
+//     /* Loop through XYZ */
+//     for (k=0; k<3; k++)
+//     {
+//         boxOffset[j][k] = dRandReal()*0.3-0.15;
+//     }
+// }
+//
+// for (k=0; k<NUM_BOXES; k++)
+// {
+//     odeGeomTransformList[k] = dCreateGeomTransform (space); /* Create geom transform that sub
+//                                                              * objects are added to */
+//     dGeomTransformSetCleanup (odeGeomTransformList[k],1);/* If '1' deleting odeGeomTransformList[k]
+//                                                           * will delete the geom added to it */
+//
+//     tempOdeBoxGeomList[k] = dCreateBox (0, sides[0], /* Create box sub-object */
+//                                         sides[1],
+//                                         sides[2]);
+//     dMassSetBox (&componentMass, /* Create normal mass for a box */
+//                  DENSITY,
+//                  sides[0],
+//                  sides[1],
+//                  sides[2]);
+//
+//     dGeomTransformSetGeom (odeGeomTransformList[k], /* Attach box to the geom transform */
+//                            tempOdeBoxGeomList[k]);
+//
+//     /* Move and rotate the box within the compound object, including the mass */
+//     dGeomSetPosition (tempOdeBoxGeomList[k],
+//                       boxOffset[k][0],
+//                       boxOffset[k][1],
+//                       boxOffset[k][2]);
+//     dMassTranslate (&componentMass,
+//                     boxOffset[k][0],
+//                     boxOffset[k][1],
+//                     boxOffset[k][2]);
+//     dMatrix3 rotation;
+//     dRFromAxisAndAngle (rotation,
+//                         dRandReal()*2.0-1.0,
+//                         dRandReal()*2.0-1.0,
+//                         dRandReal()*2.0-1.0,
+//                         dRandReal()*10.0-5.0);
+//     dGeomSetRotation (tempOdeBoxGeomList[k], rotation);
+//     dMassRotate (&componentMass, rotation);
+//
+//     /* Add sub object mass to the total mass */
+//     dMassAdd (&compositeMass,&componentMass);
+// }
+//
+// // We've finished adding object. The center of mass is not going to be centered at the moment.
+// // Move all encapsulated objects so that the center of mass is (0,0,0)
+// for (k=0; k<NUM_BOXES; k++)
+// {
+//     dGeomSetPosition (tempOdeBoxGeomList[k],
+//                       boxOffset[k][0]-compositeMass.c[0],
+//                       boxOffset[k][1]-compositeMass.c[1],
+//                       boxOffset[k][2]-compositeMass.c[2]);
+// }
+// dMassTranslate (&compositeMass,
+//                 -compositeMass.c[0],
+//                 -compositeMass.c[1],
+//                 -compositeMass.c[2]);
+//
+// /* Tell all the geom transforms that they belong to the parent body */
+// for (k=0; k < NUM_BOXES; k++)
+// {
+//     if (odeGeomTransformList?[k])
+//         dGeomSetBody (odeGeomTransformList[k], parentBody );
+// }
+//
+// /* Set the parent body mass to be the one we've calculated. */
+// dBodySetMass (parentBody, &compositeMass );
+//
+//Getting the position of a composite object component
+//
+//If you get the position of a composite object component, ODE will return the relative/local position within the body. The code that follows is for converting this to a real world position. Again the code originates from the 'box stack' sample. Apologies that it's not in straight C calls, but it's quick to change to whatever you're using.
+//
+// // Get the geomID of the component from the geom transform
+// dGeomID geomID = dGeomTransformGetGeom( geomTransformID? );
+//
+// // Get world position/orientation of parent body
+// const Real* pBodyPos = parentBody->getPosition();
+// const Real* pBodyRotMat = parentBody->getRotation();
+//
+// // Get local position/orientation of component within geom transform
+// const Real* pLocalPos = dGeomGetPosition (geomID);
+// const Real* pLocalRotMat = dGeomGetRotation (geomID);
+//
+// // Calculate world space position of component by using the body position/orientation
+// dVector3 worldPos;
+// dMatrix3 worldRotMat;
+// dMULTIPLY0_331( worldPos, pBodyRotMat, pLocalPos );
+// worldPos[0] += pBodyPos[0];
+// worldPos[1] += pBodyPos[1];
+// worldPos[2] += pBodyPos[2];
+// dMULTIPLY0_333( worldRotMat, pBodyRotMat, pLocalRotMat );
+//
+// // And if you want a quaternion instead of a matrix...
+// dQuaternion worldQuat;
+// dQfromR(worldQuat, worldRotMat);
+//
