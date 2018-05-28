@@ -10,7 +10,26 @@ address  = "127.0.0.1"
 port     = random.randint(7000, 9000)
 bufsize  = 4096
 scene_id = 3
-robot_ids = [ 31, 32, 11, 20, 40, 50, 60, 80, 90 ]
+robot_ids = [ [32,  0, 0.00 ] # normal hannah
+            , [37,  0, 0.10 ] # random hannah
+            , [37, 42, 1.00 ]
+            , [37, 43, 1.00 ]
+            , [37, 44, 1.00 ]
+            , [37, 45, 1.00 ]
+            , [37, 46, 1.00 ]
+            , [37, 23, 0.10 ]
+            , [37, 23, 0.25 ]
+            , [37, 23, 0.50 ]
+            , [37, 23, 1.00 ]
+            , [31,  0, 0.00 ] # other robots
+            , [11,  0, 0.00 ]
+            , [20,  0, 0.00 ]
+            , [40,  0, 0.00 ]
+            , [50,  0, 0.00 ]
+            , [60,  0, 0.00 ]
+            , [80,  0, 0.00 ]
+            , [90,  0, 0.00 ]
+            ]
 
 
 
@@ -97,6 +116,11 @@ class Simloid:
 		self.sock.send(cmd)
 		self.recv_robot_info()
 
+	def change_to_random_model(self, model_id, instance, amlitude):
+		cmd = "MODEL {0} {1} {2}\nDONE\n".format(model_id, instance, amlitude)
+		self.sock.send(cmd)
+		self.recv_robot_info()
+
 
 def control_loop(joints):
 	# simple p-ctrl holding the default position
@@ -108,7 +132,7 @@ def control_loop(joints):
 def main(argv):
 	random.seed()
 	cur_model_id = 0
-	subprocess.Popen([sim_path, "--port", str(port), "--robot", str(robot_ids[cur_model_id]), "--scene", str(scene_id)])
+	subprocess.Popen([sim_path, "--port", str(port), "--robot", str(robot_ids[cur_model_id][0]), "--scene", str(scene_id)])
 	time.sleep(0.5)
 	simloid = Simloid(address, port)
 	result = True
@@ -124,7 +148,7 @@ def main(argv):
 					cur_model_id += 1
 					if cur_model_id == len(robot_ids):
 						cur_model_id = 0
-					simloid.change_model(robot_ids[cur_model_id])
+					simloid.change_to_random_model(robot_ids[cur_model_id][0],robot_ids[cur_model_id][1],robot_ids[cur_model_id][2])
 
 			except KeyboardInterrupt: # press CTRL + C to exit
 				print(MSG + "Bye___")
