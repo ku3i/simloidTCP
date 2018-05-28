@@ -2,6 +2,8 @@
 
 void recordSnapshot(const Robot& robot, const Obstacle& obstacles, Snapshot *s)
 {
+    s->model_id = robot.get_model_id();
+
     dsPrint("Recording snapshot.\n");
     /* robot */
     for (unsigned int i = 0; i < robot.number_of_bodies(); ++i)
@@ -44,6 +46,8 @@ void recordSnapshot(const Robot& robot, const Obstacle& obstacles, Snapshot *s)
 
 void playSnapshot(const Robot& robot, const Obstacle& obstacles, const Snapshot *s)
 {
+    assert(robot.get_model_id() == s->model_id);
+
     /* robot */
     for (unsigned int i = 0; i < robot.number_of_bodies(); ++i)
     {

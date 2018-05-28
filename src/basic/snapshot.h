@@ -20,6 +20,7 @@ struct BodyState {
 
 
 struct Snapshot {
+    ModelID model_id;
     struct BodyState bodystate[constants::max_bodies];
     struct BodyState obststate[constants::max_obstacles];
 };

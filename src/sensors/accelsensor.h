@@ -97,9 +97,11 @@ public:
 
     std::size_t get_size() const { return accels.size(); }
 
-    void reset_all(void) {
-        for (unsigned int idx = 0; idx < get_size(); ++idx)
-            accels[idx].reset();
+    void reset_all(void) { for (auto& a : accels) a.reset(); }
+
+    void destroy(void) {
+        dsPrint("Destroying acceleration sensors (for recreation).\n");
+        accels.clear();
     }
 
 private:

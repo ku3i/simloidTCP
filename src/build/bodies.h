@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <cassert>
 #include <draw/drawstuff.h>
 #include <basic/vector3.h>
 #include <basic/color.h>
@@ -213,28 +214,34 @@ public:
 
     unsigned int get_body_id_by_name(const std::string& name) const
     {
-        for (unsigned int i = 0; i < bodies.size(); ++i)
+        for (std::size_t i = 0; i < bodies.size(); ++i)
             if (name == bodies[i].name)
                 return i;
         return bodies.size();
     }
 
-          Solid& operator[](std::size_t idx)       { return bodies[idx]; }
-    const Solid& operator[](std::size_t idx) const { return bodies[idx]; }
+          Solid& operator[](std::size_t idx)       { return bodies.at(idx); /**TODO use normal index if everything works out*/}
+    const Solid& operator[](std::size_t idx) const { return bodies.at(idx); }
 
     std::size_t get_size() const { return bodies.size(); }
 
     dMass get_total_mass(void) const {
+        assert(bodies.size() > 0);
         dMass total_mass;
         dMassSetZero(&total_mass);
-        for (std::size_t i = 0; i < get_size(); ++i) {
+        for (auto const& b : bodies) {
             dMass add_mass;
-            dBodyGetMass(bodies[i].body, &add_mass);
-            const dReal* pos= dBodyGetPosition(bodies[i].body);
+            dBodyGetMass(b.body, &add_mass);
+            const dReal* pos= dBodyGetPosition(b.body);
             dMassTranslate(&add_mass, pos[0], pos[1], pos[2]);
             dMassAdd(&total_mass, &add_mass);
         }
         return total_mass;
+    }
+
+    void destroy(void) {
+        dsPrint("Destroying bodies (for recreation).\n");
+        bodies.clear();
     }
 
 private:

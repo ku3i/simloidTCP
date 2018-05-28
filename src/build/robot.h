@@ -11,6 +11,19 @@
 #include <sensors/accelsensor.h>
 #include <misc/camera.h>
 
+struct ModelID {
+    unsigned identifier;
+    unsigned instance_no;
+
+    friend bool operator==(ModelID const& lhs, ModelID const& rhs) {
+        return lhs.identifier  == rhs.identifier
+           and lhs.instance_no == rhs.instance_no;
+    }
+
+};
+
+
+
 class Robot {
 public:
     Robot(const dWorldID &world, const dSpaceID &space)
@@ -21,6 +34,7 @@ public:
     , accels(constants::max_accels)
     , cam_center_obj(0)
     , cam_setup(Vector3(0.3,-0.3,0.3), 130.,-18.,0.)
+    , model_id()
     { }
     const dWorldID&  world;
     const dSpaceID&  space;
@@ -89,10 +103,36 @@ public:
 
     ~Robot() { dsPrint("Destroying robot.\n"); }
 
+    ModelID const& get_model_id() const { return model_id; }
+
+    void draw(Configuration const& conf)
+    {
+        /* draw robot's bodies */
+        for (std::size_t i = 0; i < number_of_bodies(); ++i)
+            bodies[i].draw(conf.show_aabb);
+
+        /* draw robot's joints */
+        if (conf.show_joints)
+            for (std::size_t i = 0; i < number_of_joints(); ++i)
+                joints[i].draw();
+
+        /* draw robot's acceleration sensors */
+        if (conf.show_accels)
+            for (std::size_t i = 0; i < number_of_accels(); ++i)
+                accels[i].draw();
+    }
+
+    void destroy(void) {
+        bodies.destroy();
+        joints.destroy();
+        accels.destroy();
+    }
+
 private:
     unsigned int cam_center_obj;
     Camera_Setup cam_setup;
 
+    ModelID model_id;
 };
 
 

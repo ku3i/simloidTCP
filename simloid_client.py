@@ -9,8 +9,10 @@ sim_path = "./bin/Release/simloid"
 address  = "127.0.0.1"
 port     = random.randint(7000, 9000)
 bufsize  = 4096
-robot_id = 31
 scene_id = 3
+robot_ids = [ 31, 32, 11, 20, 40, 50, 60, 80, 90 ]
+
+
 
 MSG = '\033[93m' #orange terminal color
 
@@ -38,6 +40,10 @@ class Simloid:
 	def __init__(self, address, port):
 		self.sock = socket.socket()
 		self.sock.connect((address, port))
+		self.recv_robot_info()
+
+
+	def recv_robot_info(self):
 		msg = self.sock.recv(bufsize)
 		robot_info = msg.split()
 		
@@ -61,12 +67,13 @@ class Simloid:
 		self.recv_sensor_status()
 
 		print(MSG + "Robot initialized.\n\n")
-		
+
 
 	def send_motor_controls(self):
 		cmd = "UX " + " ".join(str(j.voltage) for j in self.joints) + "\nDONE\n"
 		self.sock.send(cmd)
 		return self.sock
+
 
 	def recv_sensor_status(self):
 		msg = self.sock.recv(bufsize)
@@ -80,10 +87,16 @@ class Simloid:
 
 		return result
 
+
 	def loop(self):
 		return self.send_motor_controls() and self.recv_sensor_status()
 
-		
+
+	def change_model(self, model_id):
+		cmd = "MODEL {0}\nDONE\n".format(model_id)
+		self.sock.send(cmd)
+		self.recv_robot_info()
+
 
 def control_loop(joints):
 	# simple p-ctrl holding the default position
@@ -94,22 +107,29 @@ def control_loop(joints):
 
 def main(argv):
 	random.seed()
-	subprocess.Popen([sim_path, "--port", str(port), "--robot", str(robot_id), "--scene", str(scene_id)])
+	cur_model_id = 0
+	subprocess.Popen([sim_path, "--port", str(port), "--robot", str(robot_ids[cur_model_id]), "--scene", str(scene_id)])
 	time.sleep(0.5)
 	simloid = Simloid(address, port)
 	result = True
 
-	while (result):
-    		try:
-        		result = simloid.loop()
-			control_loop(simloid.joints)
+	cycles = 0
 
-    		except KeyboardInterrupt: # press CTRL + C to exit
-        		print(MSG + "Bye___")
-	        	sys.exit()
+	while (result):
+			try:
+				cycles += 1
+				result = simloid.loop()
+				control_loop(simloid.joints)
+				if cycles % 200 == 0:
+					cur_model_id += 1
+					if cur_model_id == len(robot_ids):
+						cur_model_id = 0
+					simloid.change_model(robot_ids[cur_model_id])
+
+			except KeyboardInterrupt: # press CTRL + C to exit
+				print(MSG + "Bye___")
+				sys.exit()
 		
-	
-	
 
 
 if __name__ == "__main__": main(sys.argv)

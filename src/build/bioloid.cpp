@@ -24,10 +24,13 @@ Bioloid::create_scene(Obstacle& obstacles, Landscape& landscape)
     }
 }
 
-void Bioloid::create_robot(Robot& robot)
+/* when no model number is given explicitly, use the one from the global configuration. */
+void Bioloid::create_robot(Robot& robot) { create_robot(robot, global_conf.robot); }
+
+void Bioloid::create_robot(Robot& robot, int index_number)
 {
-    dsPrint("Creating robot: ");
-    switch (global_conf.robot)
+    dsPrint("Creating robot with index number %d: ", index_number);
+    switch (index_number)
     {
         case 10: Robots::KarlSims  ::create_tadpole_0       (robot); break;
         case 11: Robots::KarlSims  ::create_tadpole_1       (robot); break;
@@ -56,7 +59,7 @@ void Bioloid::create_robot(Robot& robot)
         case 95: Robots::Standard  ::create_pendulum (robot, false); break;
 
         default:
-            dsError("Wrong robot index number (%d)!\n", global_conf.robot);
+            dsError("Wrong robot index number (%d)!\n", index_number);
             break;
     }
 

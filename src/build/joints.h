@@ -258,6 +258,11 @@ public:
             joints[idx].apply_control();
     }
 
+    void destroy(void) {
+        dsPrint("Destroying joints (for recreation).\n");
+        joints.clear();
+    }
+
 private:
     std::vector<NJoint> joints;
     const std::size_t   max_number_of_joints;

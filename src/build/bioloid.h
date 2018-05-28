@@ -15,6 +15,7 @@ namespace Bioloid
 {
     /* generator routines */
     void create_robot(Robot& robot);
+    void create_robot(Robot& robot, int index_number);
     void create_scene(Obstacle& obstacles, Landscape& landscape);
 };
 

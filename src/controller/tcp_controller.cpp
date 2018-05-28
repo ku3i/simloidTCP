@@ -9,16 +9,7 @@ bool TCPController::establishConnection(int port)
     {
         dsPrint("Connection to client established.\nSending the robot's configuration to client.\n");
         TCPController::send_robot_configuration();
-        dsPrint("Waiting for acknowledge.\n");
-        std::string ack = socketServer->getNextLine();
-
-        if (ack.compare(0, 3, "ACK") == 0)
-            dsPrint("Acknowledge for configuration received.\n");
-        else {
-            dsPrint("Failed to receive acknowledge.\n");
-            return false;
-        }
-        return true;
+        return wait_for_ack();
     }
     else
     {
@@ -37,6 +28,8 @@ bool TCPController::control(const double time)
     bool done = false;
     unsigned int fail_counter = 0;
     std::string msg;
+
+    bool reload_model = false;
 
     /* reset frame record flag */
     config.record_frames = false;
@@ -89,10 +82,22 @@ bool TCPController::control(const double time)
         if (starts_with(msg, "DONE"   )) { done = true; continue; }
         if (starts_with(msg, "EXIT"   )) { dsPrint("Received 'EXIT' command.\n"); return false; }
 
+        /* model updates */
+        if (starts_with(msg, "MODEL"  )) { reload_model = parse_update_model_command(msg.c_str()); continue; }
+
         /* error */
         if (fail_counter++ >= 42) { dsPrint("Too many messages without a 'DONE'-command.\n"); return false; }
 
         dsPrint("ERROR: unknown command: '%s'\n", msg.c_str());
+    }
+
+    if (reload_model) {
+        reset();
+        recordSnapshot(robot, obstacles, &s1);
+        recordSnapshot(robot, obstacles, &s2);
+        camera.set_viewpoint(robot.get_camera_center_obj(), robot.get_camera_setup());
+        send_robot_configuration();
+        wait_for_ack();
     }
 
     if (not paused)
@@ -110,7 +115,7 @@ void TCPController::send_ordered_info(const double time)
     snprintf(tmp, buffer_size, "%lf ", time);
     message.append(tmp);
 
-    /* anglular position */
+    /* angular position */
     for (std::size_t i = 0; i < robot.number_of_joints(); ++i)
     {
         snprintf(tmp, buffer_size, "%lf ", robot.joints[i].get_low_resolution_position());
@@ -184,6 +189,20 @@ void TCPController::send_robot_configuration()
     /* send message to socket */
     if (!socketServer->send_message(message))
         dsError("Could not send robot configuration message to client.\n");
+}
+
+bool TCPController::wait_for_ack(void)
+{
+    dsPrint("Waiting for acknowledge.\n");
+    std::string ack = socketServer->getNextLine();
+
+    if (ack.compare(0, 3, "ACK") == 0)
+        dsPrint("Acknowledge for configuration received.\n");
+    else {
+        dsPrint("Failed to receive acknowledge.\n");
+        return false;
+    }
+    return true;
 }
 
 void TCPController::execute_controller()
@@ -383,6 +402,24 @@ void TCPController::parse_impulse_FI(const char* msg)
             dsPrint("ERROR: value #1 out of range (0...%u): '%s'\n", robot.number_of_bodies() - 1, msg);
     }
     else dsPrint("ERROR: bad 'FI' format: '%s'\n", msg);
+}
+
+bool TCPController::parse_update_model_command(const char* msg)
+{
+    int offset = 5;
+
+    msg += offset;
+    int new_model_id;
+
+    if (1 == sscanf(msg, " %d", &new_model_id))
+    {
+        robot.destroy();
+        Bioloid::create_robot(robot, new_model_id);
+        return true;
+    }
+
+    dsPrint("ERROR: bad 'MODEL' format: '%s'\n", msg);
+    return false;
 }
 
 /* fin */

@@ -9,15 +9,23 @@
 #include <basic/constants.h>
 #include <basic/snapshot.h>
 #include <build/robot.h>
+#include <build/bioloid.h>
 #include <sensors/accelsensor.h>
+#include <misc/camera.h>
 
 extern Configuration global_conf;
 
 class TCPController : public Controller {
 public:
-    TCPController(Configuration& config, const physics& universe, Robot& robot, const Obstacle& obstacles, void (*r)())
+    TCPController( Configuration& config
+                 , const physics& universe
+                 , Robot& robot
+                 , const Obstacle& obstacles
+                 , void (*r)()
+                 , Camera& camera )
     : Controller(universe, robot, obstacles, r)
     , config(config)
+    , camera(camera)
     {
         dsPrint("Starting TCP controller...");
         if (robot.number_of_joints() < 1)
@@ -57,15 +65,19 @@ private:
     void parse_impulse_FX(const char* msg);
     void parse_impulse_FI(const char* msg);
 
+    bool parse_update_model_command(const char* msg);
+
     void execute_controller();
 
     Snapshot s1;
     Snapshot s2;
 
     void send_ordered_info(const double time);
-    void send_robot_configuration();
+    void send_robot_configuration(void);
+    bool wait_for_ack(void);
 
     Configuration& config;
+    Camera& camera;
 };
 
 
