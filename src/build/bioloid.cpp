@@ -36,7 +36,9 @@ void Bioloid::create_robot(Robot& robot)
 
         case 30: Robots::Fourlegged::create_wildcat_0       (robot); break;
         case 31: Robots::Fourlegged::create_wildcat_1       (robot); break;
-        case 32: Robots::Hannah    ::create_hannah          (robot); break;
+        case 32: Robots::Hannah    ::create_hannah_0        (robot); break;
+        case 33: Robots::Hannah    ::create_hannah_1        (robot); break;
+        case 34: Robots::Hannah    ::create_hannah_2        (robot); break;
 
         case 40: Robots::Biped     ::create_ostrich         (robot); break;
 
