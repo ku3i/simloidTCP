@@ -10,6 +10,7 @@
 #include <basic/color.h>
 #include <basic/configuration.h>
 #include <build/bodies.h>
+#include <build/params.h>
 #include <controller/pid_controller.h>
 
 extern Configuration global_conf;
@@ -32,7 +33,9 @@ public:
           , double position_default_rad
           , Vector3 rel
           , const char axis
-          , unsigned int torque_factor)
+          , unsigned int torque_factor
+          , ActuatorParameters const& conf
+          )
     : joint_id(joint_id)
     , body1(body1)
     , body2(body2)
@@ -50,6 +53,7 @@ public:
     , voltage_setpoint(0.0)
     , is_sticking(false)
     , z(.0)
+    , conf(conf)
     {
         if (name == "") {
             name = "joint_" + std::to_string(joint_id);
@@ -199,6 +203,8 @@ private:
     bool               is_sticking;
 
     double             z; // Bristle displacement for friction model
+
+    ActuatorParameters conf;
 };
 
 
@@ -230,11 +236,15 @@ public:
                        , double position_default_rad
                        , Vector3 rel
                        , const char axis
-                       , unsigned int torque_factor)
+                       , unsigned int torque_factor
+                       , ActuatorParameters const& conf
+                       )
     {
         unsigned int joint_id = joints.size();
         if (joint_id < max_number_of_joints)
-            joints.emplace_back(world, bodies, joint_id, body1, body2, type, name, stopLo_rad, stopHi_rad, position_default_rad, rel, axis, torque_factor);
+            joints.emplace_back( world, bodies, joint_id, body1, body2, type, name
+                               , stopLo_rad, stopHi_rad, position_default_rad, rel
+                               , axis, torque_factor, conf );
         else
             dsError("Maximum number of joints is %u.", max_number_of_joints);
 
@@ -268,5 +278,7 @@ private:
     const std::size_t   max_number_of_joints;
 
 };
+
+
 
 #endif // JOINTS_H_INCLUDED

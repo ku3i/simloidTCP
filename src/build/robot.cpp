@@ -55,7 +55,8 @@ void Robot::connect_joint( const std::string bodyname1, const std::string bodyna
                            const double jointstopLo_deg, const double jointstopHi_deg, const double jointposDefault_deg,
                            const JointType Type,
                            const std::string Name, const std::string SymName,
-                           unsigned int torque_factor)
+                           unsigned int torque_factor,
+                           ActuatorParameters const& conf )
 {
     check_joint_axis(axis);
 
@@ -70,7 +71,7 @@ void Robot::connect_joint( const std::string bodyname1, const std::string bodyna
     if (body1 == bodies.get_size()) { dsError("Cannot find such an object for connection: '%s'\n", bodyname1.c_str()); }
     if (body2 == bodies.get_size()) { dsError("Cannot find such an object for connection: '%s'\n", bodyname2.c_str()); }
 
-    unsigned int joint_id = joints.create(world, bodies, body1, body2, Type, Name, jointstopLo, jointstopHi, jointposDefault, Vector3(relx, rely, relz), axis, torque_factor);
+    unsigned int joint_id = joints.create(world, bodies, body1, body2, Type, Name, jointstopLo, jointstopHi, jointposDefault, Vector3(relx, rely, relz), axis, torque_factor, conf);
 
     bool result = joints.add_symmetric(joint_id, SymName);
     if (not result)

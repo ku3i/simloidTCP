@@ -84,7 +84,8 @@ public:
                     const JointType Type,
                     const std::string Name,
                     const std::string SymName = "",
-                    const unsigned int torque_factor = 5
+                    const unsigned int torque_factor = 5,
+                    ActuatorParameters const& conf = ActuatorParameters()
                 );
 
     void print_statistics(void) const;
