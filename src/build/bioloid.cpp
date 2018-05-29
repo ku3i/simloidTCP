@@ -30,7 +30,7 @@ void Bioloid::create_robot(Robot& robot) { create_robot(robot, global_conf.robot
 
 void Bioloid::create_robot(Robot& robot, int index_number, unsigned rnd_instance, double rnd_amp)
 {
-    dsPrint("Creating robot with index number %d: ", index_number);
+    dsPrint("Creating robot with index number %d: \n", index_number);
     switch (index_number)
     {
         case 10: Robots::KarlSims  ::create_tadpole_0       (robot); break;

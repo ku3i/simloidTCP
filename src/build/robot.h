@@ -80,7 +80,7 @@ public:
                     const std::string bodyname1, const std::string bodyname2,
                     const double relx, const double rely, const double relz,
                     const char axis,
-                    const int jointstopLo_deg, const int jointstopHi_deg, const int jointposDefault_deg,
+                    const double jointstopLo_deg, const double jointstopHi_deg, const double jointposDefault_deg,
                     const JointType Type,
                     const std::string Name,
                     const std::string SymName = "",
