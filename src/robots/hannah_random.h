@@ -77,10 +77,11 @@ namespace HannahRand {
         , color_dark ( rnd(.3, .50, amp), rnd(.3, .50, amp), rnd(.3, .50, amp), 1.0 )
         , color_light( rnd(.9, .10, amp), rnd(.9, .10, amp), rnd(.9, .10, amp), 1.0 )
         {
-            dsPrint("Body       : m=%1.4f l=(%1.4f %1.4f %1.4f)\n"
-                    "Shoulder   : m=%1.4f l=(%1.4f)\n"
-                    "Legs Upper : m=%1.4f l=(%1.4f %1.4f %1.4f)\n"
-                    "Legs Lower : m=%1.4f l=(%1.4f %1.4f)\n"
+            dsPrint("Model Parameters:\n"
+                    "\tBody       : m=%1.4f l=(%1.4f %1.4f %1.4f)\n"
+                    "\tShoulder   : m=%1.4f l=(%1.4f)\n"
+                    "\tLegs Upper : m=%1.4f l=(%1.4f %1.4f %1.4f)\n"
+                    "\tLegs Lower : m=%1.4f l=(%1.4f %1.4f)\n"
                     , weight_kg.body     , body.x       , body.y       , body.z
                     , weight_kg.shoulder , shoulder_a
                     , weight_kg.leg_upper, leg_upper.x  , leg_upper.y  , leg_upper.z

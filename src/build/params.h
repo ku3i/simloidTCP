@@ -39,7 +39,7 @@ struct ActuatorParameters {
     , kM               ( rnd(motor_parameter::kM     , perc, var) )
     , R_i_inv          ( rnd(motor_parameter::R_i_inv, perc, var) )
     {
-        dsPrint("Using randomized actuator parameters by %1.2f \% and %1.2f variation", perc*100, var);
+        dsPrint("Using randomized actuator parameters by %1.2f %% and %1.3f variation", perc*100, var);
         assert (perc >= 0. and perc <= 0.33);
         assert (var  >= 0. and var  <= 1.00);
         /* Sticktion must be greater than coulomb friction. This is guarantied up to a range of 33%*/
