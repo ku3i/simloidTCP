@@ -2,6 +2,7 @@
 #define HANNAH_RANDOM_H_INCLUDED
 
 #include <basic/common.h>
+#include <basic/color.h>
 #include <build/robot.h>
 #include <build/params.h>
 #include <build/physics.h>
@@ -11,6 +12,8 @@ namespace Robots {
 namespace HannahRand {
 
     using common::rnd;
+
+    const double range = 0.2;
 
     struct Capsule {
         Capsule(double l, double r) : len(l), rad(r) {}
@@ -39,26 +42,32 @@ namespace HannahRand {
             double leg_lower;
         } weight_kg;
 
+        Color4 color_body;
+        Color4 color_dark;
+        Color4 color_light;
 
         HannahMorphology(double amp)
-        : body( rnd(.250, 0.2, amp)
-              , rnd(.500, 0.2, amp)
-              , rnd(.120, 0.2, amp)
+        : body( rnd(.250, range, amp)
+              , rnd(.500, range, amp)
+              , rnd(.120, range, amp)
               )
-        , leg_upper( rnd(.010, 0.2, amp)
-                   , rnd(.060, 0.2, amp)
-                   , rnd(.320, 0.2, amp) // length
+        , leg_upper( rnd(.010, range, amp)
+                   , rnd(.060, range, amp)
+                   , rnd(.320, range, amp) // length
                    )
-        , leg_lower( rnd(0.50, 0.2, amp) // length
-                   , rnd(0.01, 0.2, amp) // radius
+        , leg_lower( rnd(0.50, range, amp) // length
+                   , rnd(0.01, range, amp) // radius
                    )
-        , shoulder_a( rnd(.04, 0.2, amp) )
+        , shoulder_a( rnd(.04, range, amp) )
         , zheight_start( leg_upper.z + leg_lower.len + leg_lower.rad )
-        , weight_kg({rnd(3.040, 0.2, amp)  /**TODO specify */
-                   , rnd(0.100, 0.2, amp)  /**TODO specify */
-                   , rnd(0.615, 0.2, amp)  /**TODO specify */
-                   , rnd(0.200, 0.2, amp)  /**TODO specify */
+        , weight_kg({rnd(3.040, range, amp)  /**TODO specify */
+                   , rnd(0.100, range, amp)  /**TODO specify */
+                   , rnd(0.615, range, amp)  /**TODO specify */
+                   , rnd(0.200, range, amp)  /**TODO specify */
                    })
+        , color_body ( rnd(.5, 1.0, amp), rnd(.5, 1.0, amp), rnd(.5, 1.0, amp), 1.0 )
+        , color_dark ( rnd(.3, .50, amp), rnd(.3, .50, amp), rnd(.3, .50, amp), 1.0 )
+        , color_light( rnd(.9, .10, amp), rnd(.9, .10, amp), rnd(.9, .10, amp), 1.0 )
         {
             dsPrint("Body: %1.4f %1.4f %1.4f\n", body.x, body.y, body.z);
         }
@@ -73,9 +82,9 @@ create_random_hannah(Robot& robot, unsigned rnd_instance, double rnd_amp)
         srand(rnd_instance);
 
     HannahMorphology m(rnd_amp);
-    ActuatorParameters params;//TODO Check ! (0.2, rnd_amp);
+    ActuatorParameters params(range, rnd_amp);
 
-    const unsigned int torque = 5; // TODO make to double and randomize
+    const double torque = rnd(5.0, range, rnd_amp);
 
     srand(time(NULL)); // usual seed for random number generator.
 
@@ -83,7 +92,7 @@ create_random_hannah(Robot& robot, unsigned rnd_instance, double rnd_amp)
 
     /* body */
     Vector3 pos (.0, .0, m.zheight_start);
-    robot.create_box("body", pos, m.body, m.weight_kg.body, 0, colors::black, true, constants::friction::hi); // body
+    robot.create_box("body", pos, m.body, m.weight_kg.body, 0, m.color_body, true, constants::friction::hi); // body
 
     /* shoulders */
     const double shoulder_z = m.zheight_start + 0.5*m.body.z - m.fx;
@@ -92,19 +101,19 @@ create_random_hannah(Robot& robot, unsigned rnd_instance, double rnd_amp)
     pos.y = -.5*m.body.y -1.5*m.shoulder_a;
     pos.x = 0.5*m.body.x - m.fx;
 
-    robot.create_box("lfsh", {+pos.x, +pos.y, pos.z}, m.shoulder_a, m.weight_kg.shoulder, 0, colors::black, true, constants::friction::lo); // left fore shoulder
-    robot.create_box("rfsh", {-pos.x, +pos.y, pos.z}, m.shoulder_a, m.weight_kg.shoulder, 0, colors::black, true, constants::friction::lo); // right fore shoulder
-    robot.create_box("lhsh", {+pos.x, -pos.y, pos.z}, m.shoulder_a, m.weight_kg.shoulder, 0, colors::black, true, constants::friction::lo); // left hind shoulder
-    robot.create_box("rhsh", {-pos.x, -pos.y, pos.z}, m.shoulder_a, m.weight_kg.shoulder, 0, colors::black, true, constants::friction::lo); // right hind shoulder
+    robot.create_box("lfsh", {+pos.x, +pos.y, pos.z}, m.shoulder_a, m.weight_kg.shoulder, 0, m.color_dark, true, constants::friction::lo); // left fore shoulder
+    robot.create_box("rfsh", {-pos.x, +pos.y, pos.z}, m.shoulder_a, m.weight_kg.shoulder, 0, m.color_dark, true, constants::friction::lo); // right fore shoulder
+    robot.create_box("lhsh", {+pos.x, -pos.y, pos.z}, m.shoulder_a, m.weight_kg.shoulder, 0, m.color_dark, true, constants::friction::lo); // left hind shoulder
+    robot.create_box("rhsh", {-pos.x, -pos.y, pos.z}, m.shoulder_a, m.weight_kg.shoulder, 0, m.color_dark, true, constants::friction::lo); // right hind shoulder
 
     /* legs upper */
     pos.z = shoulder_z + m.fz - .5*m.leg_upper.z;
     pos.x += 1.5*m.shoulder_a + 0.5*m.leg_upper.x;
 
-    robot.create_box("lflu", {+pos.x, +pos.y, pos.z}, m.leg_upper, m.weight_kg.leg_upper, 0, colors::white, true, constants::friction::hi); // left fore leg upper
-    robot.create_box("rflu", {-pos.x, +pos.y, pos.z}, m.leg_upper, m.weight_kg.leg_upper, 0, colors::white, true, constants::friction::hi); // right fore leg upper
-    robot.create_box("lhlu", {+pos.x, -pos.y, pos.z}, m.leg_upper, m.weight_kg.leg_upper, 0, colors::white, true, constants::friction::hi); // left hind leg upper
-    robot.create_box("rhlu", {-pos.x, -pos.y, pos.z}, m.leg_upper, m.weight_kg.leg_upper, 0, colors::white, true, constants::friction::hi); // right hind leg upper
+    robot.create_box("lflu", {+pos.x, +pos.y, pos.z}, m.leg_upper, m.weight_kg.leg_upper, 0, m.color_light, true, constants::friction::hi); // left fore leg upper
+    robot.create_box("rflu", {-pos.x, +pos.y, pos.z}, m.leg_upper, m.weight_kg.leg_upper, 0, m.color_light, true, constants::friction::hi); // right fore leg upper
+    robot.create_box("lhlu", {+pos.x, -pos.y, pos.z}, m.leg_upper, m.weight_kg.leg_upper, 0, m.color_light, true, constants::friction::hi); // left hind leg upper
+    robot.create_box("rhlu", {-pos.x, -pos.y, pos.z}, m.leg_upper, m.weight_kg.leg_upper, 0, m.color_light, true, constants::friction::hi); // right hind leg upper
 
     /* legs lower */
     pos.z = shoulder_z + m.fz - m.leg_upper.z - .5*m.leg_lower.len;
@@ -113,10 +122,10 @@ create_random_hannah(Robot& robot, unsigned rnd_instance, double rnd_amp)
     const double D = dy+0.01;
     const double K = 0.034;
 
-    robot.create_segment("lfll", +pos.x, +pos.y + dy, pos.z, 3, m.leg_lower.len, m.leg_lower.rad, m.weight_kg.leg_lower, 0, colors::black, true, constants::friction::sticky); // left fore leg lower
-    robot.create_segment("rfll", -pos.x, +pos.y + dy, pos.z, 3, m.leg_lower.len, m.leg_lower.rad, m.weight_kg.leg_lower, 0, colors::black, true, constants::friction::sticky); // right fore leg lower
-    robot.create_segment("lhll", +pos.x, -pos.y + dy, pos.z, 3, m.leg_lower.len, m.leg_lower.rad, m.weight_kg.leg_lower, 0, colors::black, true, constants::friction::sticky); // left hind leg lower
-    robot.create_segment("rhll", -pos.x, -pos.y + dy, pos.z, 3, m.leg_lower.len, m.leg_lower.rad, m.weight_kg.leg_lower, 0, colors::black, true, constants::friction::sticky); // right hind leg lower
+    robot.create_segment("lfll", +pos.x, +pos.y + dy, pos.z, 3, m.leg_lower.len, m.leg_lower.rad, m.weight_kg.leg_lower, 0, m.color_dark, true, constants::friction::sticky); // left fore leg lower
+    robot.create_segment("rfll", -pos.x, +pos.y + dy, pos.z, 3, m.leg_lower.len, m.leg_lower.rad, m.weight_kg.leg_lower, 0, m.color_dark, true, constants::friction::sticky); // right fore leg lower
+    robot.create_segment("lhll", +pos.x, -pos.y + dy, pos.z, 3, m.leg_lower.len, m.leg_lower.rad, m.weight_kg.leg_lower, 0, m.color_dark, true, constants::friction::sticky); // left hind leg lower
+    robot.create_segment("rhll", -pos.x, -pos.y + dy, pos.z, 3, m.leg_lower.len, m.leg_lower.rad, m.weight_kg.leg_lower, 0, m.color_dark, true, constants::friction::sticky); // right hind leg lower
 
     /* connect by joints */
     robot.connect_joint("body", "lfsh", .0, .0, .0,                       'y', -90,  +90,  -1 + rnd(3), JointType::normal,    "L_shoulder_roll" , ""                , torque, params);
@@ -135,7 +144,7 @@ create_random_hannah(Robot& robot, unsigned rnd_instance, double rnd_amp)
     robot.connect_joint("rhlu", "rhll", .0, -D, +.5*m.leg_lower.len + K , 'x',   0, +180, +15 + rnd(3), JointType::symmetric, "R_knee_pitch"    , "L_knee_pitch"    , torque, params);
 
     /* attach sensors */
-    robot.attach_accel_sensor("body");
+    robot.attach_accel_sensor("body", /* keep original color = */true);
 
     /* camera */
     robot.set_camera_center_on("body");

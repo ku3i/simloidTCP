@@ -38,7 +38,7 @@ void Robot::create_segment( const std::string name
 }
 
 
-void Robot::attach_accel_sensor(const std::string bodyname)
+void Robot::attach_accel_sensor(const std::string bodyname, bool keep_original_color)
 {
     unsigned int objnr = bodies.get_body_id_by_name(bodyname);
     if (objnr == bodies.get_size())
@@ -46,7 +46,8 @@ void Robot::attach_accel_sensor(const std::string bodyname)
 
     dsPrint("Attaching acceleration sensor to '%s' (%d)\n", bodyname.c_str(), objnr);
     accels.attach(bodies[objnr].body, _left, _forward, _up); // right hand rule with x,y,z
-    bodies[objnr].color = colors::orange;
+    if (!keep_original_color)
+        bodies[objnr].color = colors::orange;
 }
 
 void Robot::connect_joint( const std::string bodyname1, const std::string bodyname2,
@@ -55,7 +56,7 @@ void Robot::connect_joint( const std::string bodyname1, const std::string bodyna
                            const double jointstopLo_deg, const double jointstopHi_deg, const double jointposDefault_deg,
                            const JointType Type,
                            const std::string Name, const std::string SymName,
-                           unsigned int torque_factor,
+                           double torque_factor,
                            ActuatorParameters const& conf )
 {
     check_joint_axis(axis);

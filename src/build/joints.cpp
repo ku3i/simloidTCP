@@ -117,11 +117,11 @@ NJoint::stribeck_friction_model(const double velocity)
  |                                                 |
  | u             : input [-1,+1]                   |
  | joint_speed   : [-1,+1] (normed joint velocity) |
- | torque_factor :  5 equals 1 Dynamixel           |
+ | torque_factor : 5 equals 1 Dynamixel            |
  |                                                 |
  +-------------------------------------------------*/
 double
-NJoint::motor_model(const double u, double joint_speed, unsigned int torque_factor) const
+NJoint::motor_model(const double u, double joint_speed) const
 {
     double U_in = conf.V_in * u;
 

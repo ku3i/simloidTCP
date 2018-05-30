@@ -59,6 +59,7 @@
 		<Unit filename="src/build/joints.cpp" />
 		<Unit filename="src/build/joints.h" />
 		<Unit filename="src/build/obstacles.h" />
+		<Unit filename="src/build/params.h" />
 		<Unit filename="src/build/physics.cpp" />
 		<Unit filename="src/build/physics.h" />
 		<Unit filename="src/build/robot.cpp" />

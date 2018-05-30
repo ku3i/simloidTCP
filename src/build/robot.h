@@ -74,7 +74,7 @@ public:
                        , const bool collision
                        , const double friction = dInfinity);
 
-    void attach_accel_sensor(std::string name_body);
+    void attach_accel_sensor(std::string name_body, bool keep_original_color = false);
 
     void connect_joint (
                     const std::string bodyname1, const std::string bodyname2,
@@ -84,7 +84,7 @@ public:
                     const JointType Type,
                     const std::string Name,
                     const std::string SymName = "",
-                    const unsigned int torque_factor = 5,
+                    const double torque_factor = 5.0,
                     ActuatorParameters const& conf = ActuatorParameters()
                 );
 

@@ -33,7 +33,7 @@ public:
           , double position_default_rad
           , Vector3 rel
           , const char axis
-          , unsigned int torque_factor
+          , double torque_factor
           , ActuatorParameters const& conf
           )
     : joint_id(joint_id)
@@ -101,6 +101,7 @@ public:
         } else
             dsError("Lower joint stop is greater than higher (%1.2f > %1.2f)\n", common::rad2deg(stop_lo_rad), common::rad2deg(stop_hi_rad));
 
+        assert(torque_factor > 0. and torque_factor <= 10);
         dsPrint("done.\n");
     }
 
@@ -125,7 +126,7 @@ public:
     /* set */
     void set_voltage(const double value) {
         pid_enable = false;
-        voltage_setpoint = motor_model(common::clip(value, 1.0), get_velocity_norm(), torque_factor);
+        voltage_setpoint = motor_model(common::clip(value, 1.0), get_velocity_norm());
     }
     void set_position(const double value) {
         pid_enable = true;
@@ -143,7 +144,7 @@ public:
         dJointAddAMotorTorques(motor, voltage_setpoint, .0, .0);
     }
     void apply_pidmaxtorque() const {
-        dJointSetAMotorParam(motor, dParamFMax, motor_model(pid_maxtorque, 0.0, torque_factor));
+        dJointSetAMotorParam(motor, dParamFMax, motor_model(pid_maxtorque, 0.0));
     }
     void apply_position_control() {
         set_motor_angular_velocity(pid_ctrl.set_position(pid_position_setpoint, get_motor_angle()));
@@ -164,7 +165,7 @@ public:
     /* physics simulation */
     double bristle(double velocity);
     double stribeck_friction_model(const double velocity);
-    double motor_model(const double u, const double joint_speed, const unsigned int torque_factor) const;
+    double motor_model(const double u, const double joint_speed) const;
 
     void reset() {
         pid_ctrl.reset();
@@ -180,7 +181,7 @@ public:
     const unsigned int joint_id;
     const unsigned int body1;
     const unsigned int body2;
-    const unsigned int torque_factor;
+    const double       torque_factor;
           unsigned int symmetric_joint;
              JointType type;
     std::string        name;
@@ -236,7 +237,7 @@ public:
                        , double position_default_rad
                        , Vector3 rel
                        , const char axis
-                       , unsigned int torque_factor
+                       , double torque_factor
                        , ActuatorParameters const& conf
                        )
     {
