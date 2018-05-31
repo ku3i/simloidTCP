@@ -70,7 +70,7 @@ namespace HannahRand {
         , weight_kg({rnd(3.040, range, amp)  /**TODO specify */
                    , rnd(0.100, range, amp)  /**TODO specify */
                    , rnd(0.615, range, amp)  /**TODO specify */
-                   , rnd(0.200, range, amp)  /**TODO specify */
+                   , rnd(0.200, range, amp)  /**TODO specify, make the real leg weight more, in order to back-drive */
                    })
         , torque( rnd(5.0, range, amp) )
         , color_body ( rnd(.5, 1.0, amp), rnd(.5, 1.0, amp), rnd(.5, 1.0, amp), 1.0 )

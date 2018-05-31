@@ -413,7 +413,7 @@ bool TCPController::parse_update_model_command(const char* msg)
     unsigned rnd_instance = 0;
     double rnd_amp = .0;
 
-    if (2 == sscanf(msg, " %d %u %lf", &new_model_id, &rnd_instance, &rnd_amp)
+    if (3 == sscanf(msg, " %d %u %lf", &new_model_id, &rnd_instance, &rnd_amp)
     or  1 == sscanf(msg, " %d"       , &new_model_id /*no instance*/))
     {
         robot.destroy();
