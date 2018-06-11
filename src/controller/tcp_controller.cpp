@@ -407,22 +407,39 @@ void TCPController::parse_impulse_FI(const char* msg)
 bool TCPController::parse_update_model_command(const char* msg)
 {
     int offset = 5;
-
     msg += offset;
-    int new_model_id;
-    unsigned rnd_instance = 0;
-    double rnd_amp = .0;
 
-    if (3 == sscanf(msg, " %d %u %lf", &new_model_id, &rnd_instance, &rnd_amp)
-    or  1 == sscanf(msg, " %d"       , &new_model_id /*no instance*/))
-    {
-        robot.destroy();
-        Bioloid::create_robot(robot, new_model_id, rnd_instance, rnd_amp);
-        return true;
+    std::vector<double> params;
+
+    int new_model_id;
+    unsigned num_params;
+
+    if (2 != sscanf(msg, " %d %u%n", &new_model_id, &num_params, &offset)) {
+        dsPrint("ERROR: bad 'MODEL' format: '%s'\n", msg);
+        return false;
     }
 
-    dsPrint("ERROR: bad 'MODEL' format: '%s'\n", msg);
-    return false;
+    msg += offset;
+    double p = 0.;
+
+    if (num_params > 0)
+    {
+        params.reserve(num_params);
+        for (unsigned int idx = 0; idx < num_params; ++idx)
+        {
+            if (1 == sscanf(msg, " %lf%n", &p, &offset)) {
+                msg += offset;
+                params.emplace_back(p);
+            } else {
+                dsPrint("ERROR: bad parameter format for 'MODEL' : '%s'\n", msg);
+                return false;
+            }
+        }
+    }
+
+    robot.destroy();
+    Bioloid::create_robot(robot, new_model_id, params);
+    return true;
 }
 
 /* fin */

@@ -26,9 +26,9 @@ Bioloid::create_scene(Obstacle& obstacles, Landscape& landscape)
 }
 
 /* when no model number is given explicitly, use the one from the global configuration. */
-void Bioloid::create_robot(Robot& robot) { create_robot(robot, global_conf.robot, 0, .0); }
+void Bioloid::create_robot(Robot& robot) { create_robot(robot, global_conf.robot, std::vector<double>{}); }
 
-void Bioloid::create_robot(Robot& robot, int index_number, unsigned rnd_instance, double rnd_amp)
+void Bioloid::create_robot(Robot& robot, int index_number, std::vector<double> params)
 {
     dsPrint("Creating robot with index number %d: \n", index_number);
     switch (index_number)
@@ -42,7 +42,7 @@ void Bioloid::create_robot(Robot& robot, int index_number, unsigned rnd_instance
         case 31: Robots::Fourlegged::create_wildcat_1       (robot); break;
         case 32: Robots::Hannah    ::create_hannah          (robot); break;
 
-        case 37: Robots::HannahRand::create_random_hannah   (robot, rnd_instance, rnd_amp); break;
+        case 37: Robots::HannahRand::create_random_hannah   (robot, params); break;
 
         case 40: Robots::Biped     ::create_ostrich         (robot); break;
 
