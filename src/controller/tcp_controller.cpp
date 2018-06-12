@@ -84,6 +84,7 @@ bool TCPController::control(const double time)
 
         /* model updates */
         if (starts_with(msg, "MODEL"  )) { reload_model = parse_update_model_command(msg.c_str()); continue; }
+        if (starts_with(msg, "MOTOR"  )) { parse_update_motor_model(msg.c_str()); continue; }
 
         /* error */
         if (fail_counter++ >= 42) { dsPrint("Too many messages without a 'DONE'-command.\n"); return false; }
@@ -404,12 +405,32 @@ void TCPController::parse_impulse_FI(const char* msg)
     else dsPrint("ERROR: bad 'FI' format: '%s'\n", msg);
 }
 
+std::vector<double> read_params(const char* msg, int* offset, unsigned num_params)
+{
+    std::vector<double> params;
+    double p = 0.;
+
+    if (num_params > 0)
+    {
+        params.reserve(num_params);
+        for (unsigned int idx = 0; idx < num_params; ++idx)
+        {
+            if (1 == sscanf(msg, " %lf%n", &p, offset)) {
+                msg += (*offset);
+                params.emplace_back(p);
+            } else {
+                dsPrint("ERROR: bad parameter format for 'MODEL' : '%s'\n", msg);
+                return {};
+            }
+        }
+    }
+    return params;
+}
+
 bool TCPController::parse_update_model_command(const char* msg)
 {
     int offset = 5;
     msg += offset;
-
-    std::vector<double> params;
 
     int new_model_id;
     unsigned num_params;
@@ -420,27 +441,35 @@ bool TCPController::parse_update_model_command(const char* msg)
     }
 
     msg += offset;
-    double p = 0.;
-
-    if (num_params > 0)
-    {
-        params.reserve(num_params);
-        for (unsigned int idx = 0; idx < num_params; ++idx)
-        {
-            if (1 == sscanf(msg, " %lf%n", &p, &offset)) {
-                msg += offset;
-                params.emplace_back(p);
-            } else {
-                dsPrint("ERROR: bad parameter format for 'MODEL' : '%s'\n", msg);
-                return false;
-            }
-        }
-    }
+    auto params = read_params(msg, &offset, num_params);
 
     robot.destroy();
     Bioloid::create_robot(robot, new_model_id, params);
     return true;
 }
+
+
+void TCPController::parse_update_motor_model(const char* msg) {
+    int offset = 5;
+    msg += offset;
+
+    unsigned num_params;
+
+    if (1 != sscanf(msg, " %u%n", &num_params, &offset)) {
+        dsPrint("ERROR: bad 'MOTOR' format: '%s'\n", msg);
+        return;
+    }
+
+    msg += offset;
+    auto params = read_params(msg, &offset, num_params);
+
+    dsPrint("Reinitializing actuator model with %u parameters.\n", num_params);
+    for (unsigned int idx = 0; idx < robot.number_of_joints(); ++idx)
+        robot.joints[idx].reinit_motormodel(ActuatorParameters(params));
+
+    return;
+}
+
 
 /* fin */
 

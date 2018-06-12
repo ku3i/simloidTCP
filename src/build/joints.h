@@ -176,6 +176,8 @@ public:
         pid_maxtorque = common::clip(global_conf.init_max_torque, 0.0, 1.0);
     }
 
+    void reinit_motormodel(ActuatorParameters const& c) { conf = c; }
+
     void draw(void) const;
 
     const unsigned int joint_id;

@@ -66,6 +66,7 @@ private:
     void parse_impulse_FI(const char* msg);
 
     bool parse_update_model_command(const char* msg);
+    void parse_update_motor_model(const char* msg);
 
     void execute_controller();
 

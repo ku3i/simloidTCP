@@ -185,6 +185,50 @@ create_random_hannah(Robot& robot, std::vector<double> model_parameter)
 }
 
 
+void
+create_motor_param_test(Robot& robot)
+{
+    const Vector3 size_base (.500, .500, .500);
+    const Vector3 size_rotor(.520, .020, .015);
+
+    dsPrint("HORIZONTAL EXCENTRIC ROTOR FOR MOTOR PARAM TESTLEG\n");
+    Vector3 pos;
+
+    const double joint_distance = 0.005;
+
+    const double axis_delta = 0.0315;
+
+    ActuatorParameters params;
+    params.V_in = 12.0;
+
+    const double density_fagus = 720; /* kg/m^3 */
+
+    /* body */
+    pos.x = .0;
+    pos.y = .0;
+    pos.z = 0.5*size_base.z;
+
+    robot.create_box("base", pos, size_base, .0, constants::materials::heavy, colors::white, true, constants::friction::hi);
+
+    /* arm */
+    pos.x = 0.5*size_rotor.x;
+    pos.y = .0;
+    pos.z = size_base.z + 0.5 * size_rotor.z + joint_distance;
+
+    robot.create_box("rotor", pos, size_rotor, .0, density_fagus, colors::black, false, constants::friction::lo);
+
+    /* connect joints */
+    robot.connect_joint("base" , "rotor", -.5*size_rotor.x + axis_delta, .0, .0, 'Z', -90.0, +90.0, 0.0, JointType::normal, "joint0", "", 5.0, params);
+
+
+    /* attach sensors */
+    //robot.attach_accel_sensor("rotor");
+
+    /* camera */
+    robot.set_camera_center_on("base");
+    robot.setup_camera(Vector3(0.0, -1.20, 1.20), 90, -40, 0);
+}
+
 }} // namespace Robots::Hannah
 
 #endif // HANNAH_RANDOM_H_INCLUDED

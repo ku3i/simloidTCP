@@ -52,6 +52,7 @@ void Bioloid::create_robot(Robot& robot, int index_number, std::vector<double> p
         case 60: Robots::Nolegs    ::create_worm            (robot); break;
 
         case 80: Robots::Hannah    ::create_hannah_leg      (robot); break;
+        case 81: Robots::HannahRand::create_motor_param_test(robot); break;
 
         case 90: Robots::Standard  ::create_pendulum        (robot); break;
         case 91: Robots::Standard  ::create_double_pendulum (robot); break;

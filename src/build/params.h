@@ -23,7 +23,7 @@ struct ActuatorParameters {
     , kM               ( motor_parameter::kM      )
     , R_i_inv          ( motor_parameter::R_i_inv )
     {
-        dsPrint("Using standard actuator parameters.");
+        printf("Using standard actuator parameters.");
         static_assert (joint::sticking_friction >= joint::coulomb_friction, "Sticktion must be greater than coulomb friction.");
     }
 
@@ -39,11 +39,62 @@ struct ActuatorParameters {
     , kM               ( rnd(motor_parameter::kM     , perc, var) )
     , R_i_inv          ( rnd(motor_parameter::R_i_inv, perc, var) )
     {
-        dsPrint("Using randomized actuator parameters by %1.2f %% variation", perc * 100 * var);
+        printf("Using randomized actuator parameters by %1.2f %% variation", perc * 100 * var);
         assert (perc >= 0. and perc <= 0.33);
         assert (var  >= 0. and var  <= 1.00);
         /* Sticktion must be greater than coulomb friction. This is guarantied up to a range of 33%*/
         assert (sticking_friction >= coulomb_friction);
+    }
+
+    ActuatorParameters(std::vector<double> params, bool assert_range = true)
+    : bristle_displ_max( params.at(0) )
+    , bristle_stiffness( params.at(1) )
+    , sticking_friction( params.at(2) )
+    , coulomb_friction ( params.at(3) )
+    , fluid_friction   ( params.at(4) )
+    , stiction_range   ( params.at(5) )
+    , V_in             ( params.at(6) )
+    , kB               ( params.at(7) )
+    , kM               ( params.at(8) )
+    , R_i_inv          ( params.at(9) )
+    {
+        printf("Using actuator parameters from vector.\n"
+               "bristle_displ_max : %7.4lf | bristle_stiffness : %7.4lf\n"
+               "sticking_friction : %7.4lf | coulomb_friction  : %7.4lf\n"
+               "fluid_friction    : %7.4lf | stiction_range    : %7.4lf\n"
+               "V_in              : %7.4lf | kB                : %7.4lf\n"
+               "kM                : %7.4lf | R_i_inv           : %7.4lf\n"
+              , bristle_displ_max
+              , bristle_stiffness
+              , sticking_friction
+              , coulomb_friction
+              , fluid_friction
+              , stiction_range
+              , V_in
+              , kB
+              , kM
+              , R_i_inv
+              );
+        if (assert_range)
+            assert (sticking_friction >= coulomb_friction);
+    }
+
+    std::vector<double> get(void) const
+    {
+        std::vector<double> params;
+        params.reserve(10);
+        params.emplace_back( bristle_displ_max );
+        params.emplace_back( bristle_stiffness );
+        params.emplace_back( sticking_friction );
+        params.emplace_back( coulomb_friction  );
+        params.emplace_back( fluid_friction    );
+        params.emplace_back( stiction_range    );
+        params.emplace_back( V_in              );
+        params.emplace_back( kB                );
+        params.emplace_back( kM                );
+        params.emplace_back( R_i_inv           );
+        assert(params.size() == 10);
+        return params;
     }
 
     double bristle_displ_max;
