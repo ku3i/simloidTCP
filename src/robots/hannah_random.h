@@ -201,7 +201,7 @@ create_motor_param_test(Robot& robot)
     ActuatorParameters params;
     params.V_in = 12.0;
 
-    const double density_fagus = 720; /* kg/m^3 */
+    const double density_fagus = 800; /* kg/m^3 */
 
     /* body */
     pos.x = .0;
@@ -228,6 +228,66 @@ create_motor_param_test(Robot& robot)
     robot.set_camera_center_on("base");
     robot.setup_camera(Vector3(0.0, -1.20, 1.20), 90, -40, 0);
 }
+
+void
+create_motor_param_test_vert(Robot& robot)
+{
+    const Vector3 size_base (.500, .500, .700);
+    const Vector3 size_rotor(.020, .015, .520);
+
+    dsPrint("HORIZONTAL EXCENTRIC ROTOR FOR MOTOR PARAM TESTLEG\n");
+    Vector3 pos;
+
+    const double joint_distance = 0.005;
+
+    const double axis_delta = 0.0315;
+
+    ActuatorParameters params;
+    params.V_in = 12.0;
+
+    const double density_fagus = 800; /* kg/m^3 */
+
+    /* body */
+    pos.x = .0;
+    pos.y = 0.5*size_base.y;
+    pos.z = 0.5*size_base.z;
+
+    robot.create_box("base", pos, size_base, .0, constants::materials::heavy, colors::white, true, constants::friction::hi);
+
+    /* arm */
+//    pos.x = 0.5*size_rotor.x;
+//    pos.y = .0;
+//    pos.z = size_base.z + 0.5 * size_rotor.z + joint_distance;
+
+    pos.y = -0.5*size_rotor.y - joint_distance;
+    pos.z = 0.9*size_base.z - 0.5 * size_rotor.z;
+
+    robot.create_box("rotor", pos, size_rotor, .0, density_fagus, colors::black, false, constants::friction::lo);
+
+    /* connect joints */
+    robot.connect_joint("base" , "rotor", .0, .0, +.5*size_rotor.z - axis_delta,  'y', -90.0, +90.0, 0.0, JointType::normal, "joint0", "", 5.0, params);
+
+    /*
+
+    pos.y = -0.5*size_lever.y - joint_distance;
+    pos.z = 0.9*size_base.z - 0.5 * size_lever.z + zheight_start;
+
+    robot.create_box("lever", pos, size_lever, .0, constants::materials::heavy, colors::black, false, constants::friction::lo);
+
+
+    robot.connect_joint("base" , "lever", .0, .0, +0.5*size_lever.z - 0.5*size_lever.x, 'y', -180, +180, 90, JointType::normal, "joint0", "", 2);
+
+    */
+
+
+    /* attach sensors */
+    //robot.attach_accel_sensor("rotor");
+
+    /* camera */
+    robot.set_camera_center_on("base");
+    robot.setup_camera(Vector3(0.0, -1.20, 1.20), 90, -40, 0);
+}
+
 
 }} // namespace Robots::Hannah
 

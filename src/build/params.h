@@ -25,6 +25,7 @@ struct ActuatorParameters {
     {
         printf("Using standard actuator parameters.");
         static_assert (joint::sticking_friction >= joint::coulomb_friction, "Sticktion must be greater than coulomb friction.");
+        static_assert (joint::stiction_range > 0, "Sticktion range must be greater zero.");
     }
 
     ActuatorParameters(double perc, double var)
@@ -44,6 +45,7 @@ struct ActuatorParameters {
         assert (var  >= 0. and var  <= 1.00);
         /* Sticktion must be greater than coulomb friction. This is guarantied up to a range of 33%*/
         assert (sticking_friction >= coulomb_friction);
+        assert (stiction_range > 0);
     }
 
     ActuatorParameters(std::vector<double> params, bool assert_range = true)
@@ -75,8 +77,10 @@ struct ActuatorParameters {
               , kM
               , R_i_inv
               );
-        if (assert_range)
+        if (assert_range) {
             assert (sticking_friction >= coulomb_friction);
+            assert (stiction_range > 0);
+        }
     }
 
     std::vector<double> get(void) const
