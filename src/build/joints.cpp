@@ -132,3 +132,11 @@ NJoint::motor_model(const double u, double joint_speed) const
 
     return M;
 }
+
+dJointID create_fixed_joint(dWorldID const& world, SolidVector const& bodies, unsigned body1, unsigned body2)
+{
+    dJointID fixed = dJointCreateFixed(world, 0);
+    dJointAttach(fixed, bodies[body1].body, bodies[body2].body);
+    return fixed;
+}
+

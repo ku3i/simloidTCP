@@ -6,6 +6,7 @@
 #include <cassert>
 #include <draw/drawstuff.h>
 #include <basic/vector3.h>
+#include <basic/capsule.h>
 #include <basic/color.h>
 #include <basic/common.h>
 #include <basic/draw.h>
@@ -80,39 +81,45 @@ public:
          , const Vector3& pos
          , const double frict
          , const Color4& color
-         , const unsigned int direction
-         , const double length
-         , const double radius
+         , const Capsule cap
          , const double mass
          , const double density
          , const bool collision)
     : Solid(world, body_id, name, pos, frict, color)
     {
+        assert(cap.len >= 0);
         /* check direction */
-        if (direction < 1 || direction > 3) {
+        if (cap.dir < 1 || cap.dir > 3) {
             dsError("'Direction' should be 1=x, 2=y, 3=z.");
         }
-        if (1 == direction) { //TODO: make a method from that, to be able to rotate other objects as well
+        if (1 == cap.dir) { //TODO: make a method from that, to be able to rotate other objects as well
             dMatrix3 R;
             dRFromAxisAndAngle(R, 0.0, 1.0, 0.0, constants::h_pi);
             dBodySetRotation(body, R);
         }
-        else if (2 == direction) {
+        else if (2 == cap.dir) {
             dMatrix3 R;
             dRFromAxisAndAngle(R, 1.0, 0.0, 0.0, constants::h_pi);
             dBodySetRotation(body, R);
         }
         //else do nothing
 
-        /* set mass for a capsule */
+        /* set mass and geometry for a capsule or sphere */
         dMass m;
         dMassSetZero(&m);
-        if (mass > 0) dMassSetCapsuleTotal(&m, mass, direction, radius, length); // if mass > 0, set mass
-        else dMassSetCapsule(&m, density, direction, radius, length);            // otherwise set density
-        dBodySetMass(body, &m);
 
-        /* geometry */
-        geometry = dCreateCCylinder(space, radius, length);
+        if (cap.len == 0.)
+        {
+            if (mass > 0) dMassSetSphereTotal(&m, mass, cap.rad); // if mass > 0, set mass
+            else dMassSetSphere(&m, density, cap.rad);            // otherwise set density
+            geometry = dCreateSphere(space, cap.rad);
+        } else {
+            if (mass > 0) dMassSetCapsuleTotal(&m, mass, cap.dir, cap.rad, cap.len); // if mass > 0, set mass
+            else dMassSetCapsule(&m, density, cap.dir, cap.rad, cap.len);            // otherwise set density
+            geometry = dCreateCCylinder(space, cap.rad, cap.len);
+        }
+
+        dBodySetMass(body, &m);
         dGeomSetBody(geometry, body);
         dGeomSetData(geometry, static_cast<void*>(&friction)); // save friction for near_callback
         if (!collision) dGeomDisable(geometry);
@@ -194,7 +201,7 @@ public:
 
     unsigned int create_capsule(const std::string& name,
                                 const Vector3& pos,
-                                const unsigned int direction, const double length, const double radius,
+                                const Capsule cap,
                                 const double mass, const double density,
                                 const Color4& color,
                                 const bool collision, const double friction)
@@ -205,14 +212,14 @@ public:
             if (get_body_id_by_name(name) < body_id) {
                 dsError("Name '%s' already in use.", name.c_str());
             }
-            bodies.emplace_back(world, space, body_id, name, pos, friction, color, direction, length, radius, mass, density, collision);
+            bodies.emplace_back(world, space, body_id, name, pos, friction, color, cap, mass, density, collision);
         } else {
             dsError("Exceeded maximum number of bodies %u.", max_number_of_bodies);
         }
         return body_id;
     }
 
-    unsigned int get_body_id_by_name(const std::string& name) const
+    unsigned int get_body_id_by_name(std::string const& name) const
     {
         for (std::size_t i = 0; i < bodies.size(); ++i)
             if (name == bodies[i].name)
@@ -223,7 +230,7 @@ public:
           Solid& operator[](std::size_t idx)       { return bodies.at(idx); /**TODO use normal index if everything works out*/}
     const Solid& operator[](std::size_t idx) const { return bodies.at(idx); }
 
-    std::size_t get_size() const { return bodies.size(); }
+    std::size_t size() const { return bodies.size(); }
 
     dMass get_total_mass(void) const {
         assert(bodies.size() > 0);

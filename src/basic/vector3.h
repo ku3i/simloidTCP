@@ -103,6 +103,11 @@ public:
 
     bool is_zero(void) const { return (x == .0 && y == .0 && z == .0); }
 
+    Vector3 _x(void) const { return {-x, y, z}; }
+    Vector3 _y(void) const { return { x,-y, z}; }
+    Vector3 _z(void) const { return { x, y,-z}; }
+
+
 //    Vector3& operator=(Vector3 rhs) // the pass-by-value parameter serves as a temporary
 //    {
 //        rhs.swap(*this); // Non-throwing swap

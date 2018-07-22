@@ -12,6 +12,7 @@ void Robot::create_box(std::string name,
     bodies.create_box(name, pos, len, mass, density, color, collision, friction);
 }
 
+
 void Robot::create_box(const std::string name,
                        const double posx, const double posy, const double posz,
                        const double lenx, const double leny, const double lenz,
@@ -22,6 +23,18 @@ void Robot::create_box(const std::string name,
     bodies.create_box(name, Vector3(posx,posy,posz), Vector3(lenx,leny,lenz), mass, density, color, collision, friction);
 }
 
+
+void Robot::create_segment( const std::string name
+                          , const Vector3 pos
+                          , const Capsule cap
+                          , const double mass
+                          , const double density
+                          , const Color4 color
+                          , const bool collision
+                          , const double friction)
+{
+    bodies.create_capsule(name, pos, cap, mass, density, color, collision, friction);
+}
 
 
 void Robot::create_segment( const std::string name
@@ -34,14 +47,14 @@ void Robot::create_segment( const std::string name
                           , const bool collision
                           , const double friction)
 {
-    bodies.create_capsule(name, Vector3(posx,posy,posz), direction, length, radius, mass, density, color, collision, friction);
+    bodies.create_capsule(name, Vector3(posx,posy,posz), Capsule(direction, length, radius), mass, density, color, collision, friction);
 }
 
 
 void Robot::attach_accel_sensor(const std::string bodyname, bool keep_original_color)
 {
     unsigned int objnr = bodies.get_body_id_by_name(bodyname);
-    if (objnr == bodies.get_size())
+    if (objnr == bodies.size())
         dsError("No body with name '%s' to attach an accelerometer on.\n", bodyname.c_str());
 
     dsPrint("Attaching acceleration sensor to '%s' (%d)\n", bodyname.c_str(), objnr);
@@ -50,7 +63,7 @@ void Robot::attach_accel_sensor(const std::string bodyname, bool keep_original_c
         bodies[objnr].color = colors::orange;
 }
 
-void Robot::connect_joint( const std::string bodyname1, const std::string bodyname2,
+void Robot::connect_joint( std::string const& bodyname1, std::string const& bodyname2,
                            const double relx, const double rely, const double relz,
                            const char axis,
                            const double jointstopLo_deg, const double jointstopHi_deg, const double jointposDefault_deg,
@@ -65,20 +78,31 @@ void Robot::connect_joint( const std::string bodyname1, const std::string bodyna
     double jointstopHi     = common::deg2rad(jointstopHi_deg    );
     double jointstopLo     = common::deg2rad(jointstopLo_deg    );
 
-    // get the bodys' object IDs by name
-    unsigned int body1 = bodies.get_body_id_by_name(bodyname1);
-    unsigned int body2 = bodies.get_body_id_by_name(bodyname2);
+    // get the bodies' object IDs by name
+    unsigned body1 = bodies.get_body_id_by_name(bodyname1);
+    unsigned body2 = bodies.get_body_id_by_name(bodyname2);
 
-    if (body1 == bodies.get_size()) { dsError("Cannot find such an object for connection: '%s'\n", bodyname1.c_str()); }
-    if (body2 == bodies.get_size()) { dsError("Cannot find such an object for connection: '%s'\n", bodyname2.c_str()); }
+    if (body1 == bodies.size()) { dsError("Cannot find such an object for connection: '%s'\n", bodyname1.c_str()); }
+    if (body2 == bodies.size()) { dsError("Cannot find such an object for connection: '%s'\n", bodyname2.c_str()); }
 
-    unsigned int joint_id = joints.create(world, bodies, body1, body2, Type, Name, jointstopLo, jointstopHi, jointposDefault, Vector3(relx, rely, relz), axis, torque_factor, conf);
+    unsigned joint_id = joints.create(world, bodies, body1, body2, Type, Name, jointstopLo, jointstopHi, jointposDefault, Vector3(relx, rely, relz), axis, torque_factor, conf);
 
     bool result = joints.add_symmetric(joint_id, SymName);
     if (not result)
         dsPrint("Did not found yet symmetric joint for %02u\n", joint_id);
 }
 
+void Robot::connect_fixed(std::string const& bodyname1, std::string const& bodyname2)
+{
+    // get the bodies' object IDs by name
+    unsigned body1 = bodies.get_body_id_by_name(bodyname1);
+    unsigned body2 = bodies.get_body_id_by_name(bodyname2);
+
+    if (body1 == bodies.size()) { dsError("Cannot find such an object for connection: '%s'\n", bodyname1.c_str()); }
+    if (body2 == bodies.size()) { dsError("Cannot find such an object for connection: '%s'\n", bodyname2.c_str()); }
+
+    create_fixed_joint(world, bodies, body1, body2);
+}
 
 void Robot::print_statistics(void) const
 {
@@ -92,10 +116,10 @@ void Robot::print_statistics(void) const
            , bodies.get_total_mass().c[2] );
 }
 
-void Robot::set_camera_center_on(const std::string bodyname)
+void Robot::set_camera_center_on(std::string const& bodyname)
 {
     unsigned int objnr = bodies.get_body_id_by_name(bodyname);
-    if (objnr == bodies.get_size())
+    if (objnr == bodies.size())
         dsError("No joint with name '%s' to focus.\n", bodyname.c_str());
 
     dsPrint("Setting camera focus on body '%s' (%d)\n", bodyname.c_str(), objnr);

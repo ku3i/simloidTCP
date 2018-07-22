@@ -21,8 +21,9 @@ struct BodyState {
 
 struct Snapshot {
     ModelID model_id;
-    struct BodyState bodystate[constants::max_bodies];
-    struct BodyState obststate[constants::max_obstacles];
+    struct BodyState bodies     [constants::max_bodies];
+    struct BodyState attachments[constants::max_bodies];
+    struct BodyState obstacles  [constants::max_obstacles];
 };
 
 void recordSnapshot(const Robot& robot, const Obstacle& obstacles, Snapshot *s);

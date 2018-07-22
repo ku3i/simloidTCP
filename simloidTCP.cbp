@@ -36,6 +36,7 @@
 			<Add library="glut" />
 			<Add library="/usr/local/lib/libode.a" />
 		</Linker>
+		<Unit filename="src/basic/capsule.h" />
 		<Unit filename="src/basic/color.h" />
 		<Unit filename="src/basic/common.cpp" />
 		<Unit filename="src/basic/common.h" />
@@ -84,6 +85,7 @@
 		<Unit filename="src/robots/biped.h" />
 		<Unit filename="src/robots/crawler.h" />
 		<Unit filename="src/robots/fourlegged.h" />
+		<Unit filename="src/robots/gretchen.h" />
 		<Unit filename="src/robots/hannah.h" />
 		<Unit filename="src/robots/hannah_random.h" />
 		<Unit filename="src/robots/karl_sims.h" />

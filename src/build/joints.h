@@ -283,5 +283,6 @@ private:
 };
 
 
+dJointID create_fixed_joint(dWorldID const& world, SolidVector const& bodies, unsigned body1, unsigned body2);
 
 #endif // JOINTS_H_INCLUDED

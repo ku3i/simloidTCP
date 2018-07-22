@@ -8,6 +8,7 @@
 #include <robots/nolegs.h>
 #include <robots/hannah.h>
 #include <robots/hannah_random.h>
+#include <robots/gretchen.h>
 
 void
 Bioloid::create_scene(Obstacle& obstacles, Landscape& landscape)
@@ -48,6 +49,8 @@ void Bioloid::create_robot(Robot& robot, int index_number, std::vector<double> p
 
         case 50: Robots::Biped     ::create_humanoid0       (robot); break;
         case 51: Robots::Biped     ::create_humanoid1       (robot); break;
+
+        case 55: Robots::Gretchen  ::create_gretchen0       (robot); break;
 
         case 60: Robots::Nolegs    ::create_worm            (robot); break;
 

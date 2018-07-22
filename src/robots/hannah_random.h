@@ -123,6 +123,11 @@ create_random_hannah(Robot& robot, std::vector<double> model_parameter)
     Vector3 pos (.0, .0, m.zheight_start);
     robot.create_box("body", pos, m.body, m.weight_kg.body, 0, m.color_body, true, constants::friction::hi); // body
 
+    //robot.create_box("payl", pos, {0.05, 0.05, 0.5}, 0.100, 0, m.color_body, false, constants::friction::lo);
+    //robot.connect_fixed("body", "payl");
+    robot.attach_box("body", pos, {0.05, 0.05, 0.5}, 0.100, 0, m.color_light, false );
+
+
     /* shoulders */
     const double shoulder_z = m.zheight_start + 0.5*m.body.z - m.body_shld_joint_dist_xz;
 
@@ -143,6 +148,10 @@ create_random_hannah(Robot& robot, std::vector<double> model_parameter)
     robot.create_box("rflu", {-pos.x, +pos.y, pos.z}, m.leg_upper, m.weight_kg.leg_upper, 0, m.color_light, true, constants::friction::hi); // right fore leg upper
     robot.create_box("lhlu", {+pos.x, -pos.y, pos.z}, m.leg_upper, m.weight_kg.leg_upper, 0, m.color_light, true, constants::friction::hi); // left hind leg upper
     robot.create_box("rhlu", {-pos.x, -pos.y, pos.z}, m.leg_upper, m.weight_kg.leg_upper, 0, m.color_light, true, constants::friction::hi); // right hind leg upper
+
+
+
+
 
     /* legs lower */
     pos.z = shoulder_z + m.shld_legs_joint_dist_z - m.leg_upper.z - .5*m.leg_lower.len;
