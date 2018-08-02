@@ -30,14 +30,19 @@ namespace Gretchen {
     };
 
 void
-create_gretchen0(Robot& robot)
+create_gretchen0(Robot& robot, std::vector<double> model_parameter)
 {
+    dsPrint("Creating Gretchen...");
     const double friction = constants::friction::normal;
 
     /* shortening knees!! */
     const double unit_len = 0.23;
 
-    const double D = 0.08;
+    const double D = 0.10;
+
+    double X = 2*rnd(1.0);//5*rnd(1.0);
+
+    dsPrint("with random factor: %1.3f", X);
 
     /* head */
     const CapConf head         ( {3, .0         , unit_len/2    }, {0.           , 0., unit_len*4.50 + D} );
@@ -70,7 +75,7 @@ create_gretchen0(Robot& robot)
 
     /* body */
     robot.create_segment("head", head        .pos     , head        .dim, 0, constants::materials::light , colors::black, true , friction);
-    robot.create_segment("neck", neck        .pos     , neck        .dim, 0, constants::materials::light , colors::black, false, friction);
+    robot.create_segment("neck", neck        .pos     , neck        .dim, 0, constants::materials::light , colors::invisible, false, friction);
     robot.create_segment("upto", torso_upper .pos     , torso_upper .dim, 0, constants::materials::light , colors::white, true , friction);
     robot.create_segment("mito", torso_middle.pos     , torso_middle.dim, 0, constants::materials::light , colors::black, false, friction);
     robot.create_segment("loto", torso_lower .pos     , torso_lower .dim, 0, constants::materials::light , colors::white, false, friction);
@@ -106,42 +111,44 @@ create_gretchen0(Robot& robot)
     robot.create_box    ("rift", foot        .pos._x(), foot        .dim, 0, constants::materials::heavy , colors::white, true , friction);
 
     //robot.attach_segment("left", pos, 3, 0, 0.02, 0, constants::materials::heavy, colors::orange, true, friction );
+    Vector3 foot_joint_pos = Vector3{0.5*foot.dim.y - leg_lower.dim.rad, foot.dim.z+ankle.dim.rad, 0.0};
 
     /* connect with joints */
-    robot.connect_joint("neck", "head", .0, .0, -.5*head.dim.len - 0.5*head.dim.rad, 'x',   -60,  +45, -10, JointType::normal   , "neck_pitch"    , "");
-    robot.connect_joint("upto", "neck", .0, .0, +.5*head.dim.rad                   , 'y',   -45,  +45,   0, JointType::normal   , "neck_roll"     , "");
-    robot.connect_joint("upto", "mito", .0, .0,  .0,                                 'y',   -45,  +45,   0, JointType::normal   , "waistroll"     , "", 10);
-    robot.connect_joint("mito", "loto", .0, .0, .25*unit_len,                        'x',   -10,  +60,  -5, JointType::normal   , "waistpitch"    , "", 10);
+    robot.connect_joint("neck", "head", .0, .0, -.5*head.dim.len - 0.5*head.dim.rad, 'x',  -60,  +45, -10 + rnd(X), JointType::normal   , "neck_pitch"    , "");
+    robot.connect_joint("upto", "neck", .0, .0, +.5*head.dim.rad                   , 'y',  -45,  +45,   0 + rnd(X), JointType::normal   , "neck_roll"     , "");
+    robot.connect_joint("upto", "mito", .0, .0,  .0,                                 'y',  -45,  +45,   0 + rnd(X), JointType::normal   , "waistroll"     , "", 10);
+    robot.connect_joint("mito", "loto", .0, .0, .25*unit_len,                        'x',  -10,  +60,  -5 + rnd(X), JointType::normal   , "waistpitch"    , "", 10);
 
-    robot.connect_joint("upto", "lshd", .0, .0,  .0,                                 'x', -120, +60,  +0, JointType::normal    , "lshoulderpitch", ""              ); // 180 deg is not enough
-    robot.connect_joint("upto", "rshd", .0, .0,  .0,                                 'x', -120, +60,  +0, JointType::symmetric , "rshoulderpitch", "lshoulderpitch");
+    robot.connect_joint("upto", "lshd", .0, .0,  .0,                                 'x', -120,  +60,   0 + rnd(X), JointType::normal   , "lshoulderpitch", ""              ); // 180 deg is not enough
+    robot.connect_joint("upto", "rshd", .0, .0,  .0,                                 'x', -120,  +60,   0 + rnd(X), JointType::symmetric, "rshoulderpitch", "lshoulderpitch");
 
-    robot.connect_joint("lshd", "lau0", .0, .0, +.50*arm_upper0.dim.len,             'y',  - 90, +150, +20, JointType::normal   , "lshoulderroll" , ""              ); //TODO joint range
-    robot.connect_joint("rshd", "rau0", .0, .0, +.50*arm_upper0.dim.len,             'Y',  - 90, +150, +20, JointType::symmetric, "rshoulderroll" , "lshoulderroll" );
+    robot.connect_joint("lshd", "lau0", .0, .0, +.50*arm_upper0.dim.len,             'y',  -90, +150, +20 + rnd(X), JointType::normal   , "lshoulderroll" , ""              ); //TODO joint range
+    robot.connect_joint("rshd", "rau0", .0, .0, +.50*arm_upper0.dim.len,             'Y',  -90, +150, +20 + rnd(X), JointType::symmetric, "rshoulderroll" , "lshoulderroll" );
 
-    robot.connect_joint("lau0", "lau1", .0, .0, +.25*arm_upper1.dim.len,             'Z',  - 90, + 90,  10, JointType::normal   , "lshoulderyaw"  , ""              );
-    robot.connect_joint("rau0", "rau1", .0, .0, +.25*arm_upper1.dim.len,             'z',  - 90, + 90,  10, JointType::symmetric, "rshoulderyaw"  , "lshoulderyaw"  );
+    robot.connect_joint("lau0", "lau1", .0, .0, +.25*arm_upper1.dim.len,             'Z',  -90,  +90,  10 + rnd(X), JointType::normal   , "lshoulderyaw"  , ""              );
+    robot.connect_joint("rau0", "rau1", .0, .0, +.25*arm_upper1.dim.len,             'z',  -90,  +90,  10 + rnd(X), JointType::symmetric, "rshoulderyaw"  , "lshoulderyaw"  );
 
-    robot.connect_joint("lau1", "lalo", .0, .0, +.50*arm_lower.dim.len,              'x',     0, +120, +30, JointType::normal   , "lelbowpitch"   , ""              );
-    robot.connect_joint("rau1", "ralo", .0, .0, +.50*arm_lower.dim.len,              'x',     0, +120, +30, JointType::symmetric, "relbowpitch"   , "lelbowpitch"   );
+    robot.connect_joint("lau1", "lalo", .0, .0, +.50*arm_lower.dim.len,              'x',    0,  120,  30 + rnd(X), JointType::normal   , "lelbowpitch"   , ""              );
+    robot.connect_joint("rau1", "ralo", .0, .0, +.50*arm_lower.dim.len,              'x',    0,  120,  30 + rnd(X), JointType::symmetric, "relbowpitch"   , "lelbowpitch"   );
 
 
-    robot.connect_joint("loto", "lhip", .0, .0, .0                   ,               'x',  - 30, + 90, +8, JointType::normal    , "lhippitch"     , ""              , 10);
-    robot.connect_joint("loto", "rhip", .0, .0, .0                   ,               'x',  - 30, + 90, +8, JointType::symmetric , "rhippitch"     , "lhippitch"     , 10);
+    robot.connect_joint("loto", "lhip", .0, .0, .0                   ,               'x',  -30,   90,   8 + rnd(X), JointType::normal   , "lhippitch"     , ""              , 10);
+    robot.connect_joint("loto", "rhip", .0, .0, .0                   ,               'x',  -30,   90,   8 + rnd(X), JointType::symmetric, "rhippitch"     , "lhippitch"     , 10);
 
-    robot.connect_joint("lhip", "llu0", .0, .0, +.50*leg_upper0.dim.len,             'y',  - 90, + 90,  +1, JointType::normal   , "lhiproll"      , ""              , 10);
-    robot.connect_joint("rhip", "rlu0", .0, .0, +.50*leg_upper0.dim.len,             'Y',  - 90, + 90,  +1, JointType::symmetric, "rhiproll"      , "lhiproll"      , 10);
+    robot.connect_joint("lhip", "llu0", .0, .0, +.50*leg_upper0.dim.len,             'y',  -90,   90,   1 + rnd(X), JointType::normal   , "lhiproll"      , ""              , 10);
+    robot.connect_joint("rhip", "rlu0", .0, .0, +.50*leg_upper0.dim.len,             'Y',  -90,   90,   1 + rnd(X), JointType::symmetric, "rhiproll"      , "lhiproll"      , 10);
 
-    robot.connect_joint("llu0", "llu1", .0, .0, +.50*leg_upper1.dim.len,             'Z',  - 30, + 60,   0, JointType::normal   , "lhipyaw"       , ""              , 10);
-    robot.connect_joint("rlu0", "rlu1", .0, .0, +.50*leg_upper1.dim.len,             'z',  - 30, + 60,   0, JointType::symmetric, "rhipyaw"       , "lhipyaw"       , 10);
+    robot.connect_joint("llu0", "llu1", .0, .0, +.50*leg_upper1.dim.len,             'Z',  -30,   60,   0 + rnd(X), JointType::normal   , "lhipyaw"       , ""              , 10);
+    robot.connect_joint("rlu0", "rlu1", .0, .0, +.50*leg_upper1.dim.len,             'z',  -30,   60,   0 + rnd(X), JointType::symmetric, "rhipyaw"       , "lhipyaw"       , 10);
 
-    robot.connect_joint("llu1", "lllo", .0, .0, +.50*leg_lower.dim.len,              'x',  -120,    0, -16, JointType::normal   , "lkneepitch"    , ""              , 10);
-    robot.connect_joint("rlu1", "rllo", .0, .0, +.50*leg_lower.dim.len,              'x',  -120,    0, -16, JointType::symmetric, "rkneepitch"    , "lkneepitch"    , 10);
+    robot.connect_joint("llu1", "lllo", .0, .0, +.50*leg_lower.dim.len,              'x', -120,    0, -16 + rnd(X), JointType::normal   , "lkneepitch"    , ""              , 10);
+    robot.connect_joint("rlu1", "rllo", .0, .0, +.50*leg_lower.dim.len,              'x', -120,    0, -16 + rnd(X), JointType::symmetric, "rkneepitch"    , "lkneepitch"    , 10);
 
-    robot.connect_joint("lllo", "lean", .0, .0, .0                                 , 'x',   -45,  +45, +8, JointType::normal    , "lanklepitch"   , ""              , 10);
-    robot.connect_joint("rllo", "rian", .0, .0, .0                                 , 'x',   -45,  +45, +8, JointType::symmetric , "ranklepitch"   , "lanklepitch"   , 10);
-    robot.connect_joint("lean", "left", .0, 0.5*foot.dim.y - leg_lower.dim.rad, foot.dim.z+ankle.dim.rad, 'y', -45, +45,   0, JointType::normal,    "lankleroll", "",10);
-    robot.connect_joint("rian", "rift", .0, 0.5*foot.dim.y - leg_lower.dim.rad, foot.dim.z+ankle.dim.rad, 'Y', -45, +45,   0, JointType::symmetric, "rankleroll", "lankleroll",10);
+    robot.connect_joint("lllo", "lean", .0, .0, .0                                 , 'x',  -45,   45,  9.0 + rnd(X), JointType::normal   , "lanklepitch"   , ""              , 10);
+    robot.connect_joint("rllo", "rian", .0, .0, .0                                 , 'x',  -45,   45,  9.0 + rnd(X), JointType::symmetric, "ranklepitch"   , "lanklepitch"   , 10);
+
+    robot.connect_joint("lean", "left", .0, foot_joint_pos.x, foot_joint_pos.y,      'y',  -45,   45,   0 + rnd(X), JointType::normal   , "lankleroll"    , ""              , 10);
+    robot.connect_joint("rian", "rift", .0, foot_joint_pos.x, foot_joint_pos.y,      'Y',  -45,   45,   0 + rnd(X), JointType::symmetric, "rankleroll"    , "lankleroll"    , 10);
 
     /* attach sensors */
     robot.attach_accel_sensor("head",true);

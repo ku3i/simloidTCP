@@ -50,7 +50,7 @@ void Bioloid::create_robot(Robot& robot, int index_number, std::vector<double> p
         case 50: Robots::Biped     ::create_humanoid0       (robot); break;
         case 51: Robots::Biped     ::create_humanoid1       (robot); break;
 
-        case 55: Robots::Gretchen  ::create_gretchen0       (robot); break;
+        case 55: Robots::Gretchen  ::create_gretchen0       (robot, params); break;
 
         case 60: Robots::Nolegs    ::create_worm            (robot); break;
 
