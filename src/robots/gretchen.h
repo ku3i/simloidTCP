@@ -33,7 +33,7 @@ void
 create_gretchen0(Robot& robot, std::vector<double> model_parameter)
 {
     dsPrint("Creating Gretchen...");
-    const double friction = constants::friction::normal;
+    const double friction = constants::friction::hi;
 
     /* shortening knees!! */
     const double unit_len = 0.23;
