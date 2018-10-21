@@ -35,9 +35,9 @@ namespace constants {
          * realistic behavior on all the simloid robots created
          * so far. Don't change them recklessly. */
         const double fluid_friction    = 0.1;
-        const double coulomb_friction  = 0.1;
-        const double sticking_friction = 2 * coulomb_friction;
-        const double stiction_range    = 0.01; // 1% of normed velocity
+        constexpr double coulomb_friction  = 0.1;
+        constexpr double sticking_friction = 2 * coulomb_friction;
+        constexpr double stiction_range    = 0.01; // 1% of normed velocity
 
         /* bristle model */
         const double bristle_displ_max = 0.01;
