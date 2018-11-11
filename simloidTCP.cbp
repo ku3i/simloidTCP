@@ -54,6 +54,7 @@
 		<Unit filename="src/basic/version.h" />
 		<Unit filename="src/build/bioloid.cpp" />
 		<Unit filename="src/build/bioloid.h" />
+		<Unit filename="src/build/bodies.cpp" />
 		<Unit filename="src/build/bodies.h" />
 		<Unit filename="src/build/heightfield.cpp" />
 		<Unit filename="src/build/heightfield.h" />
@@ -86,7 +87,9 @@
 		<Unit filename="src/robots/crawler.h" />
 		<Unit filename="src/robots/fourlegged.h" />
 		<Unit filename="src/robots/gretchen.h" />
+		<Unit filename="src/robots/gretchen_dev0.h" />
 		<Unit filename="src/robots/hannah.h" />
+		<Unit filename="src/robots/hannah_detail_rnd.h" />
 		<Unit filename="src/robots/hannah_random.h" />
 		<Unit filename="src/robots/karl_sims.h" />
 		<Unit filename="src/robots/nolegs.h" />

@@ -72,6 +72,19 @@ void Robot::connect_joint( std::string const& bodyname1, std::string const& body
                            double torque_factor,
                            ActuatorParameters const& conf )
 {
+    connect_joint( bodyname1, bodyname2, {relx, rely, relz}, axis, jointstopLo_deg, jointstopHi_deg, jointposDefault_deg,
+                   Type, Name, SymName, torque_factor, conf );
+}
+
+void Robot::connect_joint( std::string const& bodyname1, std::string const& bodyname2,
+                           const Vector3 pos,
+                           const char axis,
+                           const double jointstopLo_deg, const double jointstopHi_deg, const double jointposDefault_deg,
+                           const JointType Type,
+                           const std::string Name, const std::string SymName,
+                           double torque_factor,
+                           ActuatorParameters const& conf )
+{
     check_joint_axis(axis);
 
     double jointposDefault = common::deg2rad(jointposDefault_deg);
@@ -85,7 +98,7 @@ void Robot::connect_joint( std::string const& bodyname1, std::string const& body
     if (body1 == bodies.size()) { dsError("Cannot find such an object for connection: '%s'\n", bodyname1.c_str()); }
     if (body2 == bodies.size()) { dsError("Cannot find such an object for connection: '%s'\n", bodyname2.c_str()); }
 
-    unsigned joint_id = joints.create(world, bodies, body1, body2, Type, Name, jointstopLo, jointstopHi, jointposDefault, Vector3(relx, rely, relz), axis, torque_factor, conf);
+    unsigned joint_id = joints.create(world, bodies, body1, body2, Type, Name, jointstopLo, jointstopHi, jointposDefault, pos, axis, torque_factor, conf);
 
     bool result = joints.add_symmetric(joint_id, SymName);
     if (not result)
@@ -106,14 +119,16 @@ void Robot::connect_fixed(std::string const& bodyname1, std::string const& bodyn
 
 void Robot::print_statistics(void) const
 {
+    auto const total = add(bodies.get_total_mass(), attachments.get_total_mass());
+
     dsPrint("Robot statistics:\n   Bodies: %lu\n   Joints: %lu\n   Accels: %lu\n   Weight: %.3lf kg\n   CoM: (%.2lf, %.2lf, %.2lf)\n\n"
            , number_of_bodies()
            , number_of_joints()
            , number_of_accels()
-           , bodies.get_total_mass().mass
-           , bodies.get_total_mass().c[0]
-           , bodies.get_total_mass().c[1]
-           , bodies.get_total_mass().c[2] );
+           , total.mass
+           , total.c[0]
+           , total.c[1]
+           , total.c[2] );
 }
 
 void Robot::set_camera_center_on(std::string const& bodyname)

@@ -149,10 +149,6 @@ create_random_hannah(Robot& robot, std::vector<double> model_parameter)
     robot.create_box("lhlu", {+pos.x, -pos.y, pos.z}, m.leg_upper, m.weight_kg.leg_upper, 0, m.color_light, true, constants::friction::hi); // left hind leg upper
     robot.create_box("rhlu", {-pos.x, -pos.y, pos.z}, m.leg_upper, m.weight_kg.leg_upper, 0, m.color_light, true, constants::friction::hi); // right hind leg upper
 
-
-
-
-
     /* legs lower */
     pos.z = shoulder_z + m.shld_legs_joint_dist_z - m.leg_upper.z - .5*m.leg_lower.len;
 
