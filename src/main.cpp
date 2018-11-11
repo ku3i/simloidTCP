@@ -188,19 +188,8 @@ static void draw_robot_and_scene()
     for (unsigned int i = 0; i < obstacles.number_of_objects(); ++i)
         obstacles.objects[i].draw(false);
 
-    /* draw robot */
-    for (unsigned int i = 0; i < robot.number_of_bodies(); ++i)
-        robot.bodies[i].draw(global_conf.show_aabb);
-
-    /* draw robot's joints */
-    if (global_conf.show_joints)
-        for (unsigned int i = 0; i < robot.number_of_joints(); ++i)
-            robot.joints[i].draw();
-
-    /* draw robot's accel sensors */
-    if (global_conf.show_accels)
-        for (unsigned int i = 0; i < robot.number_of_accels(); ++i)
-            robot.accels[i].draw();
+    /* draw the robot */
+    robot.draw(global_conf);
 
     /* draw time and velocity information */
     if (global_conf.show_time_stat) print_time_statistics();
@@ -508,7 +497,7 @@ main(int argc, char **argv)
     recordSnapshot(robot, obstacles, &s2);
 
     /* create TCP Controller */
-    controller = new TCPController(global_conf, universe, robot, obstacles, reset_time);
+    controller = new TCPController(global_conf, universe, robot, obstacles, reset_time, camera);
     if (((TCPController*)controller)->establishConnection(global_conf.tcp_port))
     {
         /* run simulation */

@@ -1,6 +1,8 @@
 #ifndef _BIOLOID_H_
 #define _BIOLOID_H_
 
+#include <vector>
+
 #include <basic/common.h>
 #include <basic/configuration.h>
 #include <build/robot.h>
@@ -15,6 +17,7 @@ namespace Bioloid
 {
     /* generator routines */
     void create_robot(Robot& robot);
+    void create_robot(Robot& robot, int index_number, std::vector<double> params);
     void create_scene(Obstacle& obstacles, Landscape& landscape);
 };
 

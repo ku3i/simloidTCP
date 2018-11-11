@@ -26,7 +26,7 @@
 		<Compiler>
 			<Add option="-Wextra" />
 			<Add option="-Wall" />
-			<Add option="-std=c++11" />
+			<Add option="-std=c++14" />
 		</Compiler>
 		<Linker>
 			<Add option="-lpthread" />
@@ -36,6 +36,7 @@
 			<Add library="glut" />
 			<Add library="/usr/local/lib/libode.a" />
 		</Linker>
+		<Unit filename="src/basic/capsule.h" />
 		<Unit filename="src/basic/color.h" />
 		<Unit filename="src/basic/common.cpp" />
 		<Unit filename="src/basic/common.h" />
@@ -59,6 +60,7 @@
 		<Unit filename="src/build/joints.cpp" />
 		<Unit filename="src/build/joints.h" />
 		<Unit filename="src/build/obstacles.h" />
+		<Unit filename="src/build/params.h" />
 		<Unit filename="src/build/physics.cpp" />
 		<Unit filename="src/build/physics.h" />
 		<Unit filename="src/build/robot.cpp" />
@@ -83,7 +85,9 @@
 		<Unit filename="src/robots/biped.h" />
 		<Unit filename="src/robots/crawler.h" />
 		<Unit filename="src/robots/fourlegged.h" />
+		<Unit filename="src/robots/gretchen.h" />
 		<Unit filename="src/robots/hannah.h" />
+		<Unit filename="src/robots/hannah_random.h" />
 		<Unit filename="src/robots/karl_sims.h" />
 		<Unit filename="src/robots/nolegs.h" />
 		<Unit filename="src/robots/standard.h" />

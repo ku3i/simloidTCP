@@ -1,99 +1,68 @@
 #include <basic/snapshot.h>
 
+
+template <typename ObjectList, typename StateList>
+void record_objects(const ObjectList& objects, StateList& s) {
+    for (unsigned int i = 0; i < objects.size(); ++i)
+    {
+        for (unsigned int j = 0; j < 3; ++j)
+        {
+            s[i].position  [j] = (dBodyGetPosition  (objects[i].body))[j]; // Position
+            s[i].linearVel [j] = (dBodyGetLinearVel (objects[i].body))[j]; // Linear Velocity
+            s[i].angularVel[j] = (dBodyGetAngularVel(objects[i].body))[j]; // Angular Velocity
+        }
+
+        for (unsigned int j = 0; j < 4; ++j)
+            s[i].quaternion[j] = (dBodyGetQuaternion(objects[i].body))[j]; // Quaternion
+
+        const dReal *tmp;
+        tmp = dBodyGetRotation(objects[i].body);
+        for (unsigned int j = 0; j < 12; ++j)
+            s[i].rotation[j] = tmp[j]; // Rotation
+    }
+}
+
+template <typename ObjectList, typename StateList>
+void restore_objects(const ObjectList& objects, const StateList& s)
+{
+    for (unsigned int i = 0; i < objects.size(); ++i)
+    {
+        dBodySetPosition  ( objects[i].body
+                          , s[i].position[0]
+                          , s[i].position[1]
+                          , s[i].position[2] );
+
+        dBodySetLinearVel ( objects[i].body
+                          , s[i].linearVel[0]
+                          , s[i].linearVel[1]
+                          , s[i].linearVel[2] );
+
+        dBodySetAngularVel( objects[i].body
+                          , s[i].angularVel[0]
+                          , s[i].angularVel[1]
+                          , s[i].angularVel[2] );
+
+        dBodySetQuaternion(objects[i].body, s[i].quaternion);
+        dBodySetRotation  (objects[i].body, s[i].rotation  );
+    }
+}
+
 void recordSnapshot(const Robot& robot, const Obstacle& obstacles, Snapshot *s)
 {
+    s->model_id = robot.get_model_id();
+
     dsPrint("Recording snapshot.\n");
-    /* robot */
-    for (unsigned int i = 0; i < robot.number_of_bodies(); ++i)
-    {
-        for (unsigned int j = 0; j < 3; ++j)
-        {
-            s->bodystate[i].position  [j] = (dBodyGetPosition  (robot.bodies[i].body))[j]; // Position
-            s->bodystate[i].linearVel [j] = (dBodyGetLinearVel (robot.bodies[i].body))[j]; // Linear Velocity
-            s->bodystate[i].angularVel[j] = (dBodyGetAngularVel(robot.bodies[i].body))[j]; // Angular Velocity
-        }
 
-        for (unsigned int j = 0; j < 4; ++j)
-            s->bodystate[i].quaternion[j] = (dBodyGetQuaternion(robot.bodies[i].body))[j]; // Quaternion
-
-        const dReal *tmp;
-        tmp = dBodyGetRotation(robot.bodies[i].body);
-        for (unsigned int j = 0; j < 12; ++j)
-            s->bodystate[i].rotation[j] = tmp[j]; // Rotation
-    }
-
-    /* obstacles */
-    for (unsigned int i = 0; i < obstacles.number_of_objects(); ++i)
-    {
-        for (unsigned int j = 0; j < 3; ++j)
-        {
-            s->obststate[i].position  [j] = (dBodyGetPosition  (obstacles.objects[i].body))[j]; // Position
-            s->obststate[i].linearVel [j] = (dBodyGetLinearVel (obstacles.objects[i].body))[j]; // Linear Velocity
-            s->obststate[i].angularVel[j] = (dBodyGetAngularVel(obstacles.objects[i].body))[j]; // Angular Velocity
-        }
-
-        for (unsigned int j = 0; j < 4; ++j)
-            s->obststate[i].quaternion[j] = (dBodyGetQuaternion(obstacles.objects[i].body))[j]; // Quaternion
-
-        const dReal *tmp;
-        tmp = dBodyGetRotation(obstacles.objects[i].body);
-        for (unsigned int j = 0; j < 12; ++j)
-            s->obststate[i].rotation[j] = tmp[j]; // Rotation
-    }
+    record_objects(robot.bodies     , s->bodies     );
+    record_objects(robot.attachments, s->attachments);
+    record_objects(obstacles.objects, s->obstacles  );
 }
 
 void playSnapshot(const Robot& robot, const Obstacle& obstacles, const Snapshot *s)
 {
-    /* robot */
-    for (unsigned int i = 0; i < robot.number_of_bodies(); ++i)
-    {
-        //Position
-        dBodySetPosition  ( robot.bodies[i].body
-                          , s->bodystate[i].position[0]
-                          , s->bodystate[i].position[1]
-                          , s->bodystate[i].position[2] );
+    assert(robot.get_model_id() == s->model_id);
 
-        //LinearVel
-        dBodySetLinearVel ( robot.bodies[i].body
-                          , s->bodystate[i].linearVel[0]
-                          , s->bodystate[i].linearVel[1]
-                          , s->bodystate[i].linearVel[2] );
-
-        //AngularVel
-        dBodySetAngularVel( robot.bodies[i].body
-                          , s->bodystate[i].angularVel[0]
-                          , s->bodystate[i].angularVel[1]
-                          , s->bodystate[i].angularVel[2] );
-
-        //Quaternion
-        dBodySetQuaternion(robot.bodies[i].body, s->bodystate[i].quaternion);
-
-        //Rotation
-        dBodySetRotation(robot.bodies[i].body, s->bodystate[i].rotation);
-    }
-
-    /* obstacles */
-    for (unsigned int i = 0; i < obstacles.number_of_objects(); ++i)
-    {
-        //Position
-        dBodySetPosition  ( obstacles.objects[i].body
-                          , s->obststate[i].position[0]
-                          , s->obststate[i].position[1]
-                          , s->obststate[i].position[2] );
-
-        //LinearVel
-        dBodySetLinearVel ( obstacles.objects[i].body
-                          , s->obststate[i].linearVel[0]
-                          , s->obststate[i].linearVel[1]
-                          , s->obststate[i].linearVel[2] );
-
-        //AngularVel
-        dBodySetAngularVel( obstacles.objects[i].body
-                          , s->obststate[i].angularVel[0]
-                          , s->obststate[i].angularVel[1]
-                          , s->obststate[i].angularVel[2] );
-
-        dBodySetQuaternion(obstacles.objects[i].body, s->obststate[i].quaternion); // Quaternion
-        dBodySetRotation  (obstacles.objects[i].body, s->obststate[i].rotation  ); // Rotation
-    }
+    restore_objects(robot.bodies     , s->bodies     );
+    restore_objects(robot.attachments, s->attachments);
+    restore_objects(obstacles.objects, s->obstacles  );
 }

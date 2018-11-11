@@ -77,14 +77,14 @@ NJoint::apply_friction(const double velocity_norm)
  * so the bristle cannot exceed a certain length. After multiplication with a
  * proportional factor the stiffness of this bristle (like a spring) is defined.
  * The eventual restoring movement is then applied by ODE's velocity controller
- * with max force depending on the stribeck friction model. */
+ * with max force depending on the Stribeck friction model. */
 double
 NJoint::bristle(double velocity) //TODO: siehe Abschnitt zur kritische Dämpfung in der eigenen Studienarbeit
 {
     z = z - velocity;
-    z = common::clip(z, constants::joint::bristle_displ_max);
+    z = common::clip(z, conf.bristle_displ_max);
 
-    return z * constants::joint::bristle_stiffness;
+    return z * conf.bristle_stiffness;
 }
 
 /* TODO: add a description
@@ -94,14 +94,13 @@ double
 NJoint::stribeck_friction_model(const double velocity)
 {
     double friction(.0);
-    static_assert (constants::joint::sticking_friction >= constants::joint::coulomb_friction, "Sticktion must be greater than coulomb friction.");
 
-    const double F_s = constants::joint::sticking_friction;
-    const double F_c = constants::joint::coulomb_friction;
-    const double F_v = constants::joint::fluid_friction;
-    const double v_s = constants::joint::stiction_range;
+    const double F_s = conf.sticking_friction;
+    const double F_c = conf.coulomb_friction;
+    const double F_v = conf.fluid_friction;
+    const double v_s = conf.stiction_range;
 
-    /* if velocity is in sticking range, use stickting friction */
+    /* if velocity is in sticking range, use sticking friction */
     //friction += (fabs(velocity) < v_s)? F_s : F_c; // nicht stetig
     double range = exp(-(velocity/v_s)*(velocity/v_s));
     friction += F_c + (F_s - F_c) * range;
@@ -118,23 +117,26 @@ NJoint::stribeck_friction_model(const double velocity)
  |                                                 |
  | u             : input [-1,+1]                   |
  | joint_speed   : [-1,+1] (normed joint velocity) |
- | torque_factor :  5 equals 1 Dynamixel           |
+ | torque_factor : 5 equals 1 Dynamixel            |
  |                                                 |
  +-------------------------------------------------*/
 double
-NJoint::motor_model(const double u, double joint_speed, unsigned int torque_factor) const
+NJoint::motor_model(const double u, double joint_speed) const
 {
-    using constants::motor_parameter::V_in;
-    using constants::motor_parameter::kB;
-    using constants::motor_parameter::kM;
-    using constants::motor_parameter::R_i_inv;
-
-    double U_in = V_in * u;
+    double U_in = conf.V_in * u;
 
     if (common::sgn(U_in) != common::sgn(joint_speed)) joint_speed = 0; // does this fixes instability problems?
 
-    double I = common::clip(U_in - (kB * joint_speed), V_in) * R_i_inv; // limit to max battery voltage
-    double M = kM * I * (0.2*torque_factor);                            // resulting motor torque
+    double I = common::clip(U_in - (conf.kB * joint_speed), conf.V_in) * conf.R_i_inv; // limit to max battery voltage
+    double M = conf.kM * I * (0.2*torque_factor);                            // resulting motor torque
 
     return M;
 }
+
+dJointID create_fixed_joint(dWorldID const& world, SolidVector const& bodies, unsigned body1, unsigned body2)
+{
+    dJointID fixed = dJointCreateFixed(world, 0);
+    dJointAttach(fixed, bodies[body1].body, bodies[body2].body);
+    return fixed;
+}
+

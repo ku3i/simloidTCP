@@ -9,16 +9,7 @@ bool TCPController::establishConnection(int port)
     {
         dsPrint("Connection to client established.\nSending the robot's configuration to client.\n");
         TCPController::send_robot_configuration();
-        dsPrint("Waiting for acknowledge.\n");
-        std::string ack = socketServer->getNextLine();
-
-        if (ack.compare(0, 3, "ACK") == 0)
-            dsPrint("Acknowledge for configuration received.\n");
-        else {
-            dsPrint("Failed to receive acknowledge.\n");
-            return false;
-        }
-        return true;
+        return wait_for_ack();
     }
     else
     {
@@ -37,6 +28,8 @@ bool TCPController::control(const double time)
     bool done = false;
     unsigned int fail_counter = 0;
     std::string msg;
+
+    bool reload_model = false;
 
     /* reset frame record flag */
     config.record_frames = false;
@@ -89,10 +82,23 @@ bool TCPController::control(const double time)
         if (starts_with(msg, "DONE"   )) { done = true; continue; }
         if (starts_with(msg, "EXIT"   )) { dsPrint("Received 'EXIT' command.\n"); return false; }
 
+        /* model updates */
+        if (starts_with(msg, "MODEL"  )) { reload_model = parse_update_model_command(msg.c_str()); continue; }
+        if (starts_with(msg, "MOTOR"  )) { parse_update_motor_model(msg.c_str()); continue; }
+
         /* error */
         if (fail_counter++ >= 42) { dsPrint("Too many messages without a 'DONE'-command.\n"); return false; }
 
         dsPrint("ERROR: unknown command: '%s'\n", msg.c_str());
+    }
+
+    if (reload_model) {
+        reset();
+        recordSnapshot(robot, obstacles, &s1);
+        recordSnapshot(robot, obstacles, &s2);
+        camera.set_viewpoint(robot.get_camera_center_obj(), robot.get_camera_setup());
+        send_robot_configuration();
+        wait_for_ack();
     }
 
     if (not paused)
@@ -110,7 +116,7 @@ void TCPController::send_ordered_info(const double time)
     snprintf(tmp, buffer_size, "%lf ", time);
     message.append(tmp);
 
-    /* anglular position */
+    /* angular position */
     for (std::size_t i = 0; i < robot.number_of_joints(); ++i)
     {
         snprintf(tmp, buffer_size, "%lf ", robot.joints[i].get_low_resolution_position());
@@ -184,6 +190,20 @@ void TCPController::send_robot_configuration()
     /* send message to socket */
     if (!socketServer->send_message(message))
         dsError("Could not send robot configuration message to client.\n");
+}
+
+bool TCPController::wait_for_ack(void)
+{
+    dsPrint("Waiting for acknowledge.\n");
+    std::string ack = socketServer->getNextLine();
+
+    if (ack.compare(0, 3, "ACK") == 0)
+        dsPrint("Acknowledge for configuration received.\n");
+    else {
+        dsPrint("Failed to receive acknowledge.\n");
+        return false;
+    }
+    return true;
 }
 
 void TCPController::execute_controller()
@@ -384,6 +404,72 @@ void TCPController::parse_impulse_FI(const char* msg)
     }
     else dsPrint("ERROR: bad 'FI' format: '%s'\n", msg);
 }
+
+std::vector<double> read_params(const char* msg, int* offset, unsigned num_params)
+{
+    std::vector<double> params;
+    double p = 0.;
+
+    if (num_params > 0)
+    {
+        params.reserve(num_params);
+        for (unsigned int idx = 0; idx < num_params; ++idx)
+        {
+            if (1 == sscanf(msg, " %lf%n", &p, offset)) {
+                msg += (*offset);
+                params.emplace_back(p);
+            } else {
+                dsPrint("ERROR: bad parameter format for 'MODEL' : '%s'\n", msg);
+                return {};
+            }
+        }
+    }
+    return params;
+}
+
+bool TCPController::parse_update_model_command(const char* msg)
+{
+    int offset = 5;
+    msg += offset;
+
+    int new_model_id;
+    unsigned num_params;
+
+    if (2 != sscanf(msg, " %d %u%n", &new_model_id, &num_params, &offset)) {
+        dsPrint("ERROR: bad 'MODEL' format: '%s'\n", msg);
+        return false;
+    }
+
+    msg += offset;
+    auto params = read_params(msg, &offset, num_params);
+
+    robot.destroy();
+    Bioloid::create_robot(robot, new_model_id, params);
+    return true;
+}
+
+
+void TCPController::parse_update_motor_model(const char* msg) {
+    int offset = 5;
+    msg += offset;
+
+    unsigned num_params;
+
+    if (1 != sscanf(msg, " %u%n", &num_params, &offset)) {
+        dsPrint("ERROR: bad 'MOTOR' format: '%s'\n", msg);
+        return;
+    }
+
+    msg += offset;
+    auto params = read_params(msg, &offset, num_params);
+
+    dsPrint("Reinitializing actuator model with %u parameters.\n", num_params);
+    for (unsigned int idx = 0; idx < robot.number_of_joints(); ++idx)
+        robot.joints[idx].reinit_motormodel(ActuatorParameters(params));
+
+    return;
+}
+
 
 /* fin */
 

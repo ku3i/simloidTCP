@@ -5,11 +5,23 @@
 #include <string>
 
 #include <basic/common.h>
+#include <basic/capsule.h>
 #include <build/physics.h>
 #include <build/joints.h>
 #include <build/bodies.h>
 #include <sensors/accelsensor.h>
 #include <misc/camera.h>
+
+struct ModelID {
+    unsigned identifier;
+    unsigned instance_no;
+
+    friend bool operator==(ModelID const& lhs, ModelID const& rhs) {
+        return lhs.identifier  == rhs.identifier
+           and lhs.instance_no == rhs.instance_no;
+    }
+
+};
 
 class Robot {
 public:
@@ -19,8 +31,10 @@ public:
     , bodies(world, space, constants::max_bodies)
     , joints(constants::max_joints)
     , accels(constants::max_accels)
+    , attachments(world, space, constants::max_bodies)
     , cam_center_obj(0)
     , cam_setup(Vector3(0.3,-0.3,0.3), 130.,-18.,0.)
+    , model_id()
     { }
     const dWorldID&  world;
     const dSpaceID&  space;
@@ -29,8 +43,10 @@ public:
     JointVector joints; // joints
     AccelVector accels; // acceleration sensors
 
+    SolidVector attachments; // additional body parts
+
     std::size_t number_of_joints() const { return joints.get_size(); }
-    std::size_t number_of_bodies() const { return bodies.get_size(); }
+    std::size_t number_of_bodies() const { return bodies.size(); }
     std::size_t number_of_accels() const { return accels.get_size(); }
 
     void create_box( const std::string name
@@ -59,23 +75,72 @@ public:
                        , const Color4 color
                        , const bool collision
                        , const double friction = dInfinity);
+    void create_segment( const std::string name
+                       , const Vector3 pos
+                       , const Capsule cap
+                       , const double mass
+                       , const double density
+                       , const Color4 color
+                       , const bool collision
+                       , const double friction = dInfinity);
 
-    void attach_accel_sensor(std::string name_body);
+    void attach_accel_sensor(std::string name_body, bool keep_original_color = false);
 
     void connect_joint (
-                    const std::string bodyname1, const std::string bodyname2,
+                    std::string const& bodyname1, std::string const& bodyname2,
                     const double relx, const double rely, const double relz,
                     const char axis,
-                    const int jointstopLo_deg, const int jointstopHi_deg, const int jointposDefault_deg,
+                    const double jointstopLo_deg, const double jointstopHi_deg, const double jointposDefault_deg,
                     const JointType Type,
                     const std::string Name,
                     const std::string SymName = "",
-                    const unsigned int torque_factor = 5
+                    const double torque_factor = 5.0,
+                    ActuatorParameters const& conf = ActuatorParameters()
                 );
+
+    void connect_fixed(std::string const& bodyname1, std::string const& bodyname2);
+
+    void attach_box( const std::string bodyname
+                   , const Vector3 pos
+                   , const Vector3 len
+                   , const double mass
+                   , const double density
+                   , const Color4 color
+                   , const bool collision
+                   , const double friction = dInfinity) {
+
+        std::string attach_name = bodyname + std::to_string(attachments.size());
+        attachments.create_box(attach_name, pos, len, mass, density, color, collision, friction);
+
+        unsigned bID = bodies     .get_body_id_by_name(bodyname);
+        unsigned aID = attachments.get_body_id_by_name(attach_name);
+
+        dJointID fixed = dJointCreateFixed(world, 0);
+        dJointAttach(fixed, bodies[bID].body, attachments[aID].body);
+    }
+
+    void attach_segment( const std::string bodyname
+                       , const Vector3 pos
+                       , const Capsule cap
+                       , const double mass
+                       , const double density
+                       , const Color4 color
+                       , const bool collision
+                       , const double friction = dInfinity) {
+
+        std::string attach_name = bodyname + std::to_string(attachments.size());
+        attachments.create_capsule(attach_name, pos, cap, mass, density, color, collision, friction);
+
+        unsigned bID = bodies     .get_body_id_by_name(bodyname);
+        unsigned aID = attachments.get_body_id_by_name(attach_name);
+
+        dJointID fixed = dJointCreateFixed(world, 0);
+        dJointAttach(fixed, bodies[bID].body, attachments[aID].body);
+    }
 
     void print_statistics(void) const;
 
-    void set_camera_center_on(std::string name_body);
+    void set_camera_center_on(std::string const& name_body);
     void set_camera_center_obj(unsigned int id) { if (id < number_of_bodies()) cam_center_obj = id; }
 
     dBodyID get_camera_center_obj(void)         const { return bodies[cam_center_obj].body; };
@@ -89,10 +154,38 @@ public:
 
     ~Robot() { dsPrint("Destroying robot.\n"); }
 
+    ModelID const& get_model_id() const { return model_id; }
+
+    void draw(Configuration const& conf)
+    {
+        /* draw robot's bodies */
+        for (std::size_t i = 0; i < number_of_bodies(); ++i)
+            bodies[i].draw(conf.show_aabb);
+        for (std::size_t i = 0; i < attachments.size(); ++i)
+            attachments[i].draw(conf.show_aabb);
+
+        /* draw robot's joints */
+        if (conf.show_joints)
+            for (std::size_t i = 0; i < number_of_joints(); ++i)
+                joints[i].draw();
+
+        /* draw robot's acceleration sensors */
+        if (conf.show_accels)
+            for (std::size_t i = 0; i < number_of_accels(); ++i)
+                accels[i].draw();
+    }
+
+    void destroy(void) {
+        bodies.destroy();
+        joints.destroy();
+        accels.destroy();
+    }
+
 private:
     unsigned int cam_center_obj;
     Camera_Setup cam_setup;
 
+    ModelID model_id;
 };
 
 

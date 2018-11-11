@@ -1,6 +1,7 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
+#include <cassert>
 #include <cstdlib>
 #include <math.h>
 
@@ -25,6 +26,21 @@ namespace common {
     inline double getRandomDouble();
     inline double getRandomDouble(const double min, const double max);
     inline int    getRandomInt   (const int min, const int max);
+
+    inline double rnd(double m, double s, double a)
+    {
+        assert(0.0 <= s and s <= 1.0);
+        assert(0.0 <= a and a <= 1.0);
+        const float rmin = (1 - a*s) * m;
+        const float rmax = (1 + a*s) * m;
+
+        assert(rmin >= 0. and rmax <= 2*m);
+        return common::getRandomDouble(rmin, rmax);
+
+    }
+
+    inline double rnd(double a) { return common::getRandomDouble(-a, a); }
+
 
     /* create normal distributed random values
      * von http://www.taygeta.com/random/boxmuller.html

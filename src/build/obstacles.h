@@ -26,7 +26,7 @@ public:
 
     SolidVector objects;
 
-    std::size_t number_of_objects() const { return objects.get_size(); }
+    std::size_t number_of_objects() const { return objects.size(); }
 
     void create_box( std::string name
                    , const Vector3 pos
@@ -48,7 +48,7 @@ public:
                           dReal friction = dInfinity)
     {
         objects.create_box(name, pos, len, mass, density, color, true, friction);
-        objects[objects.get_size()-1].fixed(world); // fix object last created
+        objects[objects.size() - 1].fixed(world); // fix object last created
     }
 
     void print_statistics(void) const {

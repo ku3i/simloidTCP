@@ -10,6 +10,7 @@
 #include <basic/color.h>
 #include <basic/configuration.h>
 #include <build/bodies.h>
+#include <build/params.h>
 #include <controller/pid_controller.h>
 
 extern Configuration global_conf;
@@ -32,7 +33,9 @@ public:
           , double position_default_rad
           , Vector3 rel
           , const char axis
-          , unsigned int torque_factor)
+          , double torque_factor
+          , ActuatorParameters const& conf
+          )
     : joint_id(joint_id)
     , body1(body1)
     , body2(body2)
@@ -50,6 +53,7 @@ public:
     , voltage_setpoint(0.0)
     , is_sticking(false)
     , z(.0)
+    , conf(conf)
     {
         if (name == "") {
             name = "joint_" + std::to_string(joint_id);
@@ -97,6 +101,7 @@ public:
         } else
             dsError("Lower joint stop is greater than higher (%1.2f > %1.2f)\n", common::rad2deg(stop_lo_rad), common::rad2deg(stop_hi_rad));
 
+        assert(torque_factor > 0. and torque_factor <= 10);
         dsPrint("done.\n");
     }
 
@@ -121,7 +126,7 @@ public:
     /* set */
     void set_voltage(const double value) {
         pid_enable = false;
-        voltage_setpoint = motor_model(common::clip(value, 1.0), get_velocity_norm(), torque_factor);
+        voltage_setpoint = motor_model(common::clip(value, 1.0), get_velocity_norm());
     }
     void set_position(const double value) {
         pid_enable = true;
@@ -139,7 +144,7 @@ public:
         dJointAddAMotorTorques(motor, voltage_setpoint, .0, .0);
     }
     void apply_pidmaxtorque() const {
-        dJointSetAMotorParam(motor, dParamFMax, motor_model(pid_maxtorque, 0.0, torque_factor));
+        dJointSetAMotorParam(motor, dParamFMax, motor_model(pid_maxtorque, 0.0));
     }
     void apply_position_control() {
         set_motor_angular_velocity(pid_ctrl.set_position(pid_position_setpoint, get_motor_angle()));
@@ -160,7 +165,7 @@ public:
     /* physics simulation */
     double bristle(double velocity);
     double stribeck_friction_model(const double velocity);
-    double motor_model(const double u, const double joint_speed, const unsigned int torque_factor) const;
+    double motor_model(const double u, const double joint_speed) const;
 
     void reset() {
         pid_ctrl.reset();
@@ -171,12 +176,14 @@ public:
         pid_maxtorque = common::clip(global_conf.init_max_torque, 0.0, 1.0);
     }
 
+    void reinit_motormodel(ActuatorParameters const& c) { conf = c; }
+
     void draw(void) const;
 
     const unsigned int joint_id;
     const unsigned int body1;
     const unsigned int body2;
-    const unsigned int torque_factor;
+    const double       torque_factor;
           unsigned int symmetric_joint;
              JointType type;
     std::string        name;
@@ -199,6 +206,8 @@ private:
     bool               is_sticking;
 
     double             z; // Bristle displacement for friction model
+
+    ActuatorParameters conf;
 };
 
 
@@ -230,11 +239,15 @@ public:
                        , double position_default_rad
                        , Vector3 rel
                        , const char axis
-                       , unsigned int torque_factor)
+                       , double torque_factor
+                       , ActuatorParameters const& conf
+                       )
     {
         unsigned int joint_id = joints.size();
         if (joint_id < max_number_of_joints)
-            joints.emplace_back(world, bodies, joint_id, body1, body2, type, name, stopLo_rad, stopHi_rad, position_default_rad, rel, axis, torque_factor);
+            joints.emplace_back( world, bodies, joint_id, body1, body2, type, name
+                               , stopLo_rad, stopHi_rad, position_default_rad, rel
+                               , axis, torque_factor, conf );
         else
             dsError("Maximum number of joints is %u.", max_number_of_joints);
 
@@ -258,10 +271,18 @@ public:
             joints[idx].apply_control();
     }
 
+    void destroy(void) {
+        dsPrint("Destroying joints (for recreation).\n");
+        joints.clear();
+    }
+
 private:
     std::vector<NJoint> joints;
     const std::size_t   max_number_of_joints;
 
 };
+
+
+dJointID create_fixed_joint(dWorldID const& world, SolidVector const& bodies, unsigned body1, unsigned body2);
 
 #endif // JOINTS_H_INCLUDED
