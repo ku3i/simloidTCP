@@ -11,6 +11,8 @@
 #include <basic/common.h>
 #include <basic/draw.h>
 
+dMass add(dMass const& m0, dMass const& m1);
+
 /* general class for solid bodies */
 class Solid {
 public:
@@ -233,9 +235,9 @@ public:
     std::size_t size() const { return bodies.size(); }
 
     dMass get_total_mass(void) const {
-        assert(bodies.size() > 0);
         dMass total_mass;
         dMassSetZero(&total_mass);
+        if (bodies.size() == 0) return total_mass;
         for (auto const& b : bodies) {
             dMass add_mass;
             dBodyGetMass(b.body, &add_mass);

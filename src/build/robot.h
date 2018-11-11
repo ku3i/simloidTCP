@@ -98,6 +98,18 @@ public:
                     ActuatorParameters const& conf = ActuatorParameters()
                 );
 
+    void connect_joint (
+                    std::string const& bodyname1, std::string const& bodyname2,
+                    const Vector3 rel_pos,
+                    const char axis,
+                    const double jointstopLo_deg, const double jointstopHi_deg, const double jointposDefault_deg,
+                    const JointType Type,
+                    const std::string Name,
+                    const std::string SymName = "",
+                    const double torque_factor = 5.0,
+                    ActuatorParameters const& conf = ActuatorParameters()
+                );
+
     void connect_fixed(std::string const& bodyname1, std::string const& bodyname2);
 
     void attach_box( const std::string bodyname
@@ -117,6 +129,7 @@ public:
 
         dJointID fixed = dJointCreateFixed(world, 0);
         dJointAttach(fixed, bodies[bID].body, attachments[aID].body);
+        dJointSetFixed(fixed);
     }
 
     void attach_segment( const std::string bodyname
@@ -179,6 +192,7 @@ public:
         bodies.destroy();
         joints.destroy();
         accels.destroy();
+        attachments.destroy();
     }
 
 private:

@@ -137,6 +137,7 @@ dJointID create_fixed_joint(dWorldID const& world, SolidVector const& bodies, un
 {
     dJointID fixed = dJointCreateFixed(world, 0);
     dJointAttach(fixed, bodies[body1].body, bodies[body2].body);
+    dJointSetFixed(fixed);
     return fixed;
 }
 

@@ -30,7 +30,7 @@ namespace Gretchen {
     };
 
 void
-create_gretchen0(Robot& robot, std::vector<double> model_parameter)
+create_gretchen0(Robot& robot, std::vector<double> /*model_parameter*/)
 {
     dsPrint("Creating Gretchen...");
     const double friction = constants::friction::hi;
@@ -88,16 +88,16 @@ create_gretchen0(Robot& robot, std::vector<double> model_parameter)
     /* arms upper */
     robot.create_segment("lau0", arm_upper0  .pos     , arm_upper0  .dim, 0, constants::materials::light , colors::white, false, friction);
     robot.create_segment("rau0", arm_upper0  .pos._x(), arm_upper0  .dim, 0, constants::materials::light , colors::white, false, friction);
-    robot.create_segment("lau1", arm_upper1  .pos     , arm_upper1  .dim, 0, constants::materials::light , colors::white, false, friction);
-    robot.create_segment("rau1", arm_upper1  .pos._x(), arm_upper1  .dim, 0, constants::materials::light , colors::white, false, friction);
+    robot.create_segment("lau1", arm_upper1  .pos     , arm_upper1  .dim, 0, constants::materials::light , colors::gray, false, friction);
+    robot.create_segment("rau1", arm_upper1  .pos._x(), arm_upper1  .dim, 0, constants::materials::light , colors::gray, false, friction);
     /* arms lower */
     robot.create_segment("lalo", arm_lower   .pos     , arm_lower   .dim, 0, constants::materials::light , colors::black, true , friction);
     robot.create_segment("ralo", arm_lower   .pos._x(), arm_lower   .dim, 0, constants::materials::light , colors::black, true , friction);
     /* legs upper */
     robot.create_segment("llu0", leg_upper0  .pos     , leg_upper0  .dim, 0, constants::materials::normal, colors::white, true , friction);
     robot.create_segment("rlu0", leg_upper0  .pos._x(), leg_upper0  .dim, 0, constants::materials::normal, colors::white, true , friction);
-    robot.create_segment("llu1", leg_upper1  .pos     , leg_upper1  .dim, 0, constants::materials::normal, colors::white, true , friction);
-    robot.create_segment("rlu1", leg_upper1  .pos._x(), leg_upper1  .dim, 0, constants::materials::normal, colors::white, true , friction);
+    robot.create_segment("llu1", leg_upper1  .pos     , leg_upper1  .dim, 0, constants::materials::normal, colors::gray, true , friction);
+    robot.create_segment("rlu1", leg_upper1  .pos._x(), leg_upper1  .dim, 0, constants::materials::normal, colors::gray, true , friction);
     /* legs lower */
     robot.create_segment("lllo", leg_lower   .pos     , leg_lower   .dim, 0, constants::materials::normal, colors::black, true , friction);
     robot.create_segment("rllo", leg_lower   .pos._x(), leg_lower   .dim, 0, constants::materials::normal, colors::black, true , friction);
@@ -109,6 +109,8 @@ create_gretchen0(Robot& robot, std::vector<double> model_parameter)
     /* feet */
     robot.create_box    ("left", foot        .pos     , foot        .dim, 0, constants::materials::heavy , colors::white, true , friction);
     robot.create_box    ("rift", foot        .pos._x(), foot        .dim, 0, constants::materials::heavy , colors::white, true , friction);
+
+    //robot.attach_box("upto", torso_upper .pos, {0.0001,1.6,1.6}, 0.1, 0.0, {1.0,  0.0,  1.0, 0.25}, false);
 
     //robot.attach_segment("left", pos, 3, 0, 0.02, 0, constants::materials::heavy, colors::orange, true, friction );
     Vector3 foot_joint_pos = Vector3{0.5*foot.dim.y - leg_lower.dim.rad, foot.dim.z+ankle.dim.rad, 0.0};
@@ -151,7 +153,7 @@ create_gretchen0(Robot& robot, std::vector<double> model_parameter)
     robot.connect_joint("rian", "rift", .0, foot_joint_pos.x, foot_joint_pos.y,      'Y',  -45,   45,   0 + rnd(X), JointType::symmetric, "rankleroll"    , "lankleroll"    , 10);
 
     /* attach sensors */
-    robot.attach_accel_sensor("head",true);
+    robot.attach_accel_sensor("head");
 
     /* camera */
     robot.set_camera_center_on("upto");
