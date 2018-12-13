@@ -16,7 +16,7 @@ Scenes::create_hurdles(Obstacle& obstacles)
 
     for (unsigned int i = 1; i < 10; ++i) // indented to start at 1
     {
-        len.z = 0.005*i;
+        len.z = 0.002*i;
         pos.y = -1.0*i - 0.5; // remember: -i (unsigned!) => very large => kills ODE
         pos.z = 0.5*len.z + 0.001;
         obstacles.create_fixed_box("", pos, len, .0, constants::materials::rock, colors::white, friction);
@@ -78,4 +78,33 @@ Scenes::create_stairways(Obstacle& obstacles)
         obstacles.create_fixed_box("", pos, len, .0, constants::materials::rock, colors::white, friction);
     }
 
+}
+
+void
+Scenes::create_plates(Obstacle& obstacles)
+{
+    dsPrint("Ground with plates.\n");
+
+    const int maxj = 20;
+    const int maxi = 5;
+    for (int i = 0; i < maxi; ++i)
+        for (int j = 0; j < maxj; ++j)
+        {
+            Vector3 pos, len;
+            Color4 color;
+            double friction = 10.0;
+
+            len.x = common::getRandomDouble(0.100, 0.100 + 0.010*(j+1));
+            len.y = common::getRandomDouble(0.100, 0.100 + 0.010*(j+1));
+            len.z = common::getRandomDouble(0.002, 0.002+0.001*(j+1));
+
+            pos.x = (i - maxi/2) * 0.25 + common::getRandomDouble(-len.x/2, +len.x/2);
+            pos.y =  -1.0 + (j * -0.25) + common::getRandomDouble(-len.y/2, +len.y/2);
+            pos.z = common::getRandomDouble( 0.01, 1.00) + 0.5 * len.z;
+
+            color = common::getRandomDouble(0.3, 0.7);
+
+            obstacles.create_box("stone"+std::to_string(i*maxj+j), pos, len, .0, constants::materials::rock, color, friction);
+
+        }
 }

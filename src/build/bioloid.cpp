@@ -23,6 +23,7 @@ Bioloid::create_scene(Obstacle& obstacles, Landscape& landscape)
         case 2: Scenes::create_hills(landscape);        break;
         case 3: Scenes::create_shaky_ground(obstacles); break;
         case 4: Scenes::create_stairways(obstacles);    break;
+        case 5: Scenes::create_plates(obstacles);       break;
 
         default: dsPrint("Warning: Wrong scene index number.\n");
     }
