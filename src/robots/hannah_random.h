@@ -125,7 +125,7 @@ create_random_hannah(Robot& robot, std::vector<double> model_parameter)
 
     //robot.create_box("payl", pos, {0.05, 0.05, 0.5}, 0.100, 0, m.color_body, false, constants::friction::lo);
     //robot.connect_fixed("body", "payl");
-    robot.attach_box("body", pos, {0.05, 0.05, 0.5}, 0.100, 0, m.color_light, false );
+    //robot.attach_box("body", pos, {0.05, 0.05, 0.5}, 0.100, 0, m.color_light, false );
 
 
     /* shoulders */

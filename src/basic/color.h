@@ -38,7 +38,7 @@ namespace colors
     const Color4 yellow    {1.0, 1.0,  .0, 1.0};
     const Color4 redorange {1.0, 0.3,  .0, 1.0};
     const Color4 blue      { .0,  .0, 1.0, 1.0};
-    const Color4 green     { .0,  .8,  .0,  .8};
+    const Color4 green     { .3, 1.0,  .0,  .9};
     const Color4 orange    {1.0,  .5,  .0, 1.0};
     const Color4 brown     { .6,  .4,  .3, 1.0};
     const Color4 pidgin    { .8,  .8, 1.0, 1.0};

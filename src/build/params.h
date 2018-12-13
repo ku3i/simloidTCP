@@ -24,8 +24,8 @@ struct ActuatorParameters {
     , R_i_inv          ( motor_parameter::R_i_inv )
     {
         printf("Using standard actuator parameters.");
-        static_assert (joint::sticking_friction >= joint::coulomb_friction, "Sticktion must be greater than coulomb friction.");
-        static_assert (joint::stiction_range > 0, "Sticktion range must be greater zero.");
+        static_assert (joint::sticking_friction >= joint::coulomb_friction, "Stiction must be greater than coulomb friction.");
+        static_assert (joint::stiction_range > 0, "Stiction range must be greater zero.");
     }
 
     ActuatorParameters(double perc, double var)
@@ -43,7 +43,7 @@ struct ActuatorParameters {
         printf("Using randomized actuator parameters by %1.2f %% variation", perc * 100 * var);
         assert (perc >= 0. and perc <= 0.33);
         assert (var  >= 0. and var  <= 1.00);
-        /* Sticktion must be greater than coulomb friction. This is guarantied up to a range of 33%*/
+        /* Stiction must be greater than coulomb friction. This is guarantied up to a range of 33%*/
         assert (sticking_friction >= coulomb_friction);
         assert (stiction_range > 0);
     }
@@ -99,6 +99,30 @@ struct ActuatorParameters {
         params.emplace_back( R_i_inv           );
         assert(params.size() == 10);
         return params;
+    }
+
+    void randomize(double perc, double var)
+    {
+        if (perc == .0 or var == .0) { printf("no randomization performed in actuator parameters."); return; }
+
+        bristle_displ_max = rnd(bristle_displ_max, perc, var);
+        bristle_stiffness = rnd(bristle_stiffness, perc, var);
+        sticking_friction = rnd(sticking_friction, perc, var);
+        coulomb_friction  = rnd(coulomb_friction , perc, var);
+        fluid_friction    = rnd(fluid_friction   , perc, var);
+        stiction_range    = rnd(stiction_range   , perc, var);
+        V_in              = rnd(V_in             , perc, var);
+        kB                = rnd(kB               , perc, var);
+        kM                = rnd(kM               , perc, var);
+        R_i_inv           = rnd(R_i_inv          , perc, var);
+
+        printf("Randomizing current actuator parameters by %1.2f %% variation", perc * 100 * var);
+        assert (perc >= 0. and perc <= 0.33);
+        assert (var  >= 0. and var  <= 1.00);
+        /* Stiction must be greater than coulomb friction. This is guarantied up to a range of 33%*/
+        if (sticking_friction <= coulomb_friction)
+            sticking_friction = 1.01 * coulomb_friction;
+        assert (stiction_range > 0);
     }
 
     double bristle_displ_max;
