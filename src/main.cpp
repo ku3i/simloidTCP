@@ -492,12 +492,8 @@ main(int argc, char **argv)
     Bioloid::create_robot(robot);
     Bioloid::create_scene(obstacles, landscape);
 
-    /* initialize snapshots */
-    recordSnapshot(robot, obstacles, &s1);
-    recordSnapshot(robot, obstacles, &s2);
-
     /* create TCP Controller */
-    controller = new TCPController(global_conf, universe, robot, obstacles, reset_time, camera);
+    controller = new TCPController(global_conf, universe, robot, obstacles, landscape, reset_time, camera);
     if (((TCPController*)controller)->establishConnection(global_conf.tcp_port))
     {
         /* run simulation */

@@ -85,7 +85,7 @@ Scenes::create_plates(Obstacle& obstacles)
 {
     dsPrint("Ground with plates.\n");
 
-    const int maxj = 20;
+    const int maxj = 5;
     const int maxi = 5;
     for (int i = 0; i < maxi; ++i)
         for (int j = 0; j < maxj; ++j)
@@ -94,12 +94,12 @@ Scenes::create_plates(Obstacle& obstacles)
             Color4 color;
             double friction = 10.0;
 
-            len.x = common::getRandomDouble(0.100, 0.100 + 0.010*(j+1));
-            len.y = common::getRandomDouble(0.100, 0.100 + 0.010*(j+1));
-            len.z = common::getRandomDouble(0.002, 0.002+0.001*(j+1));
+            len.x = common::getRandomDouble(0.100, 0.100 + 0.025*(j+1));
+            len.y = common::getRandomDouble(0.100, 0.100 + 0.025*(j+1));
+            len.z = common::getRandomDouble(0.002, 0.002+0.003*(j+1));
 
             pos.x = (i - maxi/2) * 0.25 + common::getRandomDouble(-len.x/2, +len.x/2);
-            pos.y =  -1.0 + (j * -0.25) + common::getRandomDouble(-len.y/2, +len.y/2);
+            pos.y =  -1.5 + (j * -0.25) + common::getRandomDouble(-len.y/2, +len.y/2);
             pos.z = common::getRandomDouble( 0.01, 1.00) + 0.5 * len.z;
 
             color = common::getRandomDouble(0.3, 0.7);

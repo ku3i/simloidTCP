@@ -59,6 +59,10 @@ public:
         dsPrint("Destroying obstacles.\n");
     }
 
+    void destroy(void) {
+        objects.destroy();
+    }
+
 };
 
 #endif

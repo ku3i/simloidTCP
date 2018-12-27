@@ -69,11 +69,11 @@ bool TCPController::control(const double time)
         if (starts_with(msg, "GRAVITY OFF")) { universe.set_gravity(false); continue; }
 
         /* reset */
-        if (starts_with(msg, "RESET"  )) { playSnapshot(robot, obstacles, &s1); reset(); continue; }
+        if (starts_with(msg, "RESET"  )) { playSnapshot(robot, obstacles, &s1_init); reset(); continue; }
 
         /* save and restore snapshots */
-        if (starts_with(msg, "SAVE"   )) { recordSnapshot(robot, obstacles, &s2); continue; }
-        if (starts_with(msg, "RESTORE")) { playSnapshot  (robot, obstacles, &s2); continue; }
+        if (starts_with(msg, "SAVE"   )) { dsPrint("Saving state.\n"); recordSnapshot(robot, obstacles, &s2_user); continue; }
+        if (starts_with(msg, "RESTORE")) { playSnapshot  (robot, obstacles, &s2_user); continue; }
         if (starts_with(msg, "NEWTIME")) { if (reset_time) reset_time(); continue; }
 
         /* simulator commands */
@@ -94,8 +94,8 @@ bool TCPController::control(const double time)
 
     if (reload_model) {
         reset();
-        recordSnapshot(robot, obstacles, &s1);
-        recordSnapshot(robot, obstacles, &s2);
+        recordSnapshot(robot, obstacles, &s1_init);
+        recordSnapshot(robot, obstacles, &s2_user);
         camera.set_viewpoint(robot.get_camera_center_obj(), robot.get_camera_setup());
         send_robot_configuration();
         wait_for_ack();
@@ -443,8 +443,13 @@ bool TCPController::parse_update_model_command(const char* msg)
     msg += offset;
     auto params = read_params(msg, &offset, num_params);
 
+    playSnapshot(robot, obstacles, &s1_init); // restore initial state
+
     robot.destroy();
+    obstacles.destroy();
+    landscape.destroy();
     Bioloid::create_robot(robot, new_model_id, params);
+    Bioloid::create_scene(obstacles, landscape);
     return true;
 }
 

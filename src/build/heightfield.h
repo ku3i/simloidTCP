@@ -59,6 +59,7 @@ public:
 
     std::size_t get_size() const { return heightfields.size(); }
 
+    void destroy(void) { heightfields.clear(); }
 
 private:
     const dSpaceID&          space;
@@ -83,6 +84,11 @@ public:
     void create_heightfield(const std::string name, const Vector3 pos, const Color4 color) { heightfields.create(name, pos, color); }
 
     void print_statistics(void) const;
+
+    void destroy(void) {
+        dsPrint("Destroying Landscape.\n");
+        heightfields.destroy();
+    }
 
     ~Landscape() { dsPrint("Destroying landscape.\n"); }
 

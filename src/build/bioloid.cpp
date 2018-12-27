@@ -15,6 +15,7 @@
 void
 Bioloid::create_scene(Obstacle& obstacles, Landscape& landscape)
 {
+    assert(obstacles.number_of_objects() == 0);
     dsPrint("Creating scene: ");
     switch (global_conf.scene)
     {

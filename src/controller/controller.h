@@ -5,14 +5,16 @@
 #include <basic/common.h>
 #include <build/robot.h>
 #include <build/obstacles.h>
+#include <build/heightfield.h>
 
 class Controller
 {
 public:
-    Controller(const physics& universe, Robot& robot, const Obstacle& obstacles, void (*_resetTime)())
+    Controller(physics const& universe, Robot& robot, Obstacle& obstacles, Landscape& landscape, void (*_resetTime)())
     : universe(universe)
     , robot(robot)
     , obstacles(obstacles)
+    , landscape(landscape)
     , reset_time(_resetTime)
     {}
     virtual ~Controller() {}
@@ -22,9 +24,10 @@ public:
     bool is_paused(void) const { return paused; }
 
 protected:
-    const physics&  universe;
-          Robot&    robot;
-    const Obstacle& obstacles;
+    physics const& universe;
+    Robot&         robot;
+    Obstacle&      obstacles;
+    Landscape&     landscape;
 
     void (*reset_time)();
     bool paused;

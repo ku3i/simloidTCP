@@ -18,12 +18,13 @@ extern Configuration global_conf;
 class TCPController : public Controller {
 public:
     TCPController( Configuration& config
-                 , const physics& universe
+                 , physics const& universe
                  , Robot& robot
-                 , const Obstacle& obstacles
+                 , Obstacle& obstacles
+                 , Landscape& landscape
                  , void (*r)()
                  , Camera& camera )
-    : Controller(universe, robot, obstacles, r)
+    : Controller(universe, robot, obstacles, landscape, r)
     , config(config)
     , camera(camera)
     {
@@ -33,8 +34,8 @@ public:
         dsPrint("done.\n");
 
         dsPrint("Recording initial snapshot.\n");
-        recordSnapshot(robot, obstacles, &s1);
-        recordSnapshot(robot, obstacles, &s2);
+        recordSnapshot(robot, obstacles, &s1_init);
+        recordSnapshot(robot, obstacles, &s2_user);
     };
 
     ~TCPController() {
@@ -70,8 +71,8 @@ private:
 
     void execute_controller();
 
-    Snapshot s1;
-    Snapshot s2;
+    Snapshot s1_init;
+    Snapshot s2_user;
 
     void send_ordered_info(const double time);
     void send_robot_configuration(void);
