@@ -9,6 +9,7 @@
 #include <basic/common.h>
 #include <basic/color.h>
 #include <basic/configuration.h>
+#include <basic/derivative.h>
 #include <build/bodies.h>
 #include <build/params.h>
 #include <controller/pid_controller.h>
@@ -54,6 +55,8 @@ public:
     , is_sticking(false)
     , z(.0)
     , conf(conf)
+    //, dpdt(.0, global_conf.step_length, /*scale=*/0.25, /*change_limit=*/0.1)
+    , dpdt(.0, global_conf.step_length, /*scale=*/0.25)
     {
         if (name == "") {
             name = "joint_" + std::to_string(joint_id);
@@ -103,6 +106,8 @@ public:
 
         assert(torque_factor > 0. and torque_factor <= 10);
         dsPrint("done.\n");
+
+        dpdt.reset(get_low_resolution_position(false));
     }
 
     ~NJoint()
@@ -114,8 +119,16 @@ public:
     }
 
     /* lower resolution and noisy sensor outputs */
-    double get_low_resolution_position() const { return common::low_resolution_sensor(get_position_norm()); }
-    double get_low_resolution_velocity() const { return common::low_resolution_sensor(get_velocity_norm()); }
+    double get_low_resolution_position(bool low_quality) const {
+        return low_quality ? common::avr_10bit_adc(get_position_norm())
+                           : common::low_resolution_sensor(get_position_norm());
+    }
+
+    double get_low_resolution_velocity(bool low_quality) {
+        dpdt.derive(get_low_resolution_position(low_quality));
+        return low_quality ? dpdt.get()
+                           : common::low_resolution_sensor(get_velocity_norm());
+    }
 
     /* get */
     double get_position_norm()  const { return common::rad2norm(dJointGetHingeAngle    (hinge)); } // +/-pi   --> +/-1
@@ -174,6 +187,7 @@ public:
         voltage_setpoint = 0.0;
         pid_position_setpoint = position_default;
         pid_maxtorque = common::clip(global_conf.init_max_torque, 0.0, 1.0);
+        dpdt.reset(get_low_resolution_position(false));
     }
 
     void reinit_motormodel(ActuatorParameters const& c) { conf = c; }
@@ -208,6 +222,9 @@ private:
     double             z; // Bristle displacement for friction model
 
     ActuatorParameters conf;
+
+//    LowpassDiff        dpdt;
+    Derived            dpdt;
 };
 
 

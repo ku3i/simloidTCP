@@ -54,6 +54,13 @@ namespace constants {
         const double min_val = -max_val;
     }
 
+    namespace avr_adc_10bit
+    {
+        const double std_dev = 1.0/1024.0;
+        const double max_val = 4.0/1024.0;
+        const double min_val = -max_val;
+    }
+
     const unsigned int max_bodies = 32; // max. number of bodies
     const unsigned int max_joints = 32; // max. number of joints
     const unsigned int max_accels = 32; // max. number of acceleration sensors

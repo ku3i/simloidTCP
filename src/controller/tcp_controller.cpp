@@ -86,6 +86,10 @@ bool TCPController::control(const double time)
         if (starts_with(msg, "MODEL"  )) { reload_model = parse_update_model_command(msg.c_str()); continue; }
         if (starts_with(msg, "MOTOR"  )) { parse_update_motor_model(msg.c_str()); continue; }
 
+        /* sensor quality */
+        if (starts_with(msg, "SENSORS POOR")) { dsPrint("Setting poor sensor quality.\n"); low_quality_sensors = true;  continue; }
+        if (starts_with(msg, "SENSORS GOOD")) { dsPrint("Setting good sensor quality.\n"); low_quality_sensors = false; continue; }
+
         /* error */
         if (fail_counter++ >= 42) { dsPrint("Too many messages without a 'DONE'-command.\n"); return false; }
 
@@ -119,14 +123,14 @@ void TCPController::send_ordered_info(const double time)
     /* angular position */
     for (std::size_t i = 0; i < robot.number_of_joints(); ++i)
     {
-        snprintf(tmp, buffer_size, "%lf ", robot.joints[i].get_low_resolution_position());
+        snprintf(tmp, buffer_size, "%lf ", robot.joints[i].get_low_resolution_position(low_quality_sensors));
         message.append(tmp);
     }
 
     /* angular velocity */
     for (std::size_t i = 0; i < robot.number_of_joints(); ++i)
     {
-        snprintf(tmp, buffer_size, "%lf ", robot.joints[i].get_low_resolution_velocity());
+        snprintf(tmp, buffer_size, "%lf ", robot.joints[i].get_low_resolution_velocity(low_quality_sensors));
         message.append(tmp);
     }
 

@@ -80,6 +80,8 @@ private:
 
     Configuration& config;
     Camera& camera;
+
+    bool low_quality_sensors = false;
 };
 
 

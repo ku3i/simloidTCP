@@ -52,6 +52,7 @@ namespace common {
     inline double dist2D(const double* v1, const double* v2);
 
     inline double low_resolution_sensor(double value);
+    inline double avr_10bit_adc(double value);
 
     inline short  double2short(double value);
     inline double short2double(short  value);
@@ -127,6 +128,19 @@ inline short common::double2short(double value) {
 
 inline double common::short2double(short value) {
     return static_cast<double>(value / 32768.0);
+}
+
+inline double common::avr_10bit_adc(double value)
+{
+    /* add Gaussian noise to ADC model */
+    double gaussian_noise = box_muller(0.0,
+                                       constants::avr_adc_10bit::std_dev,
+                                       constants::avr_adc_10bit::min_val,
+                                       constants::avr_adc_10bit::max_val);
+    /* lower to 10 bit resolution */
+    value = clip(value + gaussian_noise, -1.0, 511.0/512.0);
+    value = static_cast<short>(512 * value);
+    return value / 512.0;
 }
 
 #endif
