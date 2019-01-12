@@ -105,6 +105,9 @@ Scenes::create_plates(Obstacle& obstacles)
             color = common::getRandomDouble(0.3, 0.7);
 
             obstacles.create_box("stone"+std::to_string(i*maxj+j), pos, len, .0, constants::materials::rock, color, friction);
-
         }
+
+    obstacles.create_box("bar"   , {.0, -3.520, 0.10}, {1.50, 0.02, 0.02}, .0, constants::materials::rock  , colors::gray  , 10.0);
+    obstacles.create_box("seesaw", {.0, -3.500, 0.20}, {1.50, 1.50, 0.01}, .0, constants::materials::normal, colors::white , 10.0);
+
 }

@@ -37,6 +37,18 @@ namespace Gretchen {
 
         double len, rad; };
 
+    ActuatorParameters Sensorimotor {{/* bristle_displ_max = */ +1.00000000e-03,
+                                      /* bristle_stiffness = */ +1.00348110e+00,
+                                      /* sticking_friction = */ +2.74093907e-01,
+                                      /* coulomb_friction  = */ +2.02936051e-01,
+                                      /* fluid_friction    = */ +1.81613953e-01,
+                                      /* stiction_range    = */ +3.39670766e-02,
+                                      /* V_in              = */ +1.20000000e+01,
+                                      /* kB                = */ +1.95730358e+00,
+                                      /* kM                = */ +1.93830452e+00,
+                                      /* R_i_inv           = */ +8.19456429e-02
+                                      }, /*assert_range=*/true };
+
     struct GrtDev0Morphology
     {
         const Vector3 body;
@@ -163,7 +175,10 @@ create_grt_dev0_rnd(Robot& robot, std::vector<double> model_parameter)
         srand(rnd_instance);
 
     GrtDev0Morphology m(rnd_amp);
-    ActuatorParameters params(range, rnd_amp);
+    //ActuatorParameters params(range, rnd_amp);
+
+    ActuatorParameters params = Sensorimotor;
+    params.randomize(range, rnd_amp);
 
     srand(time(NULL)); // usual seed for random number generator.
 

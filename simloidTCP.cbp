@@ -43,6 +43,7 @@
 		<Unit filename="src/basic/configuration.cpp" />
 		<Unit filename="src/basic/configuration.h" />
 		<Unit filename="src/basic/constants.h" />
+		<Unit filename="src/basic/derivative.h" />
 		<Unit filename="src/basic/draw.cpp" />
 		<Unit filename="src/basic/draw.h" />
 		<Unit filename="src/basic/signals.h" />
