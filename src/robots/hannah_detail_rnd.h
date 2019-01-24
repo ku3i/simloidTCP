@@ -175,8 +175,6 @@ void create_leg(Robot& robot, HannahMorphology const& m, Vector3 pos, std::strin
 void
 create_hannah_detail_random(Robot& robot, std::vector<double> model_parameter)
 {
-    srand(time(NULL)); // usual seed for random number generator.
-
     unsigned rnd_instance = 0;
     double   rnd_amp = .0;
 
@@ -197,6 +195,7 @@ create_hannah_detail_random(Robot& robot, std::vector<double> model_parameter)
     ActuatorParameters params = Sensorimotor;
     params.randomize(range, rnd_amp);
 
+    srand(time(NULL)); // reset usual seed for random number generator.
 
     dsPrint("Creating randomized Hannah <3\n");
 
@@ -223,8 +222,7 @@ create_hannah_detail_random(Robot& robot, std::vector<double> model_parameter)
     robot.attach_box("body", bearing_pos._x()     , m.dbl_bearing, m.weight_kg.dbl_bearing, 0, colors::cyan_t, false);
     robot.attach_box("body", bearing_pos     ._y(), m.dbl_bearing, m.weight_kg.dbl_bearing, 0, colors::cyan_t, false);
     robot.attach_box("body", bearing_pos._x()._y(), m.dbl_bearing, m.weight_kg.dbl_bearing, 0, colors::cyan_t, false);
-    //robot.create_box("payl", pos, {0.05, 0.05, 0.5}, 0.100, 0, m.color_body, false, constants::friction::lo);
-    //robot.connect_fixed("body", "payl");
+
 
     const Vector3 shoulder =
     { 0.5*m.body.x - m.body_shld_joint_dist_xz

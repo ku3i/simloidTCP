@@ -175,12 +175,10 @@ create_grt_dev0_rnd(Robot& robot, std::vector<double> model_parameter)
         srand(rnd_instance);
 
     GrtDev0Morphology m(rnd_amp);
-    //ActuatorParameters params(range, rnd_amp);
-
     ActuatorParameters params = Sensorimotor;
     params.randomize(range, rnd_amp);
 
-    srand(time(NULL)); // usual seed for random number generator.
+    srand(time(NULL)); // reset usual seed for random number generator.
 
     dsPrint("Creating randomized grt_dev0 <3\n");
 
