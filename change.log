@@ -1,6 +1,18 @@
 
+2019-01-24: release 1.2.0
+	+ fixed error in randomizing models.
+	+ motor model for gretchen, and seesaw for training robustly.
+	+ Added support for very low resolution position and velocity, sensorimotor simulation.
+	+ emoving bug with not resetting landscape, improving plates scene.
+	+ added plate scene.
+	+ changes for hannah and test leg params.
+	+ adding new (detailed) models for hannah and grt_dev0, more functions for adding bodies.
+	+ Set friction for gretchen correctly.
+
+
 2018-08-02: release 1.1.1
 	+ Added Gretchen
+
 
 2018-01-19: release 1.1.0
 
