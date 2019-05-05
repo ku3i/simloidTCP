@@ -1,6 +1,8 @@
 #ifndef HANNAH_DETAIL_RND_H_INCLUDED
 #define HANNAH_DETAIL_RND_H_INCLUDED
 
+#include <sstream>
+
 #include <basic/common.h>
 #include <basic/color.h>
 #include <basic/capsule.h>
@@ -199,7 +201,34 @@ create_hannah_detail_random(Robot& robot, std::vector<double> model_parameter)
 
     dsPrint("Creating randomized Hannah <3\n");
 
-    const double X = 3*rnd_amp;
+    const double X = 3*rnd_amp; //TODO increase this
+
+    std::ostringstream descr;
+    descr << "Hannah Randomized\n";
+    descr << "weight_body="       << m.weight_kg.body              << "\n";
+    descr << "weight_leg_upper="  << m.weight_kg.leg_upper         << "\n";
+    descr << "weight_leg_lower="  << m.weight_kg.leg_lower         << "\n";
+    descr << "length_body="       << m.body.y                      << "\n";
+    descr << "length_leg_upper="  << m.leg_upper.z                 << "\n";
+    descr << "length_leg_lower="  << m.leg_lower.len               << "\n";
+    descr << "leg_ratio="         << m.leg_lower.len/m.leg_upper.z << "\n";
+    descr << "knee_y_offset="     << m.knee_y_offset               << "\n";
+
+    descr << "torque="            << m.torque                      << "\n";
+    descr << "ground_friction="   << m.ground_contact_friction     << "\n";
+    descr << "bristle_displ_max=" << params.bristle_displ_max      << "\n";
+    descr << "bristle_stiffness=" << params.bristle_stiffness      << "\n";
+    descr << "sticking_friction=" << params.sticking_friction      << "\n";
+    descr << "coulomb_friction="  << params.coulomb_friction       << "\n";
+    descr << "fluid_friction="    << params.fluid_friction         << "\n";
+    descr << "stiction_range="    << params.stiction_range         << "\n";
+    descr << "V_in="              << params.V_in                   << "\n";
+    descr << "kB="                << params.kB                     << "\n";
+    descr << "kM="                << params.kM                     << "\n";
+    descr << "R_i_inv="           << params.R_i_inv                << "\n";
+
+
+    robot.description = descr.str();
 
     /* body */
     Vector3 body_pos (.0, .0, m.zheight_start);

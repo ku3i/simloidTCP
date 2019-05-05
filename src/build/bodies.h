@@ -32,6 +32,7 @@ private:
     , friction((frict > 0)? frict : .0) // avoid negative values
     , color(color)
     , force_to_draw(.0)
+    , fixed_joint(nullptr)
     {
         if (fabs(pos.x) > constants::max_position || fabs(pos.y) > constants::max_position || fabs(pos.z) > constants::max_position)
             dsError("Body is far too distant.\n");
@@ -43,7 +44,7 @@ private:
         if (name == "")
             name = "solid_" + std::to_string(body_id);
 
-        dsPrint("Creating body %02u '%s'.\n", id, name.c_str());
+        //dsPrint("Creating body %02u '%s'.\n", id, name.c_str());
     }
 
 public:
@@ -129,7 +130,9 @@ public:
 
     ~Solid()
     {
-        dsPrint("Destroying body %02u '%s'.\n", id, name.c_str());
+        //dsPrint("Destroying body %02u '%s'.\n", id, name.c_str());
+        if (fixed_joint != nullptr)
+            dJointDestroy(fixed_joint);
         dGeomDestroy(geometry);
         dBodyDestroy(body);
     }
@@ -156,11 +159,18 @@ public:
 
     void set_impulse(const Vector3& force) { dBodyAddForce(body, force.x, force.y, force.z); force_to_draw = clip(0.1*force, 1.0); }
 
-    void fixed(const dWorldID& world)
+    void toggle_fixed(const dWorldID& world)
     {
-        fixed_joint = dJointCreateFixed(world, 0);
-        dJointAttach(fixed_joint, body, 0);
-        dJointSetFixed(fixed_joint);
+        if (fixed_joint == nullptr) {
+            dsPrint("Fixating solid: '%s'\n", name.c_str());
+            fixed_joint = dJointCreateFixed(world, 0);
+            dJointAttach(fixed_joint, body, 0);
+            dJointSetFixed(fixed_joint);
+        } else {
+            dsPrint("Releasing solid: '%s'\n", name.c_str());
+            dJointDestroy(fixed_joint);
+            fixed_joint = nullptr;
+        }
     }
 };
 

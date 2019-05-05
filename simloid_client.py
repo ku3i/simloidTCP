@@ -86,6 +86,9 @@ class Simloid:
 		self.recv_sensor_status()
 
 		print(MSG + "Robot initialized.\n\n")
+		self.sock.send("DESCRIPTION\n")
+		descr = self.sock.recv(bufsize)
+		print("robot description: {0}".format(descr))
 
 
 	def send_motor_controls(self):
@@ -116,8 +119,9 @@ class Simloid:
 		self.sock.send(cmd)
 		self.recv_robot_info()
 
-	def change_to_random_model(self, model_id, instance, amlitude):
-		cmd = "MODEL {0} {1} {2}\nDONE\n".format(model_id, instance, amlitude)
+	def change_to_random_model(self, model_id, instance, amplitude):
+		cmd = "MODEL {0} 2 {1} {2}\nDONE\n".format(model_id, instance, amplitude)
+		print(cmd)
 		self.sock.send(cmd)
 		self.recv_robot_info()
 
