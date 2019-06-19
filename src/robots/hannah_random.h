@@ -119,6 +119,8 @@ create_random_hannah(Robot& robot, std::vector<double> model_parameter)
 
     const double X = 3*rnd_amp;
 
+    robot.description = "Hannah random <3";
+
     /* body */
     Vector3 pos (.0, .0, m.zheight_start);
     robot.create_box("body", pos, m.body, m.weight_kg.body, 0, m.color_body, true, constants::friction::hi); // body

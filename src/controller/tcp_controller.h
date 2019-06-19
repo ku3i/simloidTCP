@@ -68,6 +68,7 @@ private:
 
     bool parse_update_model_command(const char* msg);
     void parse_update_motor_model(const char* msg);
+    void parse_toggle_fixed(const char* msg);
 
     void execute_controller();
 
@@ -76,6 +77,7 @@ private:
 
     void send_ordered_info(const double time);
     void send_robot_configuration(void);
+    void send_robot_description_str(void);
     bool wait_for_ack(void);
 
     Configuration& config;

@@ -90,6 +90,10 @@ bool TCPController::control(const double time)
         if (starts_with(msg, "SENSORS POOR")) { dsPrint("Setting poor sensor quality.\n"); low_quality_sensors = true;  continue; }
         if (starts_with(msg, "SENSORS GOOD")) { dsPrint("Setting good sensor quality.\n"); low_quality_sensors = false; continue; }
 
+        /* misc */
+        if (starts_with(msg, "FIXED")) { parse_toggle_fixed(msg.c_str()); continue; }
+        if (starts_with(msg, "DESCRIPTION")) { send_robot_description_str(); continue; }
+
         /* error */
         if (fail_counter++ >= 42) { dsPrint("Too many messages without a 'DONE'-command.\n"); return false; }
 
@@ -479,6 +483,37 @@ void TCPController::parse_update_motor_model(const char* msg) {
     return;
 }
 
+
+void TCPController::parse_toggle_fixed(const char* msg)
+{
+    unsigned int idx = 0;
+
+    if (sscanf(msg, "FIXED %u", &idx) == 1)
+    {
+        if (idx < robot.number_of_bodies())
+            robot.bodies[idx].toggle_fixed(universe.world);
+        else
+            dsPrint("ERROR: value #1 out of range (0...%u): '%s'\n", robot.number_of_bodies() - 1, msg);
+    }
+    else dsPrint("ERROR: bad 'FIXED' format: '%s'\n", msg);
+}
+
+
+void TCPController::send_robot_description_str()
+{
+    std::string message = robot.description;
+
+    assert(!message.empty());
+
+    if (message.back() != '\n')
+        message.append("\n");
+
+    dsPrint("Robot description requested.\n");
+
+    /* send message to socket */
+    if (!socketServer->send_message(message))
+        dsError("Could not send robot description message to client.\n");
+}
 
 /* fin */
 

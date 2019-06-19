@@ -48,7 +48,7 @@ public:
                           dReal friction = dInfinity)
     {
         objects.create_box(name, pos, len, mass, density, color, true, friction);
-        objects[objects.size() - 1].fixed(world); // fix object last created
+        objects[objects.size() - 1].toggle_fixed(world); // fix object last created
     }
 
     void print_statistics(void) const {

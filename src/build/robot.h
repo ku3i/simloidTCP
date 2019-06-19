@@ -23,6 +23,10 @@ struct ModelID {
 
 };
 
+namespace detail {
+    const std::string default_description = "<EMPTY>";
+}
+
 class Robot {
 public:
     Robot(const dWorldID &world, const dSpaceID &space)
@@ -32,6 +36,7 @@ public:
     , joints(constants::max_joints)
     , accels(constants::max_accels)
     , attachments(world, space, constants::max_bodies)
+    , description(detail::default_description)
     , cam_center_obj(0)
     , cam_setup(Vector3(0.3,-0.3,0.3), 130.,-18.,0.)
     , model_id()
@@ -44,6 +49,8 @@ public:
     AccelVector accels; // acceleration sensors
 
     SolidVector attachments; // additional body parts
+
+    std::string description; // individual robot's description
 
     std::size_t number_of_joints() const { return joints.get_size(); }
     std::size_t number_of_bodies() const { return bodies.size(); }
@@ -193,6 +200,7 @@ public:
         joints.destroy();
         accels.destroy();
         attachments.destroy();
+        description = detail::default_description;
     }
 
 private:

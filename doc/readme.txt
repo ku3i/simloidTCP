@@ -27,6 +27,11 @@
 |   Simloid uses the version 0.13 of ODE, be sure you have the provided file
 |   'libode.a' installed in '/usr/local/lib/libode.a
 |
+|   Build the lib and install headers:
+|   $ ./configure --enable-double-precision
+|   $ make
+|   $ make install
+|
 |
 +---------------------+-------------------------------------------------------+
 | Starting the Server |
