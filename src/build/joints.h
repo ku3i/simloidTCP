@@ -112,10 +112,10 @@ public:
 
     ~NJoint()
     {
-        dsPrint("Destroying joint number %2u...", joint_id);
+        //dsPrint("Destroying joint number %2u...", joint_id);
         dJointDestroy(hinge);
         dJointDestroy(motor);
-        dsPrint("done.\n");
+        //dsPrint("done.\n");
     }
 
     /* lower resolution and noisy sensor outputs */

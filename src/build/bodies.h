@@ -43,7 +43,7 @@ private:
         if (name == "")
             name = "solid_" + std::to_string(body_id);
 
-        dsPrint("Creating body %02u '%s'.\n", id, name.c_str());
+        //dsPrint("Creating body %02u '%s'.\n", id, name.c_str());
     }
 
 public:
@@ -129,7 +129,7 @@ public:
 
     ~Solid()
     {
-        dsPrint("Destroying body %02u '%s'.\n", id, name.c_str());
+        //dsPrint("Destroying body %02u '%s'.\n", id, name.c_str());
         dGeomDestroy(geometry);
         dBodyDestroy(body);
     }
