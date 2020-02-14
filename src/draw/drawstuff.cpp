@@ -25,41 +25,31 @@
 simple graphics.
 
 the following command line flags can be used (typically under unix)
-	-notex		Do not use any textures
-	-noshadow[s]	Do not draw any shadows
-	-pause		Start the simulation paused
-
-TODO
-----
-
-manage openGL state changes better
+	-notex       Do not use any textures
+	-noshadow[s] Do not draw any shadows
+	-pause       Start the simulation paused
 
 */
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
-//#include <ode/config.h>
 #include <string.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
 #include <unistd.h>
 
 #include "./drawstuff.h"
+#include "./image.h"
+#include "./texture.h"
 #include "./internal.h"
 
 //***************************************************************************
 // misc
 
-#ifdef WIN32
-#define DEFAULT_PATH_TO_TEXTURES "..\\textures\\"
-#else
 #define DEFAULT_PATH_TO_TEXTURES "./textures"
-#endif
 
 #ifndef M_PI
 #define M_PI (3.14159265358979323846)
@@ -112,173 +102,6 @@ static void normalizeVector3 (float v[3])
     v[1] *= len;
     v[2] *= len;
   }
-}
-
-//***************************************************************************
-// PPM image object
-
-typedef unsigned char byte;
-
-class Image {
-  int image_width,image_height;
-  byte *image_data;
-public:
-  Image (char *filename);
-  // load from PPM file
-  ~Image();
-  int width() { return image_width; }
-  int height() { return image_height; }
-  byte *data() { return image_data; }
-};
-
-
-// skip over whitespace and comments in a stream.
-
-static void skipWhiteSpace (char *filename, FILE *f)
-{
-  int c,d;
-  for(;;) {
-    c = fgetc(f);
-    if (c==EOF) dsError ("unexpected end of file in \"%s\"",filename);
-
-    // skip comments
-    if (c == '#') {
-      do {
-	d = fgetc(f);
-	if (d==EOF) dsError ("unexpected end of file in \"%s\"",filename);
-      } while (d != '\n');
-      continue;
-    }
-
-    if (c > ' ') {
-      ungetc (c,f);
-      return;
-    }
-  }
-}
-
-
-// read a number from a stream, this return 0 if there is none (that's okay
-// because 0 is a bad value for all PPM numbers anyway).
-
-static int readNumber (char *filename, FILE *f)
-{
-  int c,n=0;
-  for(;;) {
-    c = fgetc(f);
-    if (c==EOF) dsError ("unexpected end of file in \"%s\"",filename);
-    if (c >= '0' && c <= '9') n = n*10 + (c - '0');
-    else {
-      ungetc (c,f);
-      return n;
-    }
-  }
-}
-
-
-Image::Image (char *filename)
-{
-  FILE *f = fopen (filename,"rb");
-  if (!f) dsError ("Can't open image file `%s'",filename);
-
-  // read in header
-  if (fgetc(f) != 'P' || fgetc(f) != '6')
-    dsError ("image file \"%s\" is not a binary PPM (no P6 header)",filename);
-  skipWhiteSpace (filename,f);
-
-  // read in image parameters
-  image_width = readNumber (filename,f);
-  skipWhiteSpace (filename,f);
-  image_height = readNumber (filename,f);
-  skipWhiteSpace (filename,f);
-  int max_value = readNumber (filename,f);
-
-  // check values
-  if (image_width < 1 || image_height < 1)
-    dsError ("bad image file \"%s\"",filename);
-  if (max_value != 255)
-    dsError ("image file \"%s\" must have color range of 255",filename);
-
-  // read either nothing, LF (10), or CR,LF (13,10)
-  int c = fgetc(f);
-  if (c == 10) {
-    // LF
-  }
-  else if (c == 13) {
-    // CR
-    c = fgetc(f);
-    if (c != 10) ungetc (c,f);
-  }
-  else ungetc (c,f);
-
-  // read in rest of data
-  image_data = new byte [image_width*image_height*3];
-  if (fread (image_data,image_width*image_height*3,1,f) != 1)
-    dsError ("Can not read data from image file `%s'",filename);
-  fclose (f);
-}
-
-
-Image::~Image()
-{
-  delete[] image_data;
-}
-
-//***************************************************************************
-// Texture object.
-
-class Texture {
-  Image *image;
-  GLuint name;
-public:
-  Texture (char *filename);
-  ~Texture();
-  void bind (int modulate);
-};
-
-
-Texture::Texture (char *filename)
-{
-  image = new Image (filename);
-  glGenTextures (1,&name);
-  glBindTexture (GL_TEXTURE_2D,name);
-
-  // set pixel unpacking mode
-  glPixelStorei (GL_UNPACK_SWAP_BYTES, 0);
-  glPixelStorei (GL_UNPACK_ROW_LENGTH, 0);
-  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
-  glPixelStorei (GL_UNPACK_SKIP_ROWS, 0);
-  glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0);
-
-  // glTexImage2D (GL_TEXTURE_2D, 0, 3, image->width(), image->height(), 0,
-  //		   GL_RGB, GL_UNSIGNED_BYTE, image->data());
-  gluBuild2DMipmaps (GL_TEXTURE_2D, 3, image->width(), image->height(),
-		     GL_RGB, GL_UNSIGNED_BYTE, image->data());
-
-  // set texture parameters - will these also be bound to the texture???
-  glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-  glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-		   GL_LINEAR_MIPMAP_LINEAR);
-
-  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-}
-
-
-Texture::~Texture()
-{
-  delete image;
-  glDeleteTextures (1,&name);
-}
-
-
-void Texture::bind (int modulate)
-{
-  glBindTexture (GL_TEXTURE_2D,name);
-  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
-	     modulate ? GL_MODULATE : GL_DECAL);
 }
 
 //***************************************************************************
@@ -809,12 +632,15 @@ void dsWheelMotion(int i)
 }
 
 //***************************************************************************
-// drawing loop stuff
+/* drawing loop stuff
 
-// the current state:
-//    0 = uninitialized
-//    1 = dsSimulationLoop() called
-//    2 = dsDrawFrame() called
+   the current state:
+    0 = uninitialized
+    1 = dsSimulationLoop() called
+    2 = dsDrawFrame() called
+
+*/
+
 static int current_state = 0;
 
 // textures and shadows
@@ -824,82 +650,46 @@ static bool suspend_shadows = false;  // true if drawing shadows must be suspend
 
 static Texture *sky_texture = 0;
 static Texture *ground_texture = 0;
-static Texture *wood_texture = 0;
+static Texture *base_texture = 0;
 
-
-#ifndef macintosh
 
 void dsStartGraphics (int /*width*/, int /*height*/, dsFunctions *fn)
 {
-    //das hier ist ganz schön oll programmiert, saumaessig
 
-	#ifndef WIN32
 	char path_to_exe[2048];
-	//ero the buffer
+
+	// zero the buffer
 	memset(path_to_exe, 0, sizeof(path_to_exe));
 
-	//use sizeof(buf)-1 since we need an extra char for NULL
-	if (readlink("/proc/self/exe", path_to_exe, sizeof(path_to_exe) - 1) == -1)
-	{
-		//There was an error.
+	// use sizeof(buf)-1 since we need an extra char for NULL
+	if (readlink("/proc/self/exe", path_to_exe, sizeof(path_to_exe) - 1) == -1) {
 		perror("readlink");
 		exit(-1);
 	}
 	printf("Pfad zum Simloid: %s\n", path_to_exe);
-	#endif
 
-    const char *prefix = DEFAULT_PATH_TO_TEXTURES;
-    if (fn->version >= 2 && fn->path_to_textures) prefix = fn->path_to_textures;
+	std::string path = path_to_exe;
+    path = path.substr(0, path.length() - strlen("simloid"));
 
-    char s0[4096];
-    char s1[4096];
-    int len = strlen(path_to_exe) - strlen("simloid");
-    strncpy (s0, path_to_exe, len);
-    strncpy (s1, path_to_exe, len);
-    s0[len] = '\0';
-    s1[len] = '\0';
+    if (fn->version >= 2 && fn->path_to_textures)
+        path += fn->path_to_textures;
+    else
+        path += DEFAULT_PATH_TO_TEXTURES;
 
-    strcat (s0, prefix);
-    strcat (s1, prefix);
-    strcat (s0, "/sky.ppm");
-    strcat (s1, "/grass.ppm");
-
-    sky_texture = new Texture (s0);
-    ground_texture = new Texture (s1);
+    sky_texture = new Texture (path + "/sky.ppm");
+    ground_texture = new Texture (path + "/grass.ppm");
+    base_texture = new Texture (path + "/fabric.ppm");
 }
-
-#else // macintosh
-
-void dsStartGraphics (int width, int height, dsFunctions *fn)
-{
-   // All examples build into the same dir
-   char *prefix = "::::drawstuff:textures";
-   char *s = (char*) alloca (strlen(prefix) + 20);
-
-   strcpy (s,prefix);
-   strcat (s,":sky.ppm");
-   sky_texture = new Texture (s);
-
-   strcpy (s,prefix);
-   strcat (s,":ground.ppm");
-   ground_texture = new Texture (s);
-
-   /*strcpy (s,prefix);
-   strcat (s,":wood.ppm");
-   wood_texture = new Texture (s);*/
-}
-
-#endif
 
 
 void dsStopGraphics()
 {
   delete sky_texture;
   delete ground_texture;
-  delete wood_texture;
+  delete base_texture;
   sky_texture = 0;
   ground_texture = 0;
-  wood_texture = 0;
+  base_texture = 0;
 }
 
 
@@ -908,11 +698,11 @@ static void drawSky (float view_xyz[3])
   glDisable (GL_LIGHTING);
   if (use_textures) {
     glEnable (GL_TEXTURE_2D);
-    sky_texture->bind (0);
+    sky_texture->bind();
   }
   else {
     glDisable (GL_TEXTURE_2D);
-    glColor3f (0,0.5,1.0);
+    glColor3f (.95f, .98f, 1.f);
   }
 
   // make sure sky depth is as far back as possible
@@ -959,7 +749,7 @@ static void drawGround(float pos_offset[3])
 
     if (use_textures) {
         glEnable(GL_TEXTURE_2D);
-        ground_texture->bind(0);
+        ground_texture->bind();
     }
     else {
         glDisable(GL_TEXTURE_2D);
@@ -997,8 +787,11 @@ static void drawGround(float pos_offset[3])
 }
 
 
-static void drawPyramidAlley()
+static void drawPyramidAlley(float pos_offset[3])
 {
+    const int N = 16;
+    float pos_offset_y = round(2*pos_offset[1])/2;
+
   // setup stuff
   glEnable (GL_LIGHTING);
   glDisable (GL_TEXTURE_2D);
@@ -1006,15 +799,19 @@ static void drawPyramidAlley()
   glEnable (GL_DEPTH_TEST);
   glDepthFunc (GL_LESS);
 
+  glEnable (GL_BLEND);
+  glBlendFunc (GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
   // draw the pyramid alley
   for (int i=-1; i<=1; i+=2) {
-    for (int j=-20; j<=1; j++) {
+    for (int j=-N; j<=N; j++) {
       glPushMatrix();
-      glTranslatef ((float)0.25 * i,(float) 0.25 * j,(float)0);
-      if (i==1 && j==1) setColor (1,0,0,1); // red
-      else if (i==-1 && j==1) setColor (0,0,1,1); // blue
-      else setColor (1,0.7,0,1); //yellow
-      const float k = 0.008f;
+      glTranslatef (.5f * i, .5f * j + pos_offset_y, .0f);
+      //if (i==1 && j==1) setColor (1,0,0,1); // red
+      //else if (i==-1 && j==1) setColor (0,0,1,1); // blue
+      /*else*/
+      float val = (float)(N-abs(j))/N;
+      setColor(val, 0.7f ,0.f , val); //transparent yellow
+      const float k = 0.007f;
       glBegin (GL_TRIANGLE_FAN);
       glNormal3f (0,-1,1);
       glVertex3f (0,0,k);
@@ -1107,7 +904,7 @@ void dsDrawFrame (int width, int height, dsFunctions *fn, int pause, int singles
 	  suspend_shadows = (view2_xyz[2] < 0);
 
 	  // draw the little markers on the ground
-	  drawPyramidAlley();
+	  drawPyramidAlley(view2_xyz);
 
 	  // leave openGL in a known state - flat shaded white, no textures
 	  #ifndef POLYGONEMODE
@@ -1158,15 +955,16 @@ void dsSetTextures (int a)
 // C interface
 
 // sets lighting and texture modes, sets current color
-static void setupDrawingMode()
+static void setupDrawingMode(/*TODO transmit index of texture*/)
 {
   #ifndef POLYGONEMODE
   	glEnable (GL_LIGHTING);
   #endif
-  if (tnum) {
+  if (true) {
     if (use_textures) {
       glEnable (GL_TEXTURE_2D);
-      wood_texture->bind (1);
+
+      base_texture->bind(true); //TODO read all avail textures and apply a certain texture to body.
       glEnable (GL_TEXTURE_GEN_S);
       glEnable (GL_TEXTURE_GEN_T);
       glTexGeni (GL_S,GL_TEXTURE_GEN_MODE,GL_OBJECT_LINEAR);
@@ -1200,7 +998,7 @@ static void setShadowDrawingMode()
   glDisable (GL_LIGHTING);
   if (use_textures) {
     glEnable (GL_TEXTURE_2D);
-    ground_texture->bind (1);
+    ground_texture->bind(true);
     glColor3f (SHADOW_INTENSITY,SHADOW_INTENSITY,SHADOW_INTENSITY);
     glEnable (GL_TEXTURE_2D);
     glEnable (GL_TEXTURE_GEN_S);
@@ -1214,8 +1012,7 @@ static void setShadowDrawingMode()
   }
   else {
     glDisable (GL_TEXTURE_2D);
-    glColor3f (GROUND_R*SHADOW_INTENSITY,GROUND_G*SHADOW_INTENSITY,
-	       GROUND_B*SHADOW_INTENSITY);
+    glColor3f (GROUND_R*SHADOW_INTENSITY,GROUND_G*SHADOW_INTENSITY,GROUND_B*SHADOW_INTENSITY);
   }
   glDepthRange (0,0.9999);
 }
@@ -1303,8 +1100,7 @@ extern "C" void dsSetColor (float red, float green, float blue)
 }
 
 
-extern "C" void dsSetColorAlpha (float red, float green, float blue,
-				 float alpha)
+extern "C" void dsSetColorAlpha (float red, float green, float blue, float alpha)
 {
   if (current_state != 2) dsError ("drawing function called outside simulation loop");
   color[0] = red;
@@ -1314,8 +1110,7 @@ extern "C" void dsSetColorAlpha (float red, float green, float blue,
 }
 
 
-extern "C" void dsDrawBox (const float pos[3], const float R[12],
-			   const float sides[3])
+extern "C" void dsDrawBox (const float pos[3], const float R[12], const float sides[3])
 {
   if (current_state != 2) dsError ("drawing function called outside simulation loop");
   setupDrawingMode();
@@ -1336,8 +1131,7 @@ extern "C" void dsDrawBox (const float pos[3], const float R[12],
 }
 
 
-extern "C" void dsDrawSphere (const float pos[3], const float R[12],
-			      float radius)
+extern "C" void dsDrawSphere (const float pos[3], const float R[12], float radius)
 {
   if (current_state != 2) dsError ("drawing function called outside simulation loop");
   setupDrawingMode();
@@ -1353,7 +1147,7 @@ extern "C" void dsDrawSphere (const float pos[3], const float R[12],
   if (use_shadows && not suspend_shadows) {
     glDisable (GL_LIGHTING);
     if (use_textures) {
-      ground_texture->bind (1);
+      ground_texture->bind(true);
       glEnable (GL_TEXTURE_2D);
       glDisable (GL_TEXTURE_GEN_S);
       glDisable (GL_TEXTURE_GEN_T);
@@ -1361,8 +1155,7 @@ extern "C" void dsDrawSphere (const float pos[3], const float R[12],
     }
     else {
       glDisable (GL_TEXTURE_2D);
-      glColor3f (GROUND_R*SHADOW_INTENSITY,GROUND_G*SHADOW_INTENSITY,
-		 GROUND_B*SHADOW_INTENSITY);
+      glColor3f (GROUND_R*SHADOW_INTENSITY,GROUND_G*SHADOW_INTENSITY,GROUND_B*SHADOW_INTENSITY);
     }
     glShadeModel (GL_FLAT);
     glDepthRange (0,0.9999);
@@ -1372,9 +1165,7 @@ extern "C" void dsDrawSphere (const float pos[3], const float R[12],
 }
 
 
-extern "C" void dsDrawTriangle (const float pos[3], const float R[12],
-				const float *v0, const float *v1,
-				const float *v2, int solid)
+extern "C" void dsDrawTriangle (const float pos[3], const float R[12], const float *v0, const float *v1, const float *v2, int solid)
 {
   if (current_state != 2) dsError ("drawing function called outside simulation loop");
   setupDrawingMode();
@@ -1385,8 +1176,7 @@ extern "C" void dsDrawTriangle (const float pos[3], const float R[12],
 }
 
 
-extern "C" void dsDrawCylinder (const float pos[3], const float R[12],
-				float length, float radius)
+extern "C" void dsDrawCylinder (const float pos[3], const float R[12], float length, float radius)
 {
   if (current_state != 2) dsError ("drawing function called outside simulation loop");
   setupDrawingMode();
@@ -1407,8 +1197,7 @@ extern "C" void dsDrawCylinder (const float pos[3], const float R[12],
 }
 
 
-extern "C" void dsDrawCappedCylinder (const float pos[3], const float R[12],
-				      float length, float radius)
+extern "C" void dsDrawCappedCylinder (const float pos[3], const float R[12], float length, float radius)
 {
   if (current_state != 2) dsError ("drawing function called outside simulation loop");
   setupDrawingMode();
@@ -1443,8 +1232,7 @@ void dsDrawLine (const float pos1[3], const float pos2[3])
 }
 
 
-void dsDrawBoxD (const double pos[3], const double R[12],
-		 const double sides[3])
+void dsDrawBoxD (const double pos[3], const double R[12], const double sides[3])
 {
   int i;
   float pos2[3],R2[12],fsides[3];
@@ -1465,9 +1253,7 @@ void dsDrawSphereD (const double pos[3], const double R[12], float radius)
 }
 
 
-void dsDrawTriangleD (const double pos[3], const double R[12],
-				 const double *v0, const double *v1,
-				 const double *v2, int solid)
+void dsDrawTriangleD (const double pos[3], const double R[12], const double *v0, const double *v1, const double *v2, int solid)
 {
   int i;
   float pos2[3],R2[12];
@@ -1482,8 +1268,7 @@ void dsDrawTriangleD (const double pos[3], const double R[12],
 }
 
 
-void dsDrawCylinderD (const double pos[3], const double R[12],
-		      float length, float radius)
+void dsDrawCylinderD (const double pos[3], const double R[12], float length, float radius)
 {
   int i;
   float pos2[3],R2[12];
@@ -1493,8 +1278,7 @@ void dsDrawCylinderD (const double pos[3], const double R[12],
 }
 
 
-void dsDrawCappedCylinderD (const double pos[3], const double R[12],
-			    float length, float radius)
+void dsDrawCappedCylinderD (const double pos[3], const double R[12], float length, float radius)
 {
   int i;
   float pos2[3],R2[12];
@@ -1525,16 +1309,23 @@ void dsSetCappedCylinderQuality (int n)
     capped_cylinder_quality = n;
 }
 
-void drawText(const char* text, const float* pos)
+
+void drawText(float x, float y, const char* format, ...)
 {
+    char text[256];
+    va_list args;
+    va_start(args, format);
+    int length = vsnprintf(text, 256, format, args);
+    va_end(args);
+
     const int mWidth = 700;
     const int mHeight = 500;
 
-    glDisable (GL_TEXTURE_2D);
-    glDisable (GL_DEPTH_TEST);
-    glDisable (GL_BLEND);
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
 
-    glMatrixMode (GL_PROJECTION);
+    glMatrixMode(GL_PROJECTION);
     glPushMatrix ();
     glLoadIdentity ();
     glOrtho (0.0,mWidth,0.0,mHeight,-0.0,0.0);
@@ -1543,9 +1334,15 @@ void drawText(const char* text, const float* pos)
 
     glColor4f(0.0, 0.0, 0.0, 1.0);
 
-    glRasterPos2f(pos[0],pos[1]);
-    for (const char* s = text; *s; ++s)
-    {
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, *s);
-    }
+    glRasterPos2f(x,y);
+    for (int i = 0; i < length; ++i)
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, text[i]);
+    /**TODO drawing bitmaps is slow... try drawing vectors instead:
+     glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, text[i]);
+     */
+
 }
+
+
+
+
