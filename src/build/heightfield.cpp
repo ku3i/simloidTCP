@@ -76,6 +76,7 @@ heightfield_callback(void* /*pUserData*/, int x, int y)
 void
 Heightfield::draw(void)
 {
+    //TODO draw texture
     const dReal* pReal = dGeomGetPosition(geometry);
     const dReal* RReal = dGeomGetRotation(geometry);
 
