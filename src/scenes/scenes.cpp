@@ -65,16 +65,16 @@ Scenes::create_stairways(Obstacle& obstacles)
     Vector3 len(1.0, 0.30, 0.00);
     Vector3 pos(.0,-1.0, .0);
     double friction = 1000.0;
-    const unsigned int max_stairs = 64;
+    const unsigned int max_stairs = 32;
     const double stepsize = 0.005;
 
     pos.z = 0.5*stepsize;
     for (unsigned int i = 0; i < max_stairs; ++i)
     {
-        pos.y -= len.y - 0.01;
-        len.z  = 0.002*i+stepsize;
-        pos.z += len.z;
-        len.x  = 1.0 + i*0.1;
+        pos.y -= len.y + 0.01;
+        len.z  = stepsize;
+        pos.z += 2*len.z;// + 0.0005*i;
+        len.x  = 0.8 + i*0.05;
         obstacles.create_fixed_box("", pos, len, .0, constants::materials::rock, colors::white, friction);
     }
 
