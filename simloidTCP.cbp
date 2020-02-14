@@ -76,7 +76,9 @@
 		<Unit filename="src/controller/tcp_controller.h" />
 		<Unit filename="src/draw/drawstuff.cpp" />
 		<Unit filename="src/draw/drawstuff.h" />
+		<Unit filename="src/draw/image.h" />
 		<Unit filename="src/draw/internal.h" />
+		<Unit filename="src/draw/texture.h" />
 		<Unit filename="src/draw/version.h" />
 		<Unit filename="src/draw/x11.cpp" />
 		<Unit filename="src/filehandler/file_handler.cpp" />
