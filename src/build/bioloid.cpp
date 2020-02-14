@@ -73,6 +73,7 @@ void Bioloid::create_robot(Robot& robot, int index_number, std::vector<double> p
         case 94: Robots::Standard  ::create_rotor_axial     (robot); break;
 
         case 95: Robots::Standard  ::create_pendulum (robot, false); break;
+        case 96: Robots::Standard  ::create_pendulum_gmes_ed(robot); break;
 
         default:
             dsError("Wrong robot index number (%d)!\n", index_number);

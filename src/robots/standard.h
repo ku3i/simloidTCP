@@ -187,6 +187,36 @@ create_rotor_axial(Robot& robot)
 }
 
 
+void
+create_pendulum_gmes_ed(Robot& robot)
+{
+    const Vector3 base (.5, .5, 1.0);
+    const Vector3 lever(.025, .025, .9);
+
+    dsPrint("PENDULUM GMES Edition\n");
+    Vector3 pos;
+
+    /* body */
+    pos.x = .0;
+    pos.y = 0.5*base.y;
+    pos.z = 0.5*base.z + zheight_start;
+
+    robot.create_box("base", pos, base, .0, constants::materials::heavy, colors::white, true, constants::friction::hi);
+
+    /* arm */
+    pos.y = -0.5*lever.y - joint_distance;
+    pos.z = 0.95*base.z - 0.5 * lever.z + zheight_start;
+
+    robot.create_box("lever", pos, lever, .0, constants::materials::heavy, colors::black, false, constants::friction::lo);
+
+    /* connect joints */
+    robot.connect_joint("base" , "lever", .0, .0, +0.5*lever.z - 0.5*lever.x, 'y', -180, +180, 0, JointType::normal, "joint0", "", 5);
+
+    /* camera */
+    robot.set_camera_center_on("base");
+    robot.setup_camera(Vector3(0.0, -1.2, .60), 90, 0, 0);
+}
+
 }} // namespace Robots::Standard
 
 #endif // STANDARD_H_INCLUDED
