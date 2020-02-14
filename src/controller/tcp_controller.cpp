@@ -9,7 +9,7 @@ bool TCPController::establishConnection(int port)
     {
         dsPrint("Connection to client established.\nSending the robot's configuration to client.\n");
         TCPController::send_robot_configuration();
-        return wait_for_ack();
+        return true;//wait_for_ack();
     }
     else
     {
@@ -35,7 +35,7 @@ bool TCPController::control(const double time)
     config.record_frames = false;
 
     /* send message to client */
-    if (not paused)
+    if (not interlaced_mode and not paused)
         send_ordered_info(time);
 
     paused = false; // client must continuously send pause signal
@@ -81,6 +81,7 @@ bool TCPController::control(const double time)
         if (starts_with(msg, "PAUSE"  )) { paused = true; continue; }
         if (starts_with(msg, "DONE"   )) { done = true; continue; }
         if (starts_with(msg, "EXIT"   )) { dsPrint("Received 'EXIT' command.\n"); return false; }
+        if (starts_with(msg, "ACK"    )) { dsPrint("Received 'ACK', configuration confirmed by client.\n"); done = true; continue; }
 
         /* model updates */
         if (starts_with(msg, "MODEL"  )) { reload_model = parse_update_model_command(msg.c_str()); continue; }
@@ -94,6 +95,9 @@ bool TCPController::control(const double time)
         if (starts_with(msg, "FIXED")) { parse_toggle_fixed(msg.c_str()); continue; }
         if (starts_with(msg, "DESCRIPTION")) { send_robot_description_str(); continue; }
 
+        if (starts_with(msg, "INTERLACED MODE")) { dsPrint("Interlaced mode.\n"); interlaced_mode = true;  continue; }
+        if (starts_with(msg, "SEQUENTIAL MODE")) { dsPrint("Sequential mode.\n"); interlaced_mode = false; continue; }
+
         /* error */
         if (fail_counter++ >= 42) { dsPrint("Too many messages without a 'DONE'-command.\n"); return false; }
 
@@ -106,8 +110,10 @@ bool TCPController::control(const double time)
         recordSnapshot(robot, obstacles, &s2_user);
         camera.set_viewpoint(robot.get_camera_center_obj(), robot.get_camera_setup());
         send_robot_configuration();
-        wait_for_ack();
+        //wait_for_ack();
     }
+    else if (interlaced_mode and not paused)
+        send_ordered_info(time);
 
     if (not paused)
         execute_controller();
@@ -200,19 +206,19 @@ void TCPController::send_robot_configuration()
         dsError("Could not send robot configuration message to client.\n");
 }
 
-bool TCPController::wait_for_ack(void)
-{
-    dsPrint("Waiting for acknowledge.\n");
-    std::string ack = socketServer->getNextLine();
-
-    if (ack.compare(0, 3, "ACK") == 0)
-        dsPrint("Acknowledge for configuration received.\n");
-    else {
-        dsPrint("Failed to receive acknowledge.\n");
-        return false;
-    }
-    return true;
-}
+//bool TCPController::wait_for_ack(void)
+//{
+//    dsPrint("Waiting for acknowledge.\n");
+//    std::string ack = socketServer->getNextLine();
+//
+//    if (ack.compare(0, 3, "ACK") == 0)
+//        dsPrint("Acknowledge for configuration received.\n");
+//    else {
+//        dsPrint("Failed to receive acknowledge.\n");
+//        return false;
+//    }
+//    return true;
+//}
 
 void TCPController::execute_controller()
 {

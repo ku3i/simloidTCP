@@ -5,7 +5,6 @@
 #include <controller/controller.h>
 #include <communication/socketserver.h>
 #include <basic/common.h>
-#include <basic/configuration.h>
 #include <basic/constants.h>
 #include <basic/snapshot.h>
 #include <build/robot.h>
@@ -13,7 +12,6 @@
 #include <sensors/accelsensor.h>
 #include <misc/camera.h>
 
-extern Configuration global_conf;
 
 class TCPController : public Controller {
 public:
@@ -78,12 +76,14 @@ private:
     void send_ordered_info(const double time);
     void send_robot_configuration(void);
     void send_robot_description_str(void);
-    bool wait_for_ack(void);
+    //bool wait_for_ack(void);
 
     Configuration& config;
     Camera& camera;
 
+    /* by client at run-time changeable flags */
     bool low_quality_sensors = false;
+    bool interlaced_mode = true;
 };
 
 
