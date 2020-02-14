@@ -155,26 +155,21 @@ print_time_statistics(void)
 {
     if (global_conf.draw_scene && !global_conf.disable_graphics)
     {
-        const float textPos[2] = {-0.98, 0.94};
-        char text[1000];
+        const float pos[2] = {-0.98, 0.94};
 
-        snprintf(text, 500, "time: %.2lf  sim vel: %.2lfx %s   fps: %.2lf%s  walking speed: %.2lf m/s",
-                 simtime, vel, (global_conf.real_time?"[real]":"      "),
-                 global_conf.fps, global_conf.use_fps_control? " ":"!", bvel); //TODO: calculate bvel by robot velocity measure
+
+        drawText(pos[0], pos[1], "time: %.2lf  sim vel: %.2lfx %s   fps: %.2lf%s  walking speed: %.2lf m/s"
+                               , simtime, vel, (global_conf.real_time?"[real]":"      ")
+                               , global_conf.fps, global_conf.use_fps_control? " ":"!", bvel);
 
         if (global_conf.show_cam_position)
         {
-            char append_txt[500];
             float vpos[3], vdir[3];
             camera.get_viewpoint(vpos, vdir);
 
-            snprintf(append_txt, 500, "   camera: (%.2f, %.2f, %.2f : %.1f, %.1f, %.1f)",
-                     vpos[0], vpos[1], vpos[2], vdir[0], vdir[1], vdir[2]);
-
-            strncat(text, append_txt, 500);
+            drawText(pos[0], pos[1]-0.05, "cam: (%.2f, %.2f, %.2f : %.1f, %.1f, %.1f)"
+                                        , vpos[0], vpos[1], vpos[2], vdir[0], vdir[1], vdir[2]);
         }
-
-        drawText(text, textPos);
     }
 }
 
