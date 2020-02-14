@@ -97,7 +97,7 @@ namespace HannahRandDetail {
                    , rnd(.320, range, amp) // length
                    )
         , leg_lower( 3
-                   , rnd(0.40, range, amp) // length
+                   , rnd(0.30, range, amp) // length
                    , rnd(0.01, range, amp) // radius
                    )
         , knee( rnd(0.02, range, amp)
@@ -109,7 +109,7 @@ namespace HannahRandDetail {
         , body_shld_joint_dist_xz( rnd(.028, range, amp) )
         , shld_legs_joint_dist_z ( rnd(.016, range, amp) )
         , knee_y_offset( rnd(.034, range, amp) )
-        , zheight_start( leg_upper.z + leg_lower.len + leg_lower.rad )
+        , zheight_start( leg_upper.z + leg_lower.len + leg_lower.rad - 0.25*body.z)
         , ground_contact_friction( rnd(constants::friction::sticky, range, amp) )
         , weight_kg({rnd(1.000, range, amp) // body TODO specify
                    , rnd(0.030, range, amp) // shoulder TODO specify
@@ -201,7 +201,7 @@ create_hannah_detail_random(Robot& robot, std::vector<double> model_parameter)
 
     dsPrint("Creating randomized Hannah <3\n");
 
-    const double X = 3*rnd_amp; //TODO increase this
+    const double X = 3+3*rnd_amp;
 
     std::ostringstream descr;
     descr << "Hannah Randomized\n";
@@ -285,8 +285,8 @@ create_hannah_detail_random(Robot& robot, std::vector<double> model_parameter)
     /*7*/ robot.connect_joint("body", "lhsh", 0.0, 'y', -90,  +90, + 1 + rnd(X), JointType::symmetric, "L_hip_roll"      , "R_hip_roll"      , m.torque, params);
     /*8*/ robot.connect_joint("rhsh", "rhlu", jpu, 'x', -90,  +90, -20 + rnd(X), JointType::normal   , "R_hip_pitch"     , ""                , m.torque, params);
     /*9*/ robot.connect_joint("lhsh", "lhlu", jpu, 'x', -90,  +90, -20 + rnd(X), JointType::symmetric, "L_hip_pitch"     , "R_hip_pitch"     , m.torque, params);
-    /*A*/ robot.connect_joint("rhlu", "rhll", jpl, 'x',   0, +180, +20 + rnd(X), JointType::normal   , "R_knee_pitch"    , ""                , m.torque, params);
-    /*B*/ robot.connect_joint("lhlu", "lhll", jpl, 'x',   0, +180, +20 + rnd(X), JointType::symmetric, "L_knee_pitch"    , "R_knee_pitch"    , m.torque, params);
+    /*A*/ robot.connect_joint("rhlu", "rhll", jpl, 'x',   0, +180, +25 + rnd(X), JointType::normal   , "R_knee_pitch"    , ""                , m.torque, params);
+    /*B*/ robot.connect_joint("lhlu", "lhll", jpl, 'x',   0, +180, +25 + rnd(X), JointType::symmetric, "L_knee_pitch"    , "R_knee_pitch"    , m.torque, params);
 
     /* attach sensors */
     robot.attach_accel_sensor("body", /* keep original color = */true);
