@@ -53,6 +53,10 @@ namespace colors
     const Color4    cyan_t { .0, 1.0, 1.0, 0.7};
     const Color4 magenta_t {1.0,  .0, 1.0, 0.7};
     const Color4   black_t { .3,  .3,  .4, 0.5};
+
+    const Color4  orange_l {1.0, .75, .25, 1.0};
+    const Color4    cyan_l {.75, 1.0, 1.0, 1.0};
+
 }
 
 #endif // COLOR_H_INCLUDED
