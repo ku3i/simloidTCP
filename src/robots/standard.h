@@ -32,7 +32,7 @@ create_pendulum(Robot& robot, bool with_accel_sensor = true)
     pos.y = -0.5*size_lever.y - joint_distance;
     pos.z = 0.9*size_base.z - 0.5 * size_lever.z + zheight_start;
 
-    robot.create_box("lever", pos, size_lever, .133, /* dichte Buche = 720*/ 0., colors::black, false, constants::friction::lo);
+    robot.create_box("lever", pos, size_lever, .133, /* Density Beech = 720*/ 0., colors::black, false, constants::friction::lo);
 
     /* connect joints */
     robot.connect_joint("base" , "lever", .0, .0, +0.5*size_lever.z - 0.03, 'y', -180, +180, 0, JointType::normal, "joint0", "", 5);
