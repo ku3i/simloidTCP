@@ -55,8 +55,7 @@ public:
     , is_sticking(false)
     , z(.0)
     , conf(conf)
-    //, dpdt(.0, global_conf.step_length, /*scale=*/0.25, /*change_limit=*/0.1)
-    , dpdt(.0, global_conf.step_length, /*scale=*/0.25)
+    , dpdt(.0, global_conf.step_length, /*scale=*/constants::avr_adc_10bit::v_scale)
     {
         if (name == "") {
             name = "joint_" + std::to_string(joint_id);
@@ -107,7 +106,9 @@ public:
         assert(torque_factor > 0. and torque_factor <= 10);
         dsPrint("done.\n");
 
-        dpdt.reset(get_low_resolution_position(false));
+        pos = common::avr_10bit_adc(get_position_norm());
+        dpdt.reset(pos);
+        vel = .0;
     }
 
     ~NJoint()
@@ -118,17 +119,21 @@ public:
         //dsPrint("done.\n");
     }
 
-    /* lower resolution and noisy sensor outputs */
-    double get_low_resolution_position(bool low_quality) const {
-        return low_quality ? common::avr_10bit_adc(get_position_norm())
-                           : common::low_resolution_sensor(get_position_norm());
+    void read_sensors(bool low_quality)
+    {
+        if (low_quality) {
+            pos = common::avr_10bit_adc(get_position_norm());
+            dpdt.derive(pos);
+            vel = dpdt.get();
+        } else {
+            pos = common::low_resolution_sensor(get_position_norm());
+            vel = common::low_resolution_sensor(get_velocity_norm());
+        }
     }
 
-    double get_low_resolution_velocity(bool low_quality) {
-        dpdt.derive(get_low_resolution_position(low_quality));
-        return low_quality ? dpdt.get()
-                           : common::low_resolution_sensor(get_velocity_norm());
-    }
+    /* lower resolution and noisy sensor outputs */
+    double get_low_resolution_position(void) const { return pos; }
+    double get_low_resolution_velocity(void) const { return vel; }
 
     /* get */
     double get_position_norm()  const { return common::rad2norm(dJointGetHingeAngle    (hinge)); } // +/-pi   --> +/-1
@@ -187,7 +192,9 @@ public:
         voltage_setpoint = 0.0;
         pid_position_setpoint = position_default;
         pid_maxtorque = common::clip(global_conf.init_max_torque, 0.0, 1.0);
-        dpdt.reset(get_low_resolution_position(false));
+        pos = common::avr_10bit_adc(get_position_norm());
+        dpdt.reset(pos);
+        vel = .0;
     }
 
     void reinit_motormodel(ActuatorParameters const& c) { conf = c; }
@@ -223,7 +230,7 @@ private:
 
     ActuatorParameters conf;
 
-//    LowpassDiff        dpdt;
+    double             pos, vel;
     Derived            dpdt;
 };
 

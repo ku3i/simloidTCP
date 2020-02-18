@@ -56,9 +56,10 @@ namespace constants {
 
     namespace avr_adc_10bit
     {
-        const double std_dev = 1.0/1024.0;
-        const double max_val = 4.0/1024.0;
+        const double std_dev = 1.0/4096.0;
+        const double max_val = 4.0/4096.0;
         const double min_val = -max_val;
+        const double v_scale = 0.2;
     }
 
     const unsigned int max_bodies = 32; // max. number of bodies
@@ -102,13 +103,13 @@ namespace constants {
         const double rotation_velocity = 0.01;
     }
 
-    namespace materials // all desities measured in kg/m^3
+    namespace materials // all densities measured in kg/m^3
     {
-        const double light  =  200.0; // Balsaholz
-        const double normal =  500.0; // Fichtenholz
+        const double light  =  200.0; // balsa wood
+        const double normal =  500.0; // spruce wood
         const double body   = 1000.0; // approx. density of a human body or water
         const double heavy  = 1500.0;
-        const double rock   = 2800.0; // density of stone (Granit)
+        const double rock   = 2800.0; // density of stone (granite)
     }
 }
 

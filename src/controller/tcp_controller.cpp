@@ -130,17 +130,21 @@ void TCPController::send_ordered_info(const double time)
     snprintf(tmp, buffer_size, "%lf ", time);
     message.append(tmp);
 
+    for (std::size_t i = 0; i < robot.number_of_joints(); ++i)
+        robot.joints[i].read_sensors(low_quality_sensors);
+
+
     /* angular position */
     for (std::size_t i = 0; i < robot.number_of_joints(); ++i)
     {
-        snprintf(tmp, buffer_size, "%lf ", robot.joints[i].get_low_resolution_position(low_quality_sensors));
+        snprintf(tmp, buffer_size, "%lf ", robot.joints[i].get_low_resolution_position());
         message.append(tmp);
     }
 
     /* angular velocity */
     for (std::size_t i = 0; i < robot.number_of_joints(); ++i)
     {
-        snprintf(tmp, buffer_size, "%lf ", robot.joints[i].get_low_resolution_velocity(low_quality_sensors));
+        snprintf(tmp, buffer_size, "%lf ", robot.joints[i].get_low_resolution_velocity());
         message.append(tmp);
     }
 
