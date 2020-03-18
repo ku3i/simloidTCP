@@ -119,43 +119,31 @@ public:
 
     void connect_fixed(std::string const& bodyname1, std::string const& bodyname2);
 
-    void attach_box( const std::string bodyname
-                   , const Vector3 pos
+    void attach_box( const std::string tobodyname
+                   , const Vector3 rel
                    , const Vector3 len
                    , const double mass
                    , const double density
                    , const Color4 color
                    , const bool collision
-                   , const double friction = dInfinity) {
-
-        std::string attach_name = bodyname + std::to_string(attachments.size());
-        attachments.create_box(attach_name, pos, len, mass, density, color, collision, friction);
-
-        unsigned bID = bodies     .get_body_id_by_name(bodyname);
-        unsigned aID = attachments.get_body_id_by_name(attach_name);
-
-        dJointID fixed = dJointCreateFixed(world, 0);
-        dJointAttach(fixed, bodies[bID].body, attachments[aID].body);
-        dJointSetFixed(fixed);
+                   , const double friction = dInfinity
+                   )
+    {
+        auto &b = bodies.get_body_by_name(tobodyname);
+        b.add_box(space, rel, len, mass, density, color, collision, friction);
     }
 
-    void attach_segment( const std::string bodyname
-                       , const Vector3 pos
+    void attach_segment( const std::string tobodyname
+                       , const Vector3 rel
                        , const Capsule cap
                        , const double mass
                        , const double density
                        , const Color4 color
                        , const bool collision
-                       , const double friction = dInfinity) {
-
-        std::string attach_name = bodyname + std::to_string(attachments.size());
-        attachments.create_capsule(attach_name, pos, cap, mass, density, color, collision, friction);
-
-        unsigned bID = bodies     .get_body_id_by_name(bodyname);
-        unsigned aID = attachments.get_body_id_by_name(attach_name);
-
-        dJointID fixed = dJointCreateFixed(world, 0);
-        dJointAttach(fixed, bodies[bID].body, attachments[aID].body);
+                       , const double friction = dInfinity)
+    {
+        auto &b = bodies.get_body_by_name(tobodyname);
+        b.add_segment(space, rel, cap, mass, density, color, collision, friction);
     }
 
     void print_statistics(void) const;

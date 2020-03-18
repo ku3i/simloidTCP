@@ -13,6 +13,18 @@ const Vector3 size_lever(.02, .015, .52);
 const double zheight_start  = 0.0;
 const double joint_distance = 0.005;
 
+const ActuatorParameters Sensorimotor {{/* bristle_displ_max = */ +8.71005098e-03, //+1.00000000e-03,
+                                      /* bristle_stiffness = */ +9.93740632e-01, //+1.00348110e+00,
+                                      /* sticking_friction = */ +2.17955433e-01, //+2.74093907e-01,
+                                      /* coulomb_friction  = */ +1.04044079e-01, //+2.02936051e-01,
+                                      /* fluid_friction    = */ +3.43298513e-01, //+1.81613953e-01,
+                                      /* stiction_range    = */ +1.30738033e-01, //+3.39670766e-02,
+                                      /* V_in              = */ +1.20000000e+01,
+                                      /* kB                = */ +1.88657814e+00, //+1.95730358e+00,
+                                      /* kM                = */ +1.88925820e+00, //+1.93830452e+00,
+                                      /* R_i_inv           = */ +5.89352492e-02, //+8.19456429e-02
+                                      }, /*assert_range=*/true };
+
 void
 create_pendulum(Robot& robot, bool with_accel_sensor = true)
 {
@@ -35,7 +47,7 @@ create_pendulum(Robot& robot, bool with_accel_sensor = true)
     robot.create_box("lever", pos, size_lever, .133, /* Density Beech = 720*/ 0., colors::black, false, constants::friction::lo);
 
     /* connect joints */
-    robot.connect_joint("base" , "lever", .0, .0, +0.5*size_lever.z - 0.03, 'y', -180, +180, 0, JointType::normal, "joint0", "", 5);
+    robot.connect_joint("base" , "lever", .0, .0, +0.5*size_lever.z - 0.03, 'y', -180, +180, 0, JointType::normal, "joint0", "", 5, Sensorimotor);
 
     /* attach sensors */
     if (with_accel_sensor)

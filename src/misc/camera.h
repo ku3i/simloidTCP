@@ -16,6 +16,7 @@ struct Camera_Setup
     double heading;
     double pitch;
     double roll;
+    bool init = false;
 };
 
 class Camera

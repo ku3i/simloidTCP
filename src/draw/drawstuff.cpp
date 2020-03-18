@@ -65,15 +65,17 @@ the following command line flags can be used (typically under unix)
 
 // ground and sky
 #define SHADOW_INTENSITY (0.65f)
-#define GROUND_R (0.400f) //102	// ground color for when there's no texture
-#define GROUND_G (0.506f) //129
-#define GROUND_B (0.192f) //49
 
-const float ground_scale = 1.0f/0.5f;	// ground texture scale (1/size)
-const float ground_ofsx = 0.5;		// offset of ground texture
-const float ground_ofsy = 0.5;
-const float sky_scale = 1.0f/4.0f;	// sky texture scale (1/size)
-const float sky_height = 1.0f;		// sky height above viewpoint
+/* ground color, for when textures are off */
+#define GROUND_R ( 97.f/255)
+#define GROUND_G (121.f/255)
+#define GROUND_B ( 45.f/255)
+
+const float ground_scale = 1.0f/0.5f; // ground texture scale (1/size)
+const float ground_ofsx  = 0.5;       // offset of ground texture
+const float ground_ofsy  = 0.5;
+const float sky_scale    = 1.0f/4.0f; // sky texture scale (1/size)
+const float sky_height   = 1.0f;      // sky height above viewpoint
 
 //***************************************************************************
 // misc mathematics stuff
@@ -784,6 +786,7 @@ static void drawGround(float pos_offset[3])
     glVertex3f(-gsize + pos_offset_x,
                +gsize + pos_offset_y, offset);
     glEnd();
+
 }
 
 
@@ -792,41 +795,58 @@ static void drawPyramidAlley(float pos_offset[3])
     const int N = 16;
     float pos_offset_y = round(2*pos_offset[1])/2;
 
-  // setup stuff
-  glEnable (GL_LIGHTING);
-  glDisable (GL_TEXTURE_2D);
-  glShadeModel (GL_FLAT);
-  glEnable (GL_DEPTH_TEST);
-  glDepthFunc (GL_LESS);
+    // setup stuff
+    glEnable (GL_LIGHTING);
+    glDisable (GL_TEXTURE_2D);
+    glShadeModel (GL_FLAT);
+    glEnable (GL_DEPTH_TEST);
+    glDepthFunc (GL_LESS);
 
-  glEnable (GL_BLEND);
-  glBlendFunc (GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-  // draw the pyramid alley
-  for (int i=-1; i<=1; i+=2) {
-    for (int j=-N; j<=N; j++) {
-      glPushMatrix();
-      glTranslatef (.5f * i, .5f * j + pos_offset_y, .0f);
-      //if (i==1 && j==1) setColor (1,0,0,1); // red
-      //else if (i==-1 && j==1) setColor (0,0,1,1); // blue
-      /*else*/
-      float val = (float)(N-abs(j))/N;
-      setColor(val, 0.7f ,0.f , val); //transparent yellow
-      const float k = 0.007f;
-      glBegin (GL_TRIANGLE_FAN);
-      glNormal3f (0,-1,1);
-      glVertex3f (0,0,k);
-      glVertex3f (-k,-k,0);
-      glVertex3f ( k,-k,0);
-      glNormal3f (1,0,1);
-      glVertex3f ( k, k,0);
-      glNormal3f (0,1,1);
-      glVertex3f (-k, k,0);
-      glNormal3f (-1,0,1);
-      glVertex3f (-k,-k,0);
-      glEnd();
-      glPopMatrix();
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    // draw the pyramid alley
+    for (int i=-1; i<=1; i+=2)
+    {
+        for (int j=-N; j<=N; j++)
+        {
+            glPushMatrix();
+            glTranslatef (.5f * i, .5f * j + pos_offset_y, .0f);
+            //if (i==1 && j==1) setColor (1,0,0,1); // red
+            //else if (i==-1 && j==1) setColor (0,0,1,1); // blue
+            /*else*/
+            float val = (float)(N-abs(j))/N;
+            setColor(val, 0.7f ,0.f , val); //transparent yellow
+            const float k = 0.007f;
+            glBegin (GL_TRIANGLE_FAN);
+            glNormal3f (0,-1,1);
+            glVertex3f (0,0,k);
+            glVertex3f (-k,-k,0);
+            glVertex3f ( k,-k,0);
+            glNormal3f (1,0,1);
+            glVertex3f ( k, k,0);
+            glNormal3f (0,1,1);
+            glVertex3f (-k, k,0);
+            glNormal3f (-1,0,1);
+            glVertex3f (-k,-k,0);
+            glEnd();
+
+            /* distance meter */
+
+            if (i==1) {
+                char text[256];
+                int length = snprintf(text, 256, "%5.2f", .5f * j + pos_offset_y);
+                setColor(val, 1.f, val, 0.5*val);
+                glTranslatef(0.25f,-0.0125f,0.001f);
+                const float size = 0.025 / 128.0f;
+
+                glScalef(size, 1.61*size, size);
+                glLineWidth(2.f);
+                for (int i = 0; i < length; ++i)
+                    glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, text[i]);
+            }
+            glPopMatrix();
+        }
     }
-  }
 }
 
 void dsDrawFrame (int width, int height, dsFunctions *fn, int pause, int singlestep)
@@ -1309,8 +1329,8 @@ void dsSetCappedCylinderQuality (int n)
     capped_cylinder_quality = n;
 }
 
-
-void drawText(float x, float y, const char* format, ...)
+void
+glprintf(float x, float y, float z, float line_height, const char* format, ...)
 {
     char text[256];
     va_list args;
@@ -1318,31 +1338,28 @@ void drawText(float x, float y, const char* format, ...)
     int length = vsnprintf(text, 256, format, args);
     va_end(args);
 
-    const int mWidth = 700;
-    const int mHeight = 500;
+    if (length > 0)
+    {
+        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_BLEND);
 
-    glDisable(GL_TEXTURE_2D);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
 
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix ();
-    glLoadIdentity ();
-    glOrtho (0.0,mWidth,0.0,mHeight,-0.0,0.0);
-    glMatrixMode (GL_MODELVIEW);
-    glLoadIdentity();
-
-    glColor4f(0.0, 0.0, 0.0, 1.0);
-
-    glRasterPos2f(x,y);
-    for (int i = 0; i < length; ++i)
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, text[i]);
-    /**TODO drawing bitmaps is slow... try drawing vectors instead:
-     glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, text[i]);
-     */
-
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glTranslatef(x, y, z);
+        const float size = line_height / 128.0f;
+        glScalef(size, 1.6*size, size);
+        glLineWidth(1.4f);
+        glColor3b(0,0,0);
+        for (int i = 0; i < length; ++i)
+            glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, text[i]);
+        glPopMatrix();
+    }
 }
-
 
 
 

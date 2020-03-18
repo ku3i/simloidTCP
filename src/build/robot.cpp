@@ -60,7 +60,7 @@ void Robot::attach_accel_sensor(const std::string bodyname, bool keep_original_c
     dsPrint("Attaching acceleration sensor to '%s' (%d)\n", bodyname.c_str(), objnr);
     accels.attach(bodies[objnr].body, _left, _forward, _up); // right hand rule with x,y,z
     if (!keep_original_color)
-        bodies[objnr].color = colors::orange;
+        bodies[objnr].geometries.at(0).color = colors::orange;
 }
 
 void Robot::connect_joint( std::string const& bodyname1, std::string const& bodyname2,
@@ -166,6 +166,8 @@ void Robot::set_camera_center_on_prev_obj(void)
  */
 void Robot::setup_camera(Vector3 pos, double heading, double pitch, double roll)
 {
+    if (cam_setup.init) return;
+    cam_setup.init    = true; // avoid setting up camera twice, letting user defined cam position untouched.
     cam_setup.pos     = pos;
     cam_setup.heading = heading;
     cam_setup.pitch   = pitch;

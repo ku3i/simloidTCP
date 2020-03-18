@@ -143,7 +143,7 @@ void dsSetCappedCylinderQuality(int n); /* default = 3 */
 /* draws a given text string onto the screen at position pos;; (-1,1)
    is top left, (+1,-1) is bottom right of the viewport
 */
-void drawText(float x, float y, const char* format, ...);
+void glprintf(float x, float y, float z, float line_height, const char* format, ...);
 
 /* closing bracket for extern "C" */
 #ifdef __cplusplus

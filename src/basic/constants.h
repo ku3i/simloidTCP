@@ -59,7 +59,6 @@ namespace constants {
         const double std_dev = 1.0/4096.0;
         const double max_val = 4.0/4096.0;
         const double min_val = -max_val;
-        const double v_scale = 0.2;
     }
 
     const unsigned int max_bodies = 32; // max. number of bodies
@@ -88,7 +87,9 @@ namespace constants {
          * With an appropriate amount of headroom, we allow a max speed of 2 RPS
          * This is 2*2*pi =
          */
-         const double max_joint_vel = 4.0 * m_pi; // 2 RPS ~ 12 rad/s
+
+         const double vel_scale = 4.0;
+         const double max_joint_vel = vel_scale * m_pi; // 2 RPS ~ 12 rad/s
 
     }
 

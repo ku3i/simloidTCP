@@ -92,7 +92,7 @@ Scenes::create_plates(Obstacle& obstacles)
         {
             Vector3 pos, len;
             Color4 color;
-            double friction = 10.0;
+            double friction = common::getRandomDouble(constants::friction::hi, constants::friction::sticky);
 
             len.x = common::getRandomDouble(0.100, 0.100 + 0.025*(j+1));
             len.y = common::getRandomDouble(0.100, 0.100 + 0.025*(j+1));

@@ -15,10 +15,11 @@ namespace Robots {
 namespace HannahRandDetail {
 
     using common::rnd;
+    using common::rndg;
 
     const double range = 0.2;
 
-    const struct MotorDimensions { //TODO randomize?
+    const struct MotorDimensions { //TODO randomize!
         double width  = 0.030;
         double height = 0.065;
         double depth  = 0.075;
@@ -39,16 +40,18 @@ namespace HannahRandDetail {
 
     */
 
-    ActuatorParameters Sensorimotor {{/* bristle_displ_max = */ +1.00000000e-03,
-                                      /* bristle_stiffness = */ +1.00348110e+00,
-                                      /* sticking_friction = */ +2.74093907e-01,
-                                      /* coulomb_friction  = */ +2.02936051e-01,
-                                      /* fluid_friction    = */ +1.81613953e-01,
-                                      /* stiction_range    = */ +3.39670766e-02,
+
+
+    ActuatorParameters Sensorimotor {{/* bristle_displ_max = */ +8.71005098e-03, //+1.00000000e-03,
+                                      /* bristle_stiffness = */ +9.93740632e-01, //+1.00348110e+00,
+                                      /* sticking_friction = */ +2.17955433e-01, //+2.74093907e-01,
+                                      /* coulomb_friction  = */ +1.04044079e-01, //+2.02936051e-01,
+                                      /* fluid_friction    = */ +3.43298513e-01, //+1.81613953e-01,
+                                      /* stiction_range    = */ +1.30738033e-01, //+3.39670766e-02,
                                       /* V_in              = */ +1.20000000e+01,
-                                      /* kB                = */ +1.95730358e+00,
-                                      /* kM                = */ +1.93830452e+00,
-                                      /* R_i_inv           = */ +8.19456429e-02
+                                      /* kB                = */ +1.88657814e+00, //+1.95730358e+00,
+                                      /* kM                = */ +1.88925820e+00, //+1.93830452e+00,
+                                      /* R_i_inv           = */ +5.89352492e-02, //+8.19456429e-02
                                       }, /*assert_range=*/true };
 
     struct HannahMorphology
@@ -57,6 +60,7 @@ namespace HannahRandDetail {
         const Vector3 leg_upper;
         const Capsule leg_lower;
         const Vector3 knee;
+        const Capsule foot;
 
         const double dbl_bearing;
         const double shoulder_a;
@@ -77,6 +81,7 @@ namespace HannahRandDetail {
             double leg_upper;
             double leg_lower;
             double knee;
+            double foot;
             double motor;
             double dbl_bearing;
         } weight_kg;
@@ -87,42 +92,47 @@ namespace HannahRandDetail {
         Color4 color_dark;
         Color4 color_light;
 
-        HannahMorphology(double amp)
-        : body( rnd(.250, range, amp)
-              , rnd(.500, range, amp)
-              , rnd(.120, range, amp)
+        HannahMorphology(double /*random*/r , double /*growth*/g)
+        : body( rndg(.250, range, r, g)
+              , rndg(.500, range, r, g)
+              , rndg(.120, range, r, g)
               )
-        , leg_upper( rnd(.010, range, amp)
-                   , rnd(.060, range, amp)
-                   , rnd(.320, range, amp) // length
+        , leg_upper( rndg(.010, range, r, g)
+                   , rndg(.060, range, r, g)
+                   , rndg(.320, range, r, g) // length
                    )
         , leg_lower( 3
-                   , rnd(0.30, range, amp) // length
-                   , rnd(0.01, range, amp) // radius
+                   , rndg(0.30, range, r, g) // length
+                   , rndg(0.01, range, r, g) // radius
                    )
-        , knee( rnd(0.02, range, amp)
-              , rnd(0.04, range, amp)
-              , rnd(0.04, range, amp)
+        , knee( rndg(0.02, range, r, g)
+              , rndg(0.04, range, r, g)
+              , rndg(0.04, range, r, g)
               )
-        , dbl_bearing( rnd(.030, range, amp))
-        , shoulder_a( rnd(.04, range, amp) )
-        , body_shld_joint_dist_xz( rnd(.028, range, amp) )
-        , shld_legs_joint_dist_z ( rnd(.016, range, amp) )
-        , knee_y_offset( rnd(.034, range, amp) )
+        , foot( 3
+              , 0. //rndg(0.015, range, r, g) // length
+              , rndg(0.015, range, r, g)
+              )
+        , dbl_bearing( rndg(.030, range, r, g))
+        , shoulder_a( rndg(.04, range, r, g) )
+        , body_shld_joint_dist_xz( rndg(.028, range, r, g) )
+        , shld_legs_joint_dist_z ( rndg(.016, range, r, g) )
+        , knee_y_offset( rndg(.034, range, r, g) )
         , zheight_start( leg_upper.z + leg_lower.len + leg_lower.rad - 0.25*body.z)
-        , ground_contact_friction( rnd(constants::friction::sticky, range, amp) )
-        , weight_kg({rnd(1.000, range, amp) // body TODO specify
-                   , rnd(0.030, range, amp) // shoulder TODO specify
-                   , rnd(0.055, range, amp) // leg_upper TODO specify
-                   , rnd(0.100, range, amp) // leg_lower TODO specify, make the real leg weight more and the leg shorter, in order to back-drive */
-                   , rnd(0.050, range, amp) // knee TODO
-                   , rnd(0.195, range, amp) // motor, incl. screws+nuts
-                   , rnd(0.100, range, amp) // dbl_bearing with axis
+        , ground_contact_friction( rndg(constants::friction::sticky, 2*range, r, g) )
+        , weight_kg({rndg(1.000, range, r, g) // body TODO specify
+                   , rndg(0.030, range, r, g) // shoulder TODO specify
+                   , rndg(0.055, range, r, g) // leg_upper TODO specify
+                   , rndg(0.100, range, r, g) // leg_lower TODO specify, make the real leg weight more and the leg shorter, in order to back-drive */
+                   , rndg(0.050, range, r, g) // knee TODO
+                   , rndg(0.010, range, r, g) // TODO specify
+                   , rndg(0.195, range, r, g) // motor, incl. screws+nuts
+                   , rndg(0.100, range, r, g) // dbl_bearing with axis
                    })
-        , torque( rnd(5.0, range, amp) )
-        , color_body ( rnd(.5, 1.0, amp), rnd(.5, 1.0, amp), rnd(.5, 1.0, amp), 1.0 )
-        , color_dark ( rnd(.3, .50, amp), rnd(.3, .50, amp), rnd(.3, .50, amp), 1.0 )
-        , color_light( rnd(.9, .10, amp), rnd(.9, .10, amp), rnd(.9, .10, amp), 1.0 )
+        , torque( rndg(5.0, range, r, g) )
+        , color_body ( rnd(.5, 1.0, r), rnd(.5, 1.0, r), rnd(.5, 1.0, r), 1.0 )
+        , color_dark ( rnd(.3, .50, r), rnd(.3, .50, r), rnd(.3, .50, r), 1.0 )
+        , color_light( rnd(.9, .10, r), rnd(.9, .10, r), rnd(.9, .10, r), 1.0 )
         {
             dsPrint("Model Parameters:\n"
                     "\tBody       : m=%1.4f l=(%1.4f %1.4f %1.4f)\n"
@@ -159,19 +169,22 @@ void create_leg(Robot& robot, HannahMorphology const& m, Vector3 pos, std::strin
     /* leg lower */ robot.create_segment(name + "ll", pos_leg_lower, m.leg_lower , m.weight_kg.leg_lower, 0, m.color_dark , true, m.ground_contact_friction);
 
     /* attach motors */
-    robot.attach_box(name+"lu", pos_leg_upper + Vector3{-sign*mot.offset,.0,+.04/**TODO*/}, motor_face_side, m.weight_kg.motor, 0, colors::black_t, false);
-    robot.attach_box(name+"lu", pos_leg_upper + Vector3{-sign*mot.offset,.0,-.04/**TODO*/}, motor_face_side, m.weight_kg.motor, 0, colors::black_t, false);
+    robot.attach_box(name+"lu", Vector3{-sign*mot.offset,.0,+.04/**TODO*/}, motor_face_side, m.weight_kg.motor, 0, colors::black_t, false);
+    robot.attach_box(name+"lu", Vector3{-sign*mot.offset,.0,-.04/**TODO*/}, motor_face_side, m.weight_kg.motor, 0, colors::black_t, false);
 
-    const Vector3 upper_bearing_pos = pos_leg_upper + Vector3{.0, .0, +.5*m.leg_upper.z - m.shld_legs_joint_dist_z};
-    const Vector3 lower_bearing_pos = pos_leg_upper + Vector3{.0, -.25*m.leg_upper.y + .5*m.leg_lower.rad, -.5*m.leg_upper.z + m.knee_y_offset -m.leg_lower.rad };
+    const Vector3 upper_bearing_pos = Vector3{.0, .0, +.5*m.leg_upper.z - m.shld_legs_joint_dist_z};
+    const Vector3 lower_bearing_pos = Vector3{.0, -.25*m.leg_upper.y + .5*m.leg_lower.rad, -.5*m.leg_upper.z + m.knee_y_offset -m.leg_lower.rad };
 
     /* attach bearings */
     robot.attach_box(name+"lu", upper_bearing_pos, m.dbl_bearing, m.weight_kg.dbl_bearing, 0, colors::cyan_t, false);
     robot.attach_box(name+"lu", lower_bearing_pos, m.dbl_bearing, m.weight_kg.dbl_bearing, 0, colors::cyan_t, false);
 
-    const Vector3 knee_pos = pos_leg_lower + Vector3{ .0, -.01, .5*m.leg_lower.len + 0.02};
+    const Vector3 knee_pos = Vector3{ .0, -.01, .5*m.leg_lower.len + 0.02};
     /* attach knee */
     robot.attach_box(name+"ll", knee_pos, m.knee, m.weight_kg.knee, 0, colors::magenta_t, false);
+
+    /* attach foot */
+    robot.attach_segment(name+"ll", -Vector3{ .0, .0, .5*m.leg_lower.len}, m.foot, m.weight_kg.foot, 0, colors::yellow_t, true, m.ground_contact_friction);
 }
 
 void
@@ -179,11 +192,13 @@ create_hannah_detail_random(Robot& robot, std::vector<double> model_parameter)
 {
     unsigned rnd_instance = 0;
     double   rnd_amp = .0;
+    double   growth = 1.0;
 
-    if (model_parameter.size() == 2) {
+    if (model_parameter.size() == 3) {
         rnd_instance = static_cast<unsigned>(model_parameter[0]);
         rnd_amp      = model_parameter[1];
-        dsPrint("Using model parameters instance %u and random amplitude %lf", rnd_instance, rnd_amp);
+        growth       = model_parameter[2];
+        dsPrint("Using model instance %u and random amp %lf and growth %lf", rnd_instance, rnd_amp, growth);
     }
     else if (model_parameter.size() == 0)
         dsPrint("No model parameters provided, taking defaults.");
@@ -193,7 +208,7 @@ create_hannah_detail_random(Robot& robot, std::vector<double> model_parameter)
     if (rnd_instance != 0)
         srand(rnd_instance);
 
-    HannahMorphology m(rnd_amp);
+    HannahMorphology m(rnd_amp, growth);
     ActuatorParameters params = Sensorimotor;
     params.randomize(range, rnd_amp);
 
@@ -235,17 +250,17 @@ create_hannah_detail_random(Robot& robot, std::vector<double> model_parameter)
     robot.create_box("body", body_pos, m.body, m.weight_kg.body, 0, m.color_body, true, constants::friction::hi); // body
 
     /* attach motors */
-    const Vector3 pos_motor = body_pos + /**TODO*/Vector3{-.125*m.body.x, -.5*m.body.y + mot.offset, .0};
+    const Vector3 pos_motor = /**TODO*/Vector3{-.125*m.body.x, -.5*m.body.y + mot.offset, .0};
     robot.attach_box("body", pos_motor          , motor_face_front, m.weight_kg.motor, 0, colors::black_t, false);
     robot.attach_box("body", pos_motor._x()     , motor_face_front, m.weight_kg.motor, 0, colors::black_t, false);
     robot.attach_box("body", pos_motor     ._y(), motor_face_front, m.weight_kg.motor, 0, colors::black_t, false);
     robot.attach_box("body", pos_motor._x()._y(), motor_face_front, m.weight_kg.motor, 0, colors::black_t, false);
 
     /* attach bearings */
-    const Vector3 bearing_pos = body_pos + /**TODO*/Vector3{ .5*m.body.x - m.body_shld_joint_dist_xz
-                                                           ,-.5*m.body.y /*- 1.5*m.shoulder_a*/
-                                                           , .5*m.body.z - m.body_shld_joint_dist_xz
-                                                           };
+    const Vector3 bearing_pos = /**TODO*/Vector3{ .5*m.body.x - m.body_shld_joint_dist_xz
+                                                ,-.5*m.body.y /*- 1.5*m.shoulder_a*/
+                                                , .5*m.body.z - m.body_shld_joint_dist_xz
+                                                };
 
     robot.attach_box("body", bearing_pos          , m.dbl_bearing, m.weight_kg.dbl_bearing, 0, colors::cyan_t, false);
     robot.attach_box("body", bearing_pos._x()     , m.dbl_bearing, m.weight_kg.dbl_bearing, 0, colors::cyan_t, false);
@@ -275,25 +290,25 @@ create_hannah_detail_random(Robot& robot, std::vector<double> model_parameter)
     /*fore legs*/
     /*0*/ robot.connect_joint("body", "rfsh", 0.0, 'Y', -90,  +90, + 1 + rnd(X), JointType::normal   , "R_shoulder_roll" , ""                , m.torque, params);
     /*1*/ robot.connect_joint("body", "lfsh", 0.0, 'y', -90,  +90, + 1 + rnd(X), JointType::symmetric, "L_shoulder_roll" , "R_shoulder_roll" , m.torque, params);
-    /*2*/ robot.connect_joint("rfsh", "rflu", jpu, 'x', -90,  +90, -15 + rnd(X), JointType::normal   , "R_shoulder_pitch", ""                , m.torque, params);
-    /*3*/ robot.connect_joint("lfsh", "lflu", jpu, 'x', -90,  +90, -15 + rnd(X), JointType::symmetric, "L_shoulder_pitch", "R_shoulder_pitch", m.torque, params);
-    /*4*/ robot.connect_joint("rflu", "rfll", jpl, 'x',   0, +180, +30 + rnd(X), JointType::normal   , "R_elbow_pitch"   , ""                , m.torque, params);
-    /*5*/ robot.connect_joint("lflu", "lfll", jpl, 'x',   0, +180, +30 + rnd(X), JointType::symmetric, "L_elbow_pitch"   , "R_elbow_pitch"   , m.torque, params);
+    /*2*/ robot.connect_joint("rfsh", "rflu", jpu, 'x', -90,  +90, -25 + rnd(X), JointType::normal   , "R_shoulder_pitch", ""                , m.torque, params);
+    /*3*/ robot.connect_joint("lfsh", "lflu", jpu, 'x', -90,  +90, -25 + rnd(X), JointType::symmetric, "L_shoulder_pitch", "R_shoulder_pitch", m.torque, params);
+    /*4*/ robot.connect_joint("rflu", "rfll", jpl, 'x',   0, +180, +40 + rnd(X), JointType::normal   , "R_elbow_pitch"   , ""                , m.torque, params);
+    /*5*/ robot.connect_joint("lflu", "lfll", jpl, 'x',   0, +180, +40 + rnd(X), JointType::symmetric, "L_elbow_pitch"   , "R_elbow_pitch"   , m.torque, params);
 
     /*rear legs*/
     /*6*/ robot.connect_joint("body", "rhsh", 0.0, 'Y', -90,  +90, + 1 + rnd(X), JointType::normal   , "R_hip_roll"      , ""                , m.torque, params);
     /*7*/ robot.connect_joint("body", "lhsh", 0.0, 'y', -90,  +90, + 1 + rnd(X), JointType::symmetric, "L_hip_roll"      , "R_hip_roll"      , m.torque, params);
-    /*8*/ robot.connect_joint("rhsh", "rhlu", jpu, 'x', -90,  +90, -20 + rnd(X), JointType::normal   , "R_hip_pitch"     , ""                , m.torque, params);
-    /*9*/ robot.connect_joint("lhsh", "lhlu", jpu, 'x', -90,  +90, -20 + rnd(X), JointType::symmetric, "L_hip_pitch"     , "R_hip_pitch"     , m.torque, params);
-    /*A*/ robot.connect_joint("rhlu", "rhll", jpl, 'x',   0, +180, +25 + rnd(X), JointType::normal   , "R_knee_pitch"    , ""                , m.torque, params);
-    /*B*/ robot.connect_joint("lhlu", "lhll", jpl, 'x',   0, +180, +25 + rnd(X), JointType::symmetric, "L_knee_pitch"    , "R_knee_pitch"    , m.torque, params);
+    /*8*/ robot.connect_joint("rhsh", "rhlu", jpu, 'x', -90,  +90, -40 + rnd(X), JointType::normal   , "R_hip_pitch"     , ""                , m.torque, params);
+    /*9*/ robot.connect_joint("lhsh", "lhlu", jpu, 'x', -90,  +90, -40 + rnd(X), JointType::symmetric, "L_hip_pitch"     , "R_hip_pitch"     , m.torque, params);
+    /*A*/ robot.connect_joint("rhlu", "rhll", jpl, 'x',   0, +180, +40 + rnd(X), JointType::normal   , "R_knee_pitch"    , ""                , m.torque, params);
+    /*B*/ robot.connect_joint("lhlu", "lhll", jpl, 'x',   0, +180, +40 + rnd(X), JointType::symmetric, "L_knee_pitch"    , "R_knee_pitch"    , m.torque, params);
 
     /* attach sensors */
     robot.attach_accel_sensor("body", /* keep original color = */true);
 
     /* camera */
     robot.set_camera_center_on("body");
-    robot.setup_camera(Vector3(1.5, -0.5, 0.7), 140, -10, 0);
+    robot.setup_camera(Vector3(1.5, -0.5, 0.7), 155, -5, 0);
 }
 
 

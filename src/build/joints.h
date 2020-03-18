@@ -55,7 +55,7 @@ public:
     , is_sticking(false)
     , z(.0)
     , conf(conf)
-    , dpdt(.0, global_conf.step_length, /*scale=*/constants::avr_adc_10bit::v_scale)
+    , dpdt(.0, global_conf.step_length, /*scale=*/1.0/constants::motor_parameter::vel_scale)
     {
         if (name == "") {
             name = "joint_" + std::to_string(joint_id);
@@ -116,7 +116,6 @@ public:
         //dsPrint("Destroying joint number %2u...", joint_id);
         dJointDestroy(hinge);
         dJointDestroy(motor);
-        //dsPrint("done.\n");
     }
 
     void read_sensors(bool low_quality)
@@ -136,10 +135,10 @@ public:
     double get_low_resolution_velocity(void) const { return vel; }
 
     /* get */
-    double get_position_norm()  const { return common::rad2norm(dJointGetHingeAngle    (hinge)); } // +/-pi   --> +/-1
-    double get_velocity_norm()  const { return common::vel2norm(dJointGetHingeAngleRate(hinge)); } // +/-2rps --> +/-1
+    double get_position_norm() const { return common::rad2norm(dJointGetHingeAngle    (hinge)); } // +/-pi   --> +/-1
+    double get_velocity_norm() const { return common::vel2norm(dJointGetHingeAngleRate(hinge)); } // +/-2rps --> +/-1
 
-    double get_motor_angle()    const { return dJointGetAMotorAngle(motor, 0); }
+    double get_motor_angle()   const { return dJointGetAMotorAngle(motor, 0); }
 
     /* set */
     void set_voltage(const double value) {

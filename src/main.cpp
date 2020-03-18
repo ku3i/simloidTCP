@@ -156,19 +156,21 @@ print_time_statistics(void)
     if (global_conf.draw_scene && !global_conf.disable_graphics)
     {
         const float pos[2] = {-0.98, 0.94};
+        auto const& rp = -robot.bodies[0].get_position().y;
 
-
-        drawText(pos[0], pos[1], "time: %.2lf  sim vel: %.2lfx %s   fps: %.2lf%s  walking speed: %.2lf m/s"
-                               , simtime, vel, (global_conf.real_time?"[real]":"      ")
-                               , global_conf.fps, global_conf.use_fps_control? " ":"!", bvel);
+        glprintf( pos[0], pos[1], 0, 0.02
+                , "time: %5.2lf  sim: %.2lfx %s  fps: %.2lf%s  walking: v=%.2lf m/s  d=%5.2f m"
+                , simtime, vel, (global_conf.real_time?"[real]":"      ")
+                , global_conf.fps, global_conf.use_fps_control? " ":"!", bvel, rp);
 
         if (global_conf.show_cam_position)
         {
             float vpos[3], vdir[3];
             camera.get_viewpoint(vpos, vdir);
 
-            drawText(pos[0], pos[1]-0.05, "cam: (%.2f, %.2f, %.2f : %.1f, %.1f, %.1f)"
-                                        , vpos[0], vpos[1], vpos[2], vdir[0], vdir[1], vdir[2]);
+            glprintf( pos[0], pos[1]-0.05, 0, /*size=*/0.02
+                    , "cam: (%.2f, %.2f, %.2f : %.1f, %.1f, %.1f)"
+                    , vpos[0], vpos[1], vpos[2], vdir[0], vdir[1], vdir[2] );
         }
     }
 }

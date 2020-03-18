@@ -35,7 +35,7 @@ namespace common {
         const float rmax = (1 + a*s) * m;
 
         assert(rmin >= 0. and rmax <= 2*m);
-        return common::getRandomDouble(rmin, rmax);
+        return common::getRandomDouble(rmin, rmax); // consider to use non-uniform distribution, box muller here
 
     }
 
@@ -47,6 +47,13 @@ namespace common {
      * m - Mittelpunkt, s - Varianz
      */
     double box_muller(const double m, const double s, const double min, const double max);
+
+    inline double grow(double m, double a) {
+        assert(0.0 < a and a <= 1.0);
+        return m*a;
+    }
+
+    inline double rndg(double m, double s, double r, double g) { return rnd( grow(m, g), s, r); }
 
     inline double dist3D(const double* v1, const double* v2);
     inline double dist2D(const double* v1, const double* v2);
