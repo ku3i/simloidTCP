@@ -55,8 +55,8 @@ namespace common {
 
     inline double rndg(double m, double s, double r, double g) { return rnd( grow(m, g), s, r); }
 
-    inline double dist3D(const double* v1, const double* v2);
-    inline double dist2D(const double* v1, const double* v2);
+    template <typename T> inline T dist3D(const T* v1, const T* v2);
+    template <typename T> inline T dist2D(const T* v1, const T* v2);
 
     inline double low_resolution_sensor(double value);
     inline double avr_10bit_adc(double value);
@@ -102,7 +102,8 @@ inline double common::getRandomDouble()
 }
 
 /* distance of two 3D points */
-inline double common::dist3D(const double* v1, const double* v2)
+template <typename T>
+inline T common::dist3D(const T* v1, const T* v2)
 {
     return sqrt( (v1[0]-v2[0])*(v1[0]-v2[0]) +
                  (v1[1]-v2[1])*(v1[1]-v2[1]) +
@@ -110,7 +111,8 @@ inline double common::dist3D(const double* v1, const double* v2)
 }
 
 /* distance of two 2D points */
-inline double common::dist2D(const double* v1, const double* v2)
+template <typename T>
+inline T common::dist2D(const T* v1, const T* v2)
 {
     return sqrt( (v1[0]-v2[0])*(v1[0]-v2[0]) +
                  (v1[1]-v2[1])*(v1[1]-v2[1]));

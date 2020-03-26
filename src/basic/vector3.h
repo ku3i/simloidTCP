@@ -8,8 +8,6 @@ class Vector3
 public:
 
     Vector3(const Vector3& rhs) : x(rhs.x), y(rhs.y), z(rhs.z) {}
-    Vector3(      Vector3& rhs) : x(rhs.x), y(rhs.y), z(rhs.z) {}
-
     Vector3(void) : x(.0), y(.0), z(.0) {}
     Vector3(double x, double y, double z) : x(x), y(y), z(z) {}
     Vector3(double val) : x(val), y(val), z(val) {}
@@ -22,12 +20,6 @@ public:
         return *this;
     }
 
-    Vector3& operator=(Vector3& rhs) {
-        this->x = rhs.x;
-        this->y = rhs.y;
-        this->z = rhs.z;
-        return *this;
-    }
     Vector3& operator=(const double& rhs) {
         this->x = rhs;
         this->y = rhs;
@@ -124,30 +116,16 @@ public:
     double x, y, z;
 };
 
-inline Vector3 operator+(Vector3 lhs, const Vector3& rhs) {
-    lhs += rhs;
-    return lhs;
-}
-inline Vector3 operator-(Vector3 lhs, const Vector3& rhs) {
-    lhs -= rhs;
-    return lhs;
-}
-inline Vector3 operator*(Vector3 lhs, const double& rhs)  {
-    lhs *= rhs;
-    return lhs;
-}
-inline Vector3 operator*(const double& lhs, Vector3 rhs)  {
-    rhs *= lhs;
-    return rhs;
-}
+inline Vector3 operator+(Vector3 lhs, Vector3 const& rhs) { lhs += rhs; return lhs; }
+inline Vector3 operator-(Vector3 lhs, Vector3 const& rhs) { lhs -= rhs; return lhs; }
+inline Vector3 operator*(Vector3 lhs, double  const& rhs) { lhs *= rhs; return lhs; }
+inline Vector3 operator*(double const& lhs,  Vector3 rhs) { rhs *= lhs; return rhs; }
+inline Vector3 operator/(Vector3 lhs,  const double& rhs) { lhs /= rhs; return lhs; }
+
 inline double operator*(const Vector3& lhs, const Vector3& rhs) { //scalar multiplication
     return lhs.x * rhs.x
          + lhs.y * rhs.y
          + lhs.z * rhs.z;
-}
-inline Vector3 operator/(Vector3 lhs, const double& rhs)  {
-    lhs /= rhs;
-    return lhs;
 }
 inline double distance(const Vector3& lhs, const Vector3& rhs) {
     return sqrt((lhs.x - rhs.x) * (lhs.x - rhs.x)
