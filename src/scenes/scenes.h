@@ -16,6 +16,7 @@ namespace Scenes
     void create_hills       (Landscape& landscape);
     void create_stairways   (Obstacle&  obstacles);
     void create_plates      (Obstacle&  obstacles);
+    void create_random      (Obstacle&  obstacles);
 }
 
 #endif // SCENES_H_INCLUDED

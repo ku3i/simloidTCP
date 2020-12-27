@@ -151,9 +151,9 @@ public:
     void set_camera_center_on(std::string const& name_body);
     void set_camera_center_obj(unsigned int id) { if (id < number_of_bodies()) cam_center_obj = id; }
 
-    dBodyID get_camera_center_obj(void)         const { return bodies[cam_center_obj].body; };
+    dBodyID const& get_camera_center_obj(void) const { return bodies[cam_center_obj].body; };
     unsigned int get_camera_center_obj_id(void) const { return cam_center_obj; }
-    Camera_Setup get_camera_setup(void)         const { return cam_setup; }
+    Camera_Setup const& get_camera_setup(void) const { return cam_setup; }
 
     void setup_camera(Vector3 pos, double height, double pitch, double roll);
 

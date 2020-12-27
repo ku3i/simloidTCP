@@ -108,7 +108,7 @@ bool TCPController::control(const double time)
         reset();
         recordSnapshot(robot, obstacles, &s1_init);
         recordSnapshot(robot, obstacles, &s2_user);
-        camera.set_viewpoint(robot.get_camera_center_obj(), robot.get_camera_setup());
+        //camera.set_viewpoint(robot.get_camera_center_obj(), robot.get_camera_setup());
         send_robot_configuration();
         //wait_for_ack();
     }
@@ -145,6 +145,13 @@ void TCPController::send_ordered_info(const double time)
     for (std::size_t i = 0; i < robot.number_of_joints(); ++i)
     {
         snprintf(tmp, buffer_size, "%lf ", robot.joints[i].get_low_resolution_velocity());
+        message.append(tmp);
+    }
+
+    /* motor current */
+    for (std::size_t i = 0; i < robot.number_of_joints(); ++i)
+    {
+        snprintf(tmp, buffer_size, "%lf ", robot.joints[i].get_current());//TODO: low_resolution 10bit
         message.append(tmp);
     }
 

@@ -16,7 +16,6 @@ struct Camera_Setup
     double heading;
     double pitch;
     double roll;
-    bool init = false;
 };
 
 class Camera
@@ -30,11 +29,11 @@ public:
     , rotation_velocity(constants::camera_parameters::rotation_velocity)
     {}
 
-    void update(dBodyID camera_center_obj);
-    void toggle_follow(dBodyID camera_center_obj);
+    void update(dBodyID const& camera_center_obj);
+    void toggle_follow(dBodyID const& camera_center_obj);
     void toggle_rotate(void);
 
-    void set_viewpoint(dBodyID camera_center_obj, Camera_Setup cam_setup);
+    void set_viewpoint(dBodyID const& camera_center_obj, Camera_Setup const& cam_setup);
     void get_viewpoint(float xyz[3], float hpr[3]);
 
     /* moving */
@@ -52,8 +51,8 @@ public:
 private:
 
     void set_fixed_position(void);
-    void do_follow(dBodyID camera_center_obj);
-    void do_rotate(dBodyID camera_center_obj);
+    void do_follow(dBodyID const& camera_center_obj);
+    void do_rotate(dBodyID const& camera_center_obj);
 
     const double* center_position;
     double current_rotation_center[3];

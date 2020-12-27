@@ -1,6 +1,6 @@
 #include <misc/camera.h>
 
-void Camera::update(dBodyID camera_center_obj)
+void Camera::update(dBodyID const& camera_center_obj)
 {
     dsGetViewpoint(vpos, vdir);
 
@@ -11,7 +11,7 @@ void Camera::update(dBodyID camera_center_obj)
     dsSetViewpoint(vpos, vdir);
 }
 
-void Camera::do_follow(dBodyID camera_center_obj)
+void Camera::do_follow(dBodyID const& camera_center_obj)
 {
     const double* center = (const double *) dBodyGetPosition(camera_center_obj);
 
@@ -49,7 +49,7 @@ void Camera::set_fixed_position (void)
     vpos[1] = (1.0 - eta_t) * vpos[1] + eta_t * fixed_position[1];
 }
 
-void Camera::do_rotate(dBodyID camera_center_obj)
+void Camera::do_rotate(dBodyID const& camera_center_obj)
 {
     double phi;
 
@@ -71,7 +71,7 @@ void Camera::do_rotate(dBodyID camera_center_obj)
     vdir[1] = 0.9 * vdir[1] + 0.1 * (-180.0 * atan2(vpos[2] - current_rotation_center[2] + 0.05, rotation_distance) / constants::m_pi);
 }
 
-void Camera::set_viewpoint(dBodyID camera_center_obj, Camera_Setup cam_setup)
+void Camera::set_viewpoint(dBodyID const& camera_center_obj, Camera_Setup const& cam_setup)
 {
     float xyz[3];
     xyz[0] = cam_setup.pos.x;
@@ -193,7 +193,7 @@ void Camera::toggle_rotate(void)
     }
 }
 
-void Camera::toggle_follow(dBodyID camera_center_obj)
+void Camera::toggle_follow(dBodyID const& camera_center_obj)
 {
     follow = !follow;
     if (follow) {

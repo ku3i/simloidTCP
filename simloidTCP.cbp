@@ -15,7 +15,7 @@
 					<Add option="-O2" />
 					<Add option="-Wextra" />
 					<Add option="-Wall" />
-					<Add option="-std=c++11" />
+					<Add option="-std=c++1z" />
 					<Add directory="src" />
 				</Compiler>
 				<Linker>
@@ -23,11 +23,6 @@
 				</Linker>
 			</Target>
 		</Build>
-		<Compiler>
-			<Add option="-Wextra" />
-			<Add option="-Wall" />
-			<Add option="-std=c++14" />
-		</Compiler>
 		<Linker>
 			<Add option="-lpthread" />
 			<Add library="GL" />

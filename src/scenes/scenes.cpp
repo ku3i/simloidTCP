@@ -111,3 +111,29 @@ Scenes::create_plates(Obstacle& obstacles)
     obstacles.create_box("seesaw", {.0, -3.500, 0.20}, {1.50, 1.50, 0.01}, .0, constants::materials::normal, colors::white , 10.0);
 
 }
+
+void
+Scenes::create_random(Obstacle& obstacles)
+{
+    dsPrint("Ground with random obstacles.\n");
+
+    const int maxj = 25;
+    for (int j = 0; j < maxj; ++j)
+    {
+        Vector3 pos, len;
+        Color4 color;
+        double friction = common::getRandomDouble(constants::friction::hi, constants::friction::sticky);
+
+        len.x = common::getRandomDouble(0.100, 0.100 + 0.025*(j+1));
+        len.y = common::getRandomDouble(0.100, 0.100 + 0.025*(j+1));
+        len.z = common::getRandomDouble(0.001, 0.001 + 0.001*(j+1));
+
+        pos.x = common::getRandomDouble(-len.x/2-0.25, +len.x/2+0.25);
+        pos.y =  -1.0 + (j * -.5) + common::getRandomDouble(-len.y/2, +len.y/2);
+        pos.z = common::getRandomDouble( 0.01, 1.00) + 0.5 * len.z;
+
+        color = common::getRandomDouble(0.3, 0.7);
+
+        obstacles.create_box("stone"+std::to_string(j), pos, len, .0, constants::materials::rock, color, friction);
+    }
+}

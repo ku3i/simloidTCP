@@ -9,9 +9,12 @@ namespace Robots {
 namespace Standard {
 
 const Vector3 size_lever(.02, .015, .52);
+const double weight_lever_kg = .133;
 
 const double zheight_start  = 0.0;
 const double joint_distance = 0.005;
+
+
 
 const ActuatorParameters Sensorimotor {{/* bristle_displ_max = */ +8.71005098e-03, //+1.00000000e-03,
                                       /* bristle_stiffness = */ +9.93740632e-01, //+1.00348110e+00,
@@ -44,7 +47,7 @@ create_pendulum(Robot& robot, bool with_accel_sensor = true)
     pos.y = -0.5*size_lever.y - joint_distance;
     pos.z = 0.9*size_base.z - 0.5 * size_lever.z + zheight_start;
 
-    robot.create_box("lever", pos, size_lever, .133, /* Density Beech = 720*/ 0., colors::black, false, constants::friction::lo);
+    robot.create_box("lever", pos, size_lever, weight_lever_kg, /* Density Beech = 720*/ 0., colors::black, false, constants::friction::lo);
 
     /* connect joints */
     robot.connect_joint("base" , "lever", .0, .0, +0.5*size_lever.z - 0.03, 'y', -180, +180, 0, JointType::normal, "joint0", "", 5, Sensorimotor);

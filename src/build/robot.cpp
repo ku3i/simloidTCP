@@ -166,8 +166,6 @@ void Robot::set_camera_center_on_prev_obj(void)
  */
 void Robot::setup_camera(Vector3 pos, double heading, double pitch, double roll)
 {
-    if (cam_setup.init) return;
-    cam_setup.init    = true; // avoid setting up camera twice, letting user defined cam position untouched.
     cam_setup.pos     = pos;
     cam_setup.heading = heading;
     cam_setup.pitch   = pitch;

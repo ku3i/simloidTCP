@@ -7,8 +7,10 @@
 #define dsDrawCappedCylinder dsDrawCappedCylinderD
 
 namespace constants {
-    const double m_pi = 3.141592653589793238512808959406186204433;
-    const double h_pi = 1.570796326794896619256404479703093102216; // halved pi
+    constexpr double m_pi = 3.141592653589793238512808959406186204433;
+    constexpr double h_pi = 1.570796326794896619256404479703093102216; // halved pi
+
+    constexpr double t_pi = 2*m_pi;
 
     const double gravity = 9.81;
     const double range_accelsensor = 8.0; // 8G, e.g. MMA7455L
@@ -56,8 +58,8 @@ namespace constants {
 
     namespace avr_adc_10bit
     {
-        const double std_dev = 1.0/4096.0;
-        const double max_val = 4.0/4096.0;
+        const double std_dev = 1.0/8192.0;
+        const double max_val = 1.0/4096.0;
         const double min_val = -max_val;
     }
 
@@ -74,8 +76,8 @@ namespace constants {
     /* motor model */
     namespace motor_parameter
     {
-        const double kM = 1.393;         // torque constant
-        const double kB = 2.563;         // speed constant
+        const double kM = 1.393;         // torque constant [Nm/A]
+        const double kB = 2.563;         // speed constant (inverted) [Vs/revolution] not [Vs/rad]
         const double R_i_inv = 1.0/9.59; // coil resistance (inverted)
         const double V_in = 16.0;        // input voltage of the motor
 

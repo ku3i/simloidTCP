@@ -130,6 +130,8 @@ static void command(int cmd, bool /*shift*/)
         case 'f': camera.toggle_follow(robot.get_camera_center_obj());            break;
         case '+': robot.set_camera_center_on_next_obj();                          break;
         case '-': robot.set_camera_center_on_prev_obj();                          break;
+        case 'u': camera.set_viewpoint( robot.get_camera_center_obj()
+                                      , robot.get_camera_setup() );               break;
 
         /* reset */
         case '2': reset_simulator();                                              break;

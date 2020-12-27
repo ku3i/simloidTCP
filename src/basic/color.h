@@ -60,6 +60,7 @@ namespace colors
     const Color4    cyan_l {.75, 1.0, 1.0, 1.0};
     const Color4  yellow_l {1.0, 1.0, .75, 1.0};
     const Color4 magenta_l {1.0, .75, 1.0, 1.0};
+    const Color4   green_l {.25, 1.0, .25, 1.0};
 
 }
 
