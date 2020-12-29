@@ -81,7 +81,6 @@
 		<Unit filename="src/main.cpp" />
 		<Unit filename="src/misc/camera.cpp" />
 		<Unit filename="src/misc/camera.h" />
-		<Unit filename="src/robots/biped.h" />
 		<Unit filename="src/robots/crawler.h" />
 		<Unit filename="src/robots/fourlegged.h" />
 		<Unit filename="src/robots/gretchen.h" />
