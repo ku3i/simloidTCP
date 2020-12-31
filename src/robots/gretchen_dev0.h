@@ -160,10 +160,14 @@ create_grt_dev0_rnd(Robot& robot, std::vector<double> model_parameter)
 {
     unsigned rnd_instance = 0;
     double   rnd_amp = .0;
+    //double   growth = 1.0;
+    //double   friction = 1.0;
 
-    if (model_parameter.size() == 2) {
+    if (model_parameter.size() == 4) {
         rnd_instance = static_cast<unsigned>(model_parameter[0]);
         rnd_amp      = model_parameter[1];
+        //growth       = model_parameter[2];
+        //friction     = model_parameter[3];
         dsPrint("Using model parameters instance %u and random amplitude %lf", rnd_instance, rnd_amp);
     }
     else if (model_parameter.size() == 0)

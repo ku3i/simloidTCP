@@ -97,7 +97,7 @@ create_random_hannah(Robot& robot, std::vector<double> model_parameter)
     unsigned rnd_instance = 0;
     double   rnd_amp = .0;
 
-    if (model_parameter.size() == 2) {
+    if (model_parameter.size() == 4) { //NOTE: 2 parameters are UNUSED!
         rnd_instance = static_cast<unsigned>(model_parameter[0]);
         rnd_amp      = model_parameter[1];
         dsPrint("Using model parameters instance %u and random amplitude %lf", rnd_instance, rnd_amp);
