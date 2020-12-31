@@ -59,7 +59,7 @@ namespace common {
     template <typename T> inline T dist2D(const T* v1, const T* v2);
 
     inline double low_resolution_sensor(double value);
-    inline double avr_10bit_adc(double value);
+    inline double sensorimotor_poti_adc(double value);
 
     inline short  double2short(double value);
     inline double short2double(short  value);
@@ -139,17 +139,20 @@ inline double common::short2double(short value) {
     return static_cast<double>(value / 32768.0);
 }
 
-inline double common::avr_10bit_adc(double value)
+/* This is used for the approx. modeling of 200 deg (first) sensorimotors' potentiometers/ADC.
+   Thus, the AVR-ADC with 10bit (1024 values) resolution only covers approx. half the circle.
+   Hence ,the actual resolution w.r.t. the full circle is ~11 bit. */
+inline double common::sensorimotor_poti_adc(double value)
 {
     /* add Gaussian noise to ADC model */
     double gaussian_noise = box_muller(0.0,
-                                       constants::avr_adc_10bit::std_dev,
-                                       constants::avr_adc_10bit::min_val,
-                                       constants::avr_adc_10bit::max_val);
+                                       constants::sensorimotor_poti_adc::std_dev,
+                                       constants::sensorimotor_poti_adc::min_val,
+                                       constants::sensorimotor_poti_adc::max_val);
     /* lower to 10 bit resolution */
-    value = clip(value + gaussian_noise, -1.0, 511.0/512.0);
-    value = static_cast<short>(512 * value);
-    return value / 512.0;
+    value = clip(value + gaussian_noise, -1.0, 1023.0/1024.0);
+    value = std::round(1024 * value);
+    return value / 1024.0;
 }
 
 #endif

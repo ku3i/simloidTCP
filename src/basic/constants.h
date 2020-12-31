@@ -56,7 +56,7 @@ namespace constants {
         const double min_val = -max_val;
     }
 
-    namespace avr_adc_10bit
+    namespace sensorimotor_poti_adc
     {
         const double std_dev = 1.0/8192.0;
         const double max_val = 1.0/4096.0;
