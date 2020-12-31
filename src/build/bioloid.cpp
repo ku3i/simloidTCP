@@ -1,7 +1,6 @@
 #include <build/bioloid.h>
 #include <scenes/scenes.h>
 #include <robots/crawler.h>
-#include <robots/biped.h>
 #include <robots/karl_sims.h>
 #include <robots/fourlegged.h>
 #include <robots/standard.h>
